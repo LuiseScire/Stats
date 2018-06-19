@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class MainController extends Controller
-{
+class MainController extends Controller{
     public function listcsvfiles(){
       $fileList = [];
       $directorio = opendir(public_path() . '/csvfiles/');
@@ -70,29 +69,53 @@ class MainController extends Controller
           break;
       }
       return response()->json($response);
-   }
+    }
 
-   public function readcsv(Request $request){
-     $linea = 0;
-      //Abrimos nuestro archivo
-      $archivo = fopen(public_path() . '/csvfiles/' . $request->filename, "r");
-      //Lo recorremos
-      while (($datos = fgetcsv($archivo, ",")) == true)
-      {
-        $num = count($datos);
-        $linea++;
-        //Recorremos las columnas de esa linea
-        for ($columna = 0; $columna > $num; $columna++)
-            {
-               echo $datos[$columna] . "\n";
-           }
+    //Estadísticas
+    /*public function estadisticas(Request $request){
+      return view('estadisticas', ['filename' => $request->filename]);
+    }*/
+
+    public function readcsv(Request $request){
+      $response = array(
+        'filename' => $request->filename
+      );
+      return response()->json($response);
+    }
+
+    public function createchartimage(Request $request){
+      $image = $request->image;
+      $tipoExport = $request->tipoExport;
+
+      switch ($tipoExport) {
+        case ($tipoExport == 'jpg') || ($tipoExport == 'png'):
+          $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
+          $filename = $this->codigoaleatorio() . "." . $tipoExport;
+          $filepath = public_path() . "/chartimages/" . $filename;
+
+          if(file_put_contents($filepath,$data));
+          break;
+        case "pdf";
+
+        default:
+          // code...
+          break;
       }
-      //Cerramos el archivo
-      fclose($archivo);
-      //return response()->json($response);
-     //return view('estadisticas', ['filename' => $request->filename]);
-   }
 
+      $response = array(
+        'status' => 'success',
+        'fileName' => $filename
+      );
 
+      return response()->json($response);
+    }
+
+    private function codigoaleatorio() {
+     $key = '';
+     $pattern = '1234567890abcdefghijklmnopqrstuvwxyz';
+     $max = strlen($pattern)-1;
+     for($i=0;$i < 10;$i++) $key .= $pattern{mt_rand(0,$max)};
+     return $key;
+    }
 
 }

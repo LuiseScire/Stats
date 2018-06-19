@@ -23,7 +23,17 @@ Route::get('subircsv', function () {
     return view('uploadcsv');
 });
 
-Route::get('estadisticas/{filename}', 'MainController@estadisticas');
+//Route::get('estadisticas/{filename}', 'MainController@estadisticas');
+Route::group(['prefix' => 'estadisticas'], function () {
+    Route::get('/{filename?}', function ($filename = "noData"){
+        // Matches The "/admin/users" URL
+        return view('estadisticas', array('filename' => $filename));
+    });
+
+    Route::post('readcsv','MainController@readcsv');
+    Route::post('createchartimage','MainController@createchartimage');
+});
+
 /*Route::get('estadisticas', function () {
     return view('estadisticas');
 });*/
@@ -36,9 +46,5 @@ Route::get('estadisticas/{filename}', 'MainController@estadisticas');
 /*Route::group(array('prefix' => 'estadisticas'), function() {
 
 });*/
-
-
-
 Route::post('uploadcsv','MainController@uploadcsv');
 Route::post('listcsvfiles','MainController@listcsvfiles');
-Route::post('readcsv', 'MainController@readcsv');
