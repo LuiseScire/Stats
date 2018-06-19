@@ -69,9 +69,30 @@ class MainController extends Controller
           // code...
           break;
       }
-
-
       return response()->json($response);
    }
+
+   public function readcsv(Request $request){
+     $linea = 0;
+      //Abrimos nuestro archivo
+      $archivo = fopen(public_path() . '/csvfiles/' . $request->filename, "r");
+      //Lo recorremos
+      while (($datos = fgetcsv($archivo, ",")) == true)
+      {
+        $num = count($datos);
+        $linea++;
+        //Recorremos las columnas de esa linea
+        for ($columna = 0; $columna > $num; $columna++)
+            {
+               echo $datos[$columna] . "\n";
+           }
+      }
+      //Cerramos el archivo
+      fclose($archivo);
+      //return response()->json($response);
+     //return view('estadisticas', ['filename' => $request->filename]);
+   }
+
+
 
 }

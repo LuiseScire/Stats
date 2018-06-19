@@ -1,4 +1,4 @@
-var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+//var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 var fileNameConfirmed;
 $("#csvFile").change(function() {
 	var this_ = $(this),
