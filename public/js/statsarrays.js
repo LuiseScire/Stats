@@ -30,6 +30,7 @@ var mesesTxt = {
 
 //array para almacenar el total de descargas por país
 var codigoPais = {
+  '0'  : 0,
   'AF' : 0,
   'AX' : 0,
   'AL' : 0,
@@ -304,6 +305,7 @@ var codigoPais = {
 
 //array para mostrar el nombre del país en las gráficas
 var codigoPaisTxt = {
+  '0'  : 'Indefinido',
   'AF' : 'Afganistán',
   'AX' : 'Aland',
   'AL' : 'Albania',

@@ -81,6 +81,7 @@
         <script src="{{ asset('js/bootstrap.js') }}"></script>
         <script src="{{ asset('js/metisMenu.js') }}"></script>
         <script src="{{ asset('js/main.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('js/pluggins/jquery.number.js') }}"></script>
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript">
           var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');

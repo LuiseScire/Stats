@@ -6,51 +6,65 @@ use Illuminate\Http\Request;
 
 class MainController extends Controller{
     public function listcsvfiles(){
-      $fileList = [];
+      $file_list = [];
       $directorio = opendir(public_path() . '/csvfiles/');
       while ($archivo = readdir($directorio)){
-        if (strtolower(substr($archivo, -3) == "csv")){
-          //echo $archivo . "<br />";
-          array_push($fileList, $archivo);
+        if (strtolower(substr($archivo, -3) == 'csv')){
+          //echo $archivo . '<br />';
+          array_push($file_list, $archivo);
         }
       }
       $response = array(
-        'fileList' => $fileList
+        'fileList' => $file_list
       );
       return response()->json($response);
     }
 
+    private function uploadCsvPreview(){
+
+    }
+
     public function uploadcsv(Request $request){
       $action = $request->action;
+      $delete_exist = (bool)$request->deleteExist;
+
+      $upload_preview_csv = 0;
 
       switch ($action) {
         case 'uploadPreview':
           if(!empty($_FILES['csvFile']['name'])) {
-            $csvfile = '/csvfiles/tmp/' . $_FILES['csvFile']['name'];
-            $path = public_path() . $csvfile;
-            if(move_uploaded_file($_FILES['csvFile']['tmp_name'], $path)){
-              $response = array(
-                'status'  => 'success',
-                'message' => 'Archivo Subido correctamente',
-                'path' => $path
-                //'msg'     => $request->message,
-              );
-            } else {
-              $response = array(
-                  'message' => "Error al subir archivos",
-              );
-            }
+            $final_path_file = public_path() . '/csvfiles/' . $_FILES['csvFile']['name'];
 
+            if(file_exists($final_path_file)) {
+              if($delete_exist){
+                if(unlink($final_path_file)){
+                  $upload_preview_csv = 1;
+                } else {
+                  $response = array(
+                    'status' => 'error',
+                    'message' => 'Error al reemplazar documento',
+                  );
+                }
+              } else {
+                $response = array(
+                  'status' => 'fileExist',
+                  'message' => 'El documento ya existe ¿desea reemplazarlo?',
+                );
+              }
+            } else {
+              $upload_preview_csv = 1;
+            }
           }else {
             $response = array(
-                'message' => "Error al recibir archivos",
+              'status' => 'error',
+              'message' => 'Error al recibir archivos',
             );
           }
           break;
         case 'moveFromTemp':
-          $fileName = $request->fileName;
-          $csvfile = '/csvfiles/tmp/' . $fileName;
-          $source_file = public_path() . $csvfile;
+          $file_name = $request->fileName;
+          $csv_file = '/csvfiles/tmp/' . $file_name;
+          $source_file = public_path() . $csv_file;
 
           $destination_path = public_path() . '/csvfiles/';
           if(rename($source_file, $destination_path . pathinfo($source_file, PATHINFO_BASENAME))){
@@ -60,6 +74,7 @@ class MainController extends Controller{
             );
           }else {
             $response = array(
+              'status' => 'error',
               'message' => 'Error al mover archivo'
             );
           }
@@ -68,6 +83,25 @@ class MainController extends Controller{
           // code...
           break;
       }
+
+      if($upload_preview_csv){
+        $csv_file = '/csvfiles/tmp/' . $_FILES['csvFile']['name'];
+        $path = public_path() . $csv_file;
+        if(move_uploaded_file($_FILES['csvFile']['tmp_name'], $path)){
+          $response = array(
+            'status'  => 'success',
+            'message' => 'Archivo Subido correctamente',
+            'path' => $path
+            //'msg'     => $request->message,
+          );
+        } else {
+          $response = array(
+            'status' => 'error',
+            'message' => 'Error al subir archivos',
+          );
+        }
+      }
+
       return response()->json($response);
     }
 
@@ -85,17 +119,17 @@ class MainController extends Controller{
 
     public function createchartimage(Request $request){
       $image = $request->image;
-      $tipoExport = $request->tipoExport;
+      $tipo_export = $request->tipoExport;
 
-      switch ($tipoExport) {
-        case ($tipoExport == 'jpg') || ($tipoExport == 'png'):
+      switch ($tipo_export) {
+        case ($tipo_export == 'jpg') || ($tipo_export == 'png'):
           $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
-          $filename = $this->codigoaleatorio() . "." . $tipoExport;
-          $filepath = public_path() . "/chartimages/" . $filename;
+          $file_name = $this->codigoaleatorio() . '.' . $tipo_export;
+          $file_path = public_path() . '/chartimages/' . $file_name;
 
-          if(file_put_contents($filepath,$data));
+          if(file_put_contents($file_path,$data));
           break;
-        case "pdf";
+        case 'pdf';
 
         default:
           // code...
@@ -104,7 +138,7 @@ class MainController extends Controller{
 
       $response = array(
         'status' => 'success',
-        'fileName' => $filename
+        'fileName' => $file_name
       );
 
       return response()->json($response);

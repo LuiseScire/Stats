@@ -44,34 +44,54 @@ function procesarDatos(data) {
 
   var allRows = data.split(/\r?\n|\r/);
   for (var singleRow = 0; singleRow < allRows.length; singleRow++) {
-    var rowCells = allRows[singleRow].split(',');
 
-    if (singleRow === 0) {
+    if(singleRow < 5 ) {
+			//se evitan las primeras 5 filas del documento.
+		} else {
 
-    } else {
-      	datos.push(rowCells);
-    }
+      var rowCells = allRows[singleRow].split(',');
 
-	  for (var rowCell = 0; rowCell < rowCells.length; rowCell++) {
-      if (singleRow === 0) {
-        cabeceras.push(rowCells[rowCell]);
+      if (singleRow === 5) {
+
+      } else {
+          rowCells.reverse();
+          datos.push(rowCells);
+      }
+
+  	  for (var rowCell = 0; rowCell < rowCells.length; rowCell++) {
+        if (singleRow === 0) {
+          cabeceras.push(rowCells[rowCell]);
+        }
       }
     }
   }
 
   datos.pop()
   $.each(datos, function(index, v){
-    var pais = v[4];
-  	var mes = parseInt(v[5].substr(5));
-  	var descargasMensuales = parseInt(v[6]);
+
+
+    //var pais = v[4];
+  	//var mes = parseInt(v[5].substr(5));
+  	//var descargasMensuales = parseInt(v[6]);
+    var pais = v[2];
+    var mes = parseInt(v[1].substr(5));
+    var descargasMensuales = parseInt(v[0]);
+    var ciudad = v[3];
+    var numero = v[4];
+    //faltan obtner el tipo y texto
 
     //descargas por país
-    codigoPais[pais] = codigoPais[pais] + descargasMensuales;
+    if(pais == ''){
+      codigoPais[0] = codigoPais[0] + descargasMensuales;
+    } else {
+      codigoPais[pais] = codigoPais[pais] + descargasMensuales;
+    }
+
     //descargas mensuales
   	meses[mes] = meses[mes] + descargasMensuales;
 
   	$.each(v, function(indexx, vv){
-  		if(indexx == 6){
+  		if(indexx == 0){
         //descargas totales
   			descargas = descargas + parseInt(vv);
   		}
@@ -133,31 +153,31 @@ function drawChartTotalDownloads() {
      ]);
 
     var options = {
-      title: "Total de descargas: " + descargas,
+      title: "Descargas: " + $.number(descargas),
       bar: {groupWidth: "95%"},
       legend: { position: "none" },
     };
 
     var chart = new google.visualization.ColumnChart(document.getElementById("chartTotalDownloads"));
-    chart.draw(view, options);
+    //chart.draw(view, options);
 
-    var chart_div = document.getElementById('chartTotalDownloadsImage');
-    var chartImage = new google.visualization.ColumnChart(chart_div);
+    /*var chart_div = document.getElementById('chartTotalDownloadsImage');
+    var chartImage = new google.visualization.ColumnChart(chart_div);*/
 
     // Wait for the chart to finish drawing before calling the getImageURI() method.
-    google.visualization.events.addListener(chartImage, 'ready', function () {
+    google.visualization.events.addListener(chart, 'ready', function () {
       //chart_div.innerHTML = '<img src="' + chartImage.getImageURI() + '">';
       //console.log(chart_div.innerHTML);
-      chartTotalDownloadsImage = chartImage.getImageURI();
+      chartTotalDownloadsImage = chart.getImageURI();
     });
-
-    chartImage.draw(view, options);
+    chart.draw(view, options);
+    //chartImage.draw(view, options);
 }
 
 function drawChartTotalDownloadsMonth() {
   var d = [
     ['Mes', 'Descargas', { role: 'style' }],
-  ]
+  ];
 
   $.each(meses, function(index, v){
     color = colorHexa();
@@ -181,38 +201,36 @@ function drawChartTotalDownloadsMonth() {
   ]);
 
   var options = {
-    title: "Total de descargas mensuales: " + descargas,
+    title: "Descargas: " + $.number(descargas),
     bar: {groupWidth: "95%"},
     legend: { position: "none" },
   };
 
 
   var chart = new google.visualization.ColumnChart(document.getElementById("chartTotalDownloadsMonth"));
-  chart.draw(view, options);
 
-  var chart_div = document.getElementById('chartTotalDownloadsMonthImage');
-  var chartImage = new google.visualization.ColumnChart(chart_div);
-
-  // Wait for the chart to finish drawing before calling the getImageURI() method.
-  google.visualization.events.addListener(chartImage, 'ready', function () {
-    //chart_div.innerHTML = '<img src="' + chartImage.getImageURI() + '">';
-    //console.log(chart_div.innerHTML);
-    chartTotalDownloadsMonthImage = chartImage.getImageURI();
+  google.visualization.events.addListener(chart, 'ready', function () {
+    chartTotalDownloadsMonthImage = chart.getImageURI();
   });
 
-  chartImage.draw(view, options);
+  chart.draw(view, options);
 }
 
 function drawChartCountryDownloads() {
   var d = [
     ['País', 'Descargas', { role: 'style' }],
-  ]
+  ];
 
+  var previewLimit = 16;
+  var countPreview = 0;
   $.each(codigoPais, function(index, v){
     color = colorHexa();
     if(v > 0){
-      var bar = [codigoPaisTxt[index], v, 'color: '+color];
-    	d.push(bar);
+      countPreview++;
+      if(countPreview < previewLimit){
+        var bar = [codigoPaisTxt[index], v, 'color: '+color];
+        d.push(bar);
+      }
     }
   });
 
@@ -232,62 +250,71 @@ function drawChartCountryDownloads() {
   ]);
 
   var options = {
-    title: "Total de descargas por país: " + descargas,
+    title: "Top 15 Países con mayores descargas. Descargas: " + $.number(descargas),
     bar: {groupWidth: "95%"},
     legend: { position: "none" },
   };
 
   var chart = new google.visualization.ColumnChart(document.getElementById("chartCountryDownloads"));
-  chart.draw(view, options);
 
-  var chart_div = document.getElementById('chartCountryDownloadsImage');
-  var chartImage = new google.visualization.ColumnChart(chart_div);
-
-  // Wait for the chart to finish drawing before calling the getImageURI() method.
-  google.visualization.events.addListener(chartImage, 'ready', function () {
-    //chart_div.innerHTML = '<img src="' + chartImage.getImageURI() + '">';
-    //console.log(chart_div.innerHTML);
-    chartCountryDownloadsImage = chartImage.getImageURI();
+  google.visualization.events.addListener(chart, 'ready', function () {
+    chartCountryDownloadsImage = chart.getImageURI();
   });
 
-  chartImage.draw(view, options);
+  chart.draw(view, options);
 }
 
 $(".export-action").click(function() {
   var grafica = $(this).data("charttype");
   var tipoExport = $(this).data("typeexport");
-  var image, pass;
+  var imagen, nombre;
+  var continuar = false;
 
   switch (grafica) {
     case 'total':
-      image = chartTotalDownloadsImage;
-      pass = true;
+      imagen = chartTotalDownloadsImage;
+      nombre = 'descargas-totales.png';
+      continuar = true;
       break;
     case 'month':
-      image = chartTotalDownloadsMonthImage;
-      pass = true;
+      imagen = chartTotalDownloadsMonthImage;
+      nombre = 'descargas-mensuales.png';
+      continuar = true;
       break;
     case 'country':
-      image = chartCountryDownloadsImage;
-      pass = true;
+      imagen = chartCountryDownloadsImage;
+      nombre = 'descargas-por-pais.png';
+      continuar = true;
       break;
     default:
-      pass = false;
-      alert("¡Error al seleccionar la gráfica a exportar!")
+      alert("¡Error al seleccionar la gráfica a exportar!");
   }
 
-  var data = {'_token': CSRF_TOKEN, 'image': image, 'tipoExport': tipoExport};
+  if(continuar){
+    if(tipoExport == 'png'){
+      download(imagen, nombre, "image/png");
+    } else if (tipoExport == 'pdf') {
+      var data = {'_token': CSRF_TOKEN, 'image': imagen, 'tipoExport': tipoExport};
 
-  if(pass){
-    $.ajax({
-      type: "POST",
-      url : "createchartimage",
-      data: data,
-      dataType: "JSON",
-      success: function(response) {
-        console.log(response);
-      }
-    });
+      /*$.ajax({
+        type: "POST",
+        url : "createchartimage",
+        data: data,
+        dataType: "JSON",
+        success: function(response) {
+          console.log(response);
+          var path = "/workspace/stats/public/chartimages/";
+          if(response.status == 'success'){
+            $("#downloadChartImageModal").modal('show');
+            $("#imgModalChartImage").attr("src", path + response.fileName);
+          } else {
+            alert("Error al Guardar Imagen");
+          }
+
+        }
+      });*/
+    }
+
   }
 
 
@@ -295,10 +322,6 @@ $(".export-action").click(function() {
   console.log(chartTotalDownloadsMonthImage);
   console.log(chartCountryDownloadsImage);*/
 });
-
-/*$(".print-chart").click(function() {
-  var chart = $(this).data('opc');
-});*/
 
 /*######### FUNCIONES EXTRA ###########*/
 function colorHexa(){
