@@ -14,9 +14,9 @@ function getList(){
       var count = 0;
       $.each(response.fileList, function(index, v){
         count++;
-        var li = '<li class="list-group-item csv-file-item" data-name="'+v+'">';
-            li+=  '<i class="fa fa-file"></i> '+v;
-            li+= '</li>';
+        var li = '<a class="csv-file-item" data-csvname="'+v+'"><li class="list-group-item">';
+            li+=  '<label style="cursor:pointer"><i class="fa fa-file"></i> '+v+'</label>';
+            li+= '</li></a>';
         $("#csvList").append(li);
       });
 
@@ -31,7 +31,7 @@ function getList(){
 }
 
 $(document).on('click', '.csv-file-item', function() {
-  var fileName = $(this).data('name');
+  var fileName = $(this).data('csvname');
 
-  location.href = 'estadisticas/' + fileName;
+  location.href = 'estadisticas/archivo/' + fileName;
 });

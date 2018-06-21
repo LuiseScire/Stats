@@ -27,7 +27,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">Stats</a>
+                <a class="navbar-brand" href="{{ url('home') }}">Stats</a>
             </div>
             <!-- /.navbar-header -->
 
@@ -51,14 +51,14 @@
             </ul>
             <!-- /.navbar-top-links -->
 
-            <div class="navbar-default sidebar" role="navigation">
+            <div id="sidebar" class="navbar-default sidebar" role="navigation">
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav" id="side-menu">
                         <li>
-                            <a href="home"><i class="fa fa-home fa-fw"></i> Inicio</a>
+                            <a href="{{ url('home') }}"><i class="fa fa-home fa-fw"></i> Inicio</a>
                         </li>
                         <li>
-                            <a href="subircsv"><i class="fa fa-upload fa-fw"></i> Subir CSV</a>
+                            <a href="{{ url('subircsv') }}"><i class="fa fa-upload fa-fw"></i> Subir CSV</a>
                         </li>
                     </ul>
                 </div>

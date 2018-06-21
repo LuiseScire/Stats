@@ -77,6 +77,9 @@
           <hr>
           <div class="col-lg-12">
             <div class="dropdown pull-right">
+              <a href="{{ url('estadisticas/descargasporpais') }}">
+                <button type="button" name="button" class="btn btn-primary">Ver gráfica completa <i class="fa fa-external-link"></i></button>
+              </a>
               <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 Exportar como:
                 <span class="caret"></span>
@@ -102,27 +105,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Dercargar Estadísticas</h4>
+                <h4 class="modal-title">title</h4>
             </div>
             <div class="modal-body">
-              <div class="row">
-                <div class="col-lg-12">
-                  <!--<div class="thumbnail">
-                    <a href="javascript:void(0)" target="_blank">
-                      <img id="imgModalChartImage" src="https://www.w3schools.com/w3images/fjords.jpg" alt="Lights" style="width:100%">
-                      <div id="chartTotalDownloadsImage" class="chart-images"></div>
-                      <div id="chartTotalDownloadsMonthImage" class="chart-images"></div>
-                      <div id="chartCountryDownloadsImage" class="chart-images"></div>
-                      <div class="caption">
-                        <p>Lorem ipsum donec id elit non mi porta gravida at eget metus.</p>
-                      </div>
-                    </a>
-                  </div>-->
-                  <div id="chartTotalDownloadsImage_" class="chart-images"></div>
-                  <div id="chartTotalDownloadsMonthImage_" class="ichart-images"></div>
-                  <div id="chartCountryDownloadsImage_" class="chart-images"></div>
-                </div>
-              </div>
 
             </div>
             <div class="modal-footer">

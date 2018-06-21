@@ -15,6 +15,7 @@ Route::get('/', function () {
     return view('main');
 });
 
+
 Route::get('home', function () {
     return view('main');
 });
@@ -25,13 +26,17 @@ Route::get('subircsv', function () {
 
 //Route::get('estadisticas/{filename}', 'MainController@estadisticas');
 Route::group(['prefix' => 'estadisticas'], function () {
-    Route::get('/{filename?}', function ($filename = "noData"){
+
+    Route::get('archivo/{filename?}', function ($filename = "noData"){
         // Matches The "/admin/users" URL
         return view('estadisticas', array('filename' => $filename));
     });
 
     Route::post('readcsv','MainController@readcsv');
     Route::post('createchartimage','MainController@createchartimage');
+    Route::get('descargasporpais', function() {
+      return view('downstatscountry');
+    });
 });
 
 /*Route::get('estadisticas', function () {

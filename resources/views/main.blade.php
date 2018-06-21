@@ -2,6 +2,12 @@
 
 @section('title', 'Home')
 
+@section('css')
+<style media="screen">
+
+</style>
+@stop
+
 @section('sidebar')
     @parent
 @stop
