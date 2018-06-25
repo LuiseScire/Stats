@@ -1,9 +1,9 @@
 var descargas = 0;//Descargas totales
 var color;
 
-var chartTotalDownloadsImage,
-    chartTotalDownloadsMonthImage,
-    chartCountryDownloadsImage;
+var totalDownloadsImageChart,
+    totalDownloadsMonthImageChart,
+    countryDownloadsImageChart;
 
 $(document).ready(function() {
   if(fileName != 'noData'){
@@ -110,9 +110,9 @@ function procesarDatos(data) {
 
   });
   google.charts.load("current", {packages:['corechart']});
-  google.charts.setOnLoadCallback(drawChartTotalDownloads);
-  google.charts.setOnLoadCallback(drawChartTotalDownloadsMonth);
-  google.charts.setOnLoadCallback(drawChartCountryDownloads);
+  google.charts.setOnLoadCallback(drawTotalDownloadsChart);
+  google.charts.setOnLoadCallback(drawTotalDownloadsMonthChart);
+  google.charts.setOnLoadCallback(drawCountryDownloadsChart);
 }
 
 /*function loadCallbackCharts(print, grafica, tipoExport){
@@ -144,7 +144,7 @@ function procesarDatos(data) {
 
 }*/
 
-function drawChartTotalDownloads() {
+function drawTotalDownloadsChart() {
     var data = google.visualization.arrayToDataTable([
       ["option", "total", { role: "style" } ],
       ["Descargas", descargas, colorHexa()],
@@ -169,7 +169,7 @@ function drawChartTotalDownloads() {
       legend: { position: "none" },
     };
 
-    var chart = new google.visualization.ColumnChart(document.getElementById("chartTotalDownloads"));
+    var chart = new google.visualization.ColumnChart(document.getElementById("totalDownloadsChart"));
     //chart.draw(view, options);
 
     /*var chart_div = document.getElementById('chartTotalDownloadsImage');
@@ -179,13 +179,13 @@ function drawChartTotalDownloads() {
     google.visualization.events.addListener(chart, 'ready', function () {
       //chart_div.innerHTML = '<img src="' + chartImage.getImageURI() + '">';
       //console.log(chart_div.innerHTML);
-      chartTotalDownloadsImage = chart.getImageURI();
+      totalDownloadsImageChart = chart.getImageURI();
     });
     chart.draw(view, options);
     //chartImage.draw(view, options);
 }
 
-function drawChartTotalDownloadsMonth() {
+function drawTotalDownloadsMonthChart() {
   var d = [
     ['Mes', 'Descargas', { role: 'style' }],
   ];
@@ -217,17 +217,16 @@ function drawChartTotalDownloadsMonth() {
     legend: { position: "none" },
   };
 
-
-  var chart = new google.visualization.ColumnChart(document.getElementById("chartTotalDownloadsMonth"));
+  var chart = new google.visualization.ColumnChart(document.getElementById("totalDownloadsMonthChart"));
 
   google.visualization.events.addListener(chart, 'ready', function () {
-    chartTotalDownloadsMonthImage = chart.getImageURI();
+    totalDownloadsMonthImageChart = chart.getImageURI();
   });
 
   chart.draw(view, options);
 }
 
-function drawChartCountryDownloads() {
+function drawCountryDownloadsChart() {
   var title;
   //console.log();
   var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
@@ -275,10 +274,10 @@ function drawChartCountryDownloads() {
     legend: { position: "none" },
   };
 
-  var chart = new google.visualization.ColumnChart(document.getElementById("chartCountryDownloads"));
+  var chart = new google.visualization.ColumnChart(document.getElementById("countryDownloadsChart"));
 
   google.visualization.events.addListener(chart, 'ready', function () {
-    chartCountryDownloadsImage = chart.getImageURI();
+    countryDownloadsImageChart = chart.getImageURI();
   });
 
   chart.draw(view, options);
@@ -292,17 +291,17 @@ $(".export-action").click(function() {
 
   switch (grafica) {
     case 'total':
-      imagen = chartTotalDownloadsImage;
+      imagen = totalDownloadsImageChart;
       nombre = 'descargas-totales.png';
       continuar = true;
       break;
     case 'month':
-      imagen = chartTotalDownloadsMonthImage;
+      imagen = totalDownloadsMonthImageChart;
       nombre = 'descargas-mensuales.png';
       continuar = true;
       break;
     case 'country':
-      imagen = chartCountryDownloadsImage;
+      imagen = countryDownloadsImageChart;
       nombre = 'descargas-por-pais.png';
       continuar = true;
       break;

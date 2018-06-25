@@ -24,7 +24,7 @@
       <div class="panel panel-default">
         <div class="panel-heading">Descargas Totales</div>
         <div class="panel-body">
-          <div id="chartTotalDownloads"></div>
+          <div id="totalDownloadsChart"></div>
           <hr>
           <div class="col-lg-12">
             <div class="dropdown pull-right">
@@ -51,7 +51,7 @@
       <div class="panel panel-default">
         <div class="panel-heading">Descargas Mensuales</div>
         <div class="panel-body">
-          <div id="chartTotalDownloadsMonth"></div>
+          <div id="totalDownloadsMonthChart"></div>
           <hr>
           <div class="col-lg-12">
             <div class="dropdown pull-right">
@@ -73,11 +73,11 @@
       <div class="panel panel-default">
         <div class="panel-heading">Descargas por País</div>
         <div class="panel-body">
-          <div id="chartCountryDownloads"></div>
+          <div id="countryDownloadsChart"></div>
           <hr>
           <div class="col-lg-12">
             <div class="dropdown pull-right">
-              <a href="{{ url('estadisticas/descargasporpais') }}">
+              <a href="{{ url('estadisticas/descargasporpais/'.$filename) }}">
                 <button type="button" name="button" class="btn btn-primary">Ver gráfica completa <i class="fa fa-external-link"></i></button>
               </a>
               <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">

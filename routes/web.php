@@ -34,8 +34,8 @@ Route::group(['prefix' => 'estadisticas'], function () {
 
     Route::post('readcsv','MainController@readcsv');
     Route::post('createchartimage','MainController@createchartimage');
-    Route::get('descargasporpais', function() {
-      return view('downstatscountry');
+    Route::get('descargasporpais/{filename?}', function($filename = "noData") {
+      return view('downstatscountry', array('filename' => $filename));
     });
 });
 
