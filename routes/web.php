@@ -13,6 +13,7 @@
 Auth::routes();
 //Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/home', 'MainController@home')->name('home');
+
 // Generating URLs...
 //$url = route('home');
 
