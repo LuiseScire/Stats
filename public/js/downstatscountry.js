@@ -229,6 +229,7 @@ function drawCountryDownloadsChart() {
     countriesWithoutDownloadsImageChart = chartWithout.getImageURI();
   });
   chartWithout.draw(viewWithout, optionsWithout);
+
   $("#paisesSinDescargas").removeClass("active");
 }
 
