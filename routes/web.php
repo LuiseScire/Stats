@@ -53,3 +53,7 @@ Route::group(['prefix' => 'estadisticas'], function () {
 });*/
 Route::post('uploadcsv','MainController@uploadcsv');
 Route::post('listcsvfiles','MainController@listcsvfiles');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

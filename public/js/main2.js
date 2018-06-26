@@ -14,9 +14,12 @@ function getList(){
       var count = 0;
       $.each(response.fileList, function(index, v){
         count++;
-        var li = '<a class="csv-file-item" data-csvname="'+v+'"><li class="list-group-item">';
-            li+=  '<label style="cursor:pointer"><i class="fa fa-file"></i> '+v+'</label>';
-            li+= '</li></a>';
+        var li = '<li class="list-group-item">';
+            li+=  '<a class="csv-file-item" data-csvname="'+v+'">';
+            li+=    '<label style="cursor:pointer"><i class="fa fa-file"></i> '+v+'</label>';
+            li+=  '</a>'//fa-ellipsis-v
+            li+=  '<i class="fa fa-ellipsis-v pull-right delete-csv-file-menu" data-csvname="'+v+'"></i>';
+            li+= '</li>';
         $("#csvList").append(li);
       });
 
@@ -32,6 +35,10 @@ function getList(){
 
 $(document).on('click', '.csv-file-item', function() {
   var fileName = $(this).data('csvname');
-
   location.href = 'estadisticas/archivo/' + fileName;
+});
+
+$(document).on('click', '.delete-csv-file-menu', function() {
+  var fileName = $(this).data('csvname');
+  console.log(fileName);
 });
