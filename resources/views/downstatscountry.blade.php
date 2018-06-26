@@ -20,6 +20,7 @@
 		<li class="active"><a  href="#paisesConDescargas" data-toggle="tab">Países con descargas <span id="badgeWith" class="badge"></span></a></li>
 		<li><a id="aPaisesSinDescargas" href="#paisesSinDescargas" data-toggle="tab">Países sin descargas <span id="badgeWithout" class="badge"></span></a></li>
 	</ul>
+
 	<div class="tab-content">
 	  <div class="tab-pane active" id="paisesConDescargas">
       <br>
@@ -59,7 +60,7 @@
       </div>
       <!-- /.col-lg-12 -->
       <br><br>
-      <div id="countryWithoutDownloadsChart" style="height:00%"></div>
+      <div id="countryWithoutDownloadsChart" class="chart" style="height:400%"></div>
 		</div>
 	</div>
 </div>

@@ -1,8 +1,6 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html>
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <!-- provide the csrf token -->
         <meta name="csrf-token" content="{{ csrf_token() }}" />
@@ -40,7 +38,7 @@
         </span>
       </a>
 
-      <div id="wrapper">
+      <div id="wrapper" class="blur">
         @section('sidebar')
         <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
           <div class="navbar-header">
@@ -118,7 +116,7 @@
         $(window).on('load', function(){
            $(".preloader").fadeOut("slow");
            $("#wrapper").removeClass("blur");
-        });
+         });
 
         $(document).ready(function() {
           $('.ir-arriba').click(function(){
@@ -135,12 +133,13 @@
               }
           });
 
+          /*hacia abajo*/
           $('.ir-abajo').click(function(){
               $('body, html').animate({
                     scrollTop: '1000px'
                 }, 1000);
             });
-        });
+          });
       </script>
 
       @yield('javascript')
