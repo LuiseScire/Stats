@@ -18,9 +18,6 @@
     <div id="noDataText" class="alert alert-info" role="alert">Documento: <strong>{{ $filename }}</strong></div>
 
     <div id="chartsContent" class="row" style="display:none">
-
-      <div class="alert alert-info" role="alert">Documento: <strong>{{ $filename }}</strong></div>
-
       <div class="panel panel-default">
         <div class="panel-heading">Descargas Totales</div>
         <div class="panel-body">

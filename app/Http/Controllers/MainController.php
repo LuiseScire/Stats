@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\csvfile;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+//use App\Http\Controllers\Controller;
 
 class MainController extends Controller{
 
@@ -25,21 +29,36 @@ class MainController extends Controller{
   }
 
   public function listcsvfiles(){
+    #Model
+    $csv_file_db = new Csvfile;
+    #
+
+    $auth_id = Auth::id();
+
+    $csv_list = $csv_file_db->where([['csv_user_id', $auth_id], ['csv_status', 'active']])->get();
+
     $file_list = [];
-    $directorio = opendir(public_path() . '/csvfiles/');
+    /*$directorio = opendir(public_path() . '/csvfiles/');
     while ($archivo = readdir($directorio)){
       if (strtolower(substr($archivo, -3) == 'csv')){
         //echo $archivo . '<br />';
         array_push($file_list, $archivo);
       }
-    }
+    }*/
     $response = array(
-      'fileList' => $file_list
+      'fileList' => $file_list,
+      'csvList' => $csv_list
     );
     return response()->json($response);
   }
 
   public function uploadcsv(Request $request) {
+    #Models
+    $csv_file_db = new Csvfile;
+
+    $auth_id = Auth::id();
+
+    #Response
     $action = $request->action;
     $delete_exist = (bool)$request->deleteExist;
 
@@ -57,7 +76,7 @@ class MainController extends Controller{
               } else {
                 $response = array(
                   'status' => 'error',
-                  'message' => 'Error al reemplazar documento',
+                  'message' => 'Error al reemplazar documento'
                 );
               }
             } else {
@@ -83,10 +102,24 @@ class MainController extends Controller{
 
         $destination_path = public_path() . '/csvfiles/';
         if(rename($source_file, $destination_path . pathinfo($source_file, PATHINFO_BASENAME))){
-          $response = array(
-            'status'  => 'success',
-            'message' => 'Archivo Movido correctamente'
-          );
+          //$update = $csv_file_db->where('csv_user_id', $auth_id)->update(['csv_status' => 'active']);
+          //if($update) {
+          $csv_file_db->csv_name = $file_name;
+          $csv_file_db->csv_path = $csv_file;
+          $csv_file_db->csv_user_id = $auth_id;
+
+          if($csv_file_db->save()){
+            $response = array(
+              'status'  => 'success',
+              'message' => 'Archivo Movido correctamente'
+            );
+          } else {
+            $response = array(
+              'status'  => 'error',
+              'message' => 'Error al mover'
+            );
+          }
+
         }else {
           $response = array(
             'status' => 'error',
@@ -103,6 +136,8 @@ class MainController extends Controller{
       $csv_file = '/csvfiles/tmp/' . $_FILES['csvFile']['name'];
       $path = public_path() . $csv_file;
       if(move_uploaded_file($_FILES['csvFile']['tmp_name'], $path)){
+        chmod($path, 0777);
+
         $response = array(
           'status'  => 'success',
           'message' => 'Archivo Subido correctamente',
@@ -170,4 +205,9 @@ class MainController extends Controller{
    return $key;
   }
 
+  public function testpath(){
+    dd(base_path());
+    //dd(public_path());
+    //dd(app_path());
+  }
 }

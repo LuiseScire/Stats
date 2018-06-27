@@ -40,7 +40,7 @@
 
       <div id="wrapper" class="blur">
         @section('sidebar')
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
           <div class="navbar-header">
               <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                   <span class="sr-only">Toggle navigation</span>
@@ -53,25 +53,35 @@
               <a id="navLinkBack" class="navbar-brand opc-nav-downstatscountry-view" href="javascript:void(0)" style="display:none">
                 <i class="fa fa-arrow-left"></i> Volver
               </a>
-              <a id="navLinkBack" class="navbar-brand opc-nav-downstatscountry-view" href="javascript:void(0)" style="display:none">
+              <a id="navLinkFileName" class="navbar-brand opc-nav-downstatscountry-view" href="javascript:void(0)" style="display:none">
                 <i class="fa fa-file"></i> Documento: <span id="fileNameNavbar"></span>
               </a>
               <!-- -->
           </div>
-          <!-- /.navbar-header -->
-
           <ul class="nav navbar-top-links navbar-right">
               <li class="dropdown">
                   <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                      <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+                      <i class="fa fa-user fa-fw"></i>{{ Auth::user()->name }} <i class="fa fa-caret-down"></i>
                   </a>
                   <ul class="dropdown-menu dropdown-user">
-                      <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                      <!--<li>
+                        <a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
                       </li>
-                      <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                      <li>
+                        <a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
                       </li>
-                      <li class="divider"></li>
-                      <li><a href="login.html"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                      <li class="divider"></li>-->
+                      <li>
+                        <a class="dropdown-item" href="{{ route('logout') }}"
+                           onclick="event.preventDefault();
+                                         document.getElementById('logout-form').submit();">
+                            <i class="fa fa-sign-out fa-fw"></i>
+                            {{ __('Salir') }}
+                        </a>
+
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
                       </li>
                   </ul>
                   <!-- /.dropdown-user -->
@@ -96,8 +106,7 @@
           <!-- /.navbar-static-side -->
         </nav>
         @show
-        <div id="page-wrapper">
-          <br>
+        <div id="page-wrapper" style="padding-top: 5%;">
           @yield('content')
         </div>
       </div>

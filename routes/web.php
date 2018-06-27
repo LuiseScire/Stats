@@ -31,6 +31,7 @@ Route::get('/subircsv', 'MainController@subircsv')->name('subircsv');
 /*Route::get('subircsv', function () {
     return view('uploadcsv');
 });*/
+Route::get('/testpath', 'MainController@test');
 
 //Route::get('estadisticas/{filename}', 'MainController@estadisticas');
 Route::group(['prefix' => 'estadisticas'], function () {

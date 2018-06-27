@@ -8,8 +8,10 @@ var countriesWithDownloadsImageChart,
 $(document).ready(function() {
   $("#sidebar").hide();
   $("#navLinkHome").hide();
-  $(".opc-nav-downstatscountry-view").show();
-  $("#fileNameNavbar").text(fileName);
+  $("#navLinkBack").show();
+  /*$(".opc-nav-downstatscountry-view").show();
+  $("#fileNameNavbar").text(fileName);*/
+  $("#a").text(fileName);
 
   $.ajax({
       type: "GET",

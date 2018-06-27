@@ -9,6 +9,10 @@ $(document).ready(function() {
   if(fileName != 'noData'){
     $("#chartsContent").css('display', 'block');
     $("#noDataText").css('display', 'none');
+    //$("#navLinkFileName").show();
+    //$("#fileNameNavbar").text(fileName);
+    $("#a").text(fileName);
+
     obtenerdatos();
   } else {
     $("#noDataText")
