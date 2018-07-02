@@ -1,6 +1,7 @@
 //var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 var fileNameConfirmed;
 var changeFile = 0;
+
 //datos globales para validar si existe el documento
 var deleteExist = 0,
 		csvFile, fileName;
@@ -52,7 +53,39 @@ function subirCsv() {
 			xhr.addEventListener('abort', abortHandler, false);
 
 			return xhr;
-		}, success: function(response){
+		},
+		success: function(response){
+			if(response.status == 'success'){
+				fileNameConfirmed = fileName;
+
+				setTimeout(function() {
+					$.ajax({
+							type: "GET",
+							url: "/workspace/stats/public/csvfiles/tmp/" + fileName,
+							dataType: "text",
+							beforeSend: function(){
+								if($("#loadPreviewText").hasClass('alert-info')){
+									$("#loadPreviewText").removeClass('alert-info').addClass('alert-warning').html("Cargando vista previa del archivo");
+									$('#preView').empty();
+								}
+								if(changeFile == 1) {
+									$("#cambiarArchivo").attr('disabled', 'disabled');
+									$("#uploadFileConfirmed").attr('disabled', 'disabled');
+								}
+								$("#loadPreviewText").show();
+
+								//mostrar el loader
+								fadeInLoader();
+							},
+							success: function(data) {
+								successFunction(data);
+							}
+					 });
+				}, 1000);
+			}
+			if(response.status == "error") alert(response.message);
+		}
+		/*success: function(response){
 			if(response.status == "fileExist"){
 				var _confirm = confirm(response.message);
 				if(_confirm){
@@ -68,16 +101,7 @@ function subirCsv() {
 			}
 
 			if(response.status == 'success'){
-				$("#seconds").css('display', 'none');
-				$("#status").html('Archivo cargado completamente');
 				fileNameConfirmed = fileName;
-				//console.log(response);
-				/*$.ajax({
-					 url: '/workspace/stats/public/csvfiles/tmp/' + fileName,
-						//url: response.path,
-						dataType: 'text',
-				}).done(successFunction);*/
-
 				$.ajax({
 						type: "GET",
 						url: "/workspace/stats/public/csvfiles/tmp/" + fileName,
@@ -97,14 +121,9 @@ function subirCsv() {
 							successFunction(data);
 						}
 				 });
-				//$("#addVideo").css('display', 'none');
-				/*$("#uploadVideo").css('display', 'block')
-					.data('url', response.url)
-					.data('idmultimedia', response.idMultimedia)
-					.data('filename', response.fileName);*/
 			}
 			if(response.status == "error") alert(response.message);
-		}
+		}*/
 	});
 }
 
@@ -112,34 +131,32 @@ function uploadProgressHandler(event) {
   var percent = (event.loaded / event.total) * 100;
   var progress = Math.round(percent);
 
-  //$('#addVideo').hide();
-	$("#inputFileContent").css("display", "none");
-  $("#seconds").css('display', 'block');
-  $("#uploadProgressBar").css("width", progress + "%");
-  $("#status").html(progress +"% cargando... por favor espere");
+	$("#inputFileContent").hide();
+
+  $("#progressBarContent").css('display', 'block');
+  $("#uploadProgressBar").css("width", progress + "%").html("Progreso: " + progress + "%");
 }
 
 function loadHandler(event) {
-  var response = event.target.responseText;
+	//sustituir esta función por el success de ajax jQuery
+  /*var response = event.target.response;
+	var status = event.target.status;
 
+	if(status == 200) {
 
-  /*if(response.status == 'success'){
-    $("#addVideo").css('display', 'none');
-    $("#uploadVideo").css('display', 'block').data('url', response.url).data('idmultimedia', response.idMultimedia);
-    //$("#uploadProgressBar").css("width", "0%");
-  }else{
-    $("#uploadProgressBar").css("width", "0%");
-  }*/
+	}*/
 }
 
 function errorHandler(event) {
-  $("#status").html("Subida Fallida");
-  //$('#addVideo').show();
+	alert("Subida Fallido");
+	location.reload();
+  //$("#status").html("Subida Fallida");
 }
 
 function abortHandler(event) {
-  $("#status").html("Subida Abortada");
-  //$('#addVideo').show();
+	alert("Subida Abortada");
+	location.reload();
+  //$("#status").html("Subida Abortada");
 }
 
 function bytesToSize(bytes) {
@@ -148,36 +165,6 @@ function bytesToSize(bytes) {
   var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
   return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 }
-
-
-/*$(document).ready(function() {
-    $.ajax({
-        type: "GET",
-        url: "data.txt",
-        dataType: "text",
-        success: function(data) {processData(data);}
-     });
-});*/
-
-/*function processData(allText) {
-    var allTextLines = allText.split(/\r\n|\n/);
-    var headers = allTextLines[0].split(',');
-    var lines = [];
-
-    for (var i=1; i<allTextLines.length; i++) {
-        var data = allTextLines[i].split(',');
-        if (data.length == headers.length) {
-
-            var tarr = [];
-            for (var j=0; j<headers.length; j++) {
-                tarr.push(headers[j]+":"+data[j]);
-            }
-            lines.push(tarr);
-        }
-    }
-		//console.log(lines);
-
-}*/
 
 function successFunction(data) {
   var allRows = data.split(/\r?\n|\r/);
@@ -218,8 +205,13 @@ function successFunction(data) {
   table += '</table>';
   $('#preView').append(table);
 
+	//ocultamos el loader
+	fadeOutLoader();
+
+	$("#progressBarContent").css('display', 'none');
 	$("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html("Vista Previa");
 	$("#confirmFileContent").show();
+	$("#strongFileName").text(fileNameConfirmed);
 
 	if(changeFile == 1) {
 		$("#cambiarArchivo").removeAttr('disabled');
@@ -228,7 +220,7 @@ function successFunction(data) {
 }
 
 $("#uploadFileConfirmed").click(function(event){
-	console.log(event);
+	//console.log(event);
 	var data = {'_token': CSRF_TOKEN, 'action': 'moveFromTemp', 'fileName': fileNameConfirmed}
 	$.ajax({
 		type: "POST",
@@ -237,7 +229,7 @@ $("#uploadFileConfirmed").click(function(event){
 		dataType: "JSON",
 		success: function(response){
 			if(response.status == 'success'){
-				alert('Documento subido correctamente');
+				//alert('Documento subido correctamente');
 				location.href = 'home';
 			}
 		}
@@ -245,7 +237,7 @@ $("#uploadFileConfirmed").click(function(event){
 });
 
 $("#cambiarArchivo").click(function(event) {
-	console.log(event);
+	//console.log(event);
 	changeFile = 1;
 	$("#csvFile").val('').click();
 });

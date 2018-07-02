@@ -6,22 +6,40 @@ var countriesWithDownloadsImageChart,
     countriesWithoutDownloadsImageChart;
 
 $(document).ready(function() {
-  $("#sidebar").hide();
+  /*$("#sidebar").hide();
   $("#navLinkHome").hide();
-  $("#navLinkBack").show();
+  $("#navLinkBack").show();*/
   /*$(".opc-nav-downstatscountry-view").show();
   $("#fileNameNavbar").text(fileName);*/
-  $("#a").text(fileName);
+  /*$("#a").text(fileName);*/
 
   $.ajax({
       type: "GET",
-      url: "/workspace/stats/public/csvfiles/" + fileName,
+      url: getCsvFile,
       dataType: "text",
       success: function(response) {
         procesarDatos(response);
       }
    });
+
+   $("#backToStats").attr('href', backLocation);
+   createOptionsMenu();
 });
+
+function createOptionsMenu() {
+  var ulContent = '<li>'+
+                    '<a href="'+backLocation+'/totalDownloadsPanel" class="link-menu"><i class="fa fa-bar-chart"></i> Descargas Totales</a>'+
+                  '</li>'+
+                  '<li>'+
+                    '<a href="'+backLocation+'/totalDownloadsMonthPanel" class="link-menu"><i class="fa fa-bar-chart"></i> Descargas Mensuales</a>'+
+                  '</li>'+
+                  '<li>'+
+                    '<a href="'+backLocation+'/countryDownloadsPanel" class="link-menu"><i class="fa fa-bar-chart"></i> Descargas por País</a>'+
+                  '</li>';
+
+  $("#menuOptionChartsContent").append(ulContent);
+  $("#menuOptionChartsFromCountriesView").css('display', 'block').addClass('active').find('ul').addClass('in');
+}
 
 function procesarDatos(data) {
   var cabeceras = [];//for charts
@@ -186,10 +204,12 @@ function drawCountryDownloadsChart() {
     fontSize: 14,
     hAxis: {
       title: 'Total de descargas: ' + $.number(descargas),
-      minValue: 0
+      minValue: 0,
+      format: 'short'
     },
     vAxis: {
-      title: 'País'
+      title: 'País',
+
     },
     chartArea: {width: '90%', height: '95%', left: 200},
   };
@@ -265,6 +285,9 @@ $(".export-action").click(function() {
     }
   }
 });
+
+
+
 
 /*######### FUNCIONES EXTRA ###########*/
 function colorHexa(){

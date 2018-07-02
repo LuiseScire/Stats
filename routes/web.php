@@ -35,7 +35,7 @@ Route::get('/testpath', 'MainController@test');
 
 //Route::get('estadisticas/{filename}', 'MainController@estadisticas');
 Route::group(['prefix' => 'estadisticas'], function () {
-  Route::get('archivo/{filename?}', 'MainController@stats');
+  Route::get('archivo/{filename?}/{target?}', 'MainController@stats');
     /*Route::get('archivo/{filename?}', function ($filename = "noData"){
         // Matches The "/admin/users" URL
         return view('estadisticas', array('filename' => $filename));

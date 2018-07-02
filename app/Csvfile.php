@@ -14,6 +14,8 @@ class Csvfile extends Model
     'csv_name',
     'csv_path',
     'csv_user_id',
-    'csv_status'
+    'csv_status',
+    'csv_version',
+    'csv_timestamp',
   ];
 }

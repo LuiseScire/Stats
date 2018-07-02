@@ -5,13 +5,17 @@ var totalDownloadsImageChart,
     totalDownloadsMonthImageChart,
     countryDownloadsImageChart;
 
+var gridlinesCount = 20;
+
 $(document).ready(function() {
   if(fileName != 'noData'){
+    $("#menuOptionCharts").css('display', 'block').addClass('active').find('ul').addClass('in');
+
     $("#chartsContent").css('display', 'block');
     $("#noDataText").css('display', 'none');
     //$("#navLinkFileName").show();
     //$("#fileNameNavbar").text(fileName);
-    $("#a").text(fileName);
+    //$("#a").text(fileName);
 
     obtenerdatos();
   } else {
@@ -24,9 +28,11 @@ $(document).ready(function() {
 
 function obtenerdatos(){
   //var data = {'_token': CSRF_TOKEN, 'filename': fileName};
+
   $.ajax({
       type: "GET",
-      url: "/workspace/stats/public/csvfiles/" + fileName,
+      url: getCsvFile,
+      //url: "/workspace/stats/public/csvfiles/" + fileName,
       dataType: "text",
       success: function(response) {
         procesarDatos(response);
@@ -117,6 +123,13 @@ function procesarDatos(data) {
   google.charts.setOnLoadCallback(drawTotalDownloadsChart);
   google.charts.setOnLoadCallback(drawTotalDownloadsMonthChart);
   google.charts.setOnLoadCallback(drawCountryDownloadsChart);
+
+
+  setTimeout(function (){
+    if(target != "noTarget") {
+      $('a[href$="'+target+'"]').click();
+    }
+  }, 1000);
 }
 
 /*function loadCallbackCharts(print, grafica, tipoExport){
@@ -167,10 +180,21 @@ function drawTotalDownloadsChart() {
        2
      ]);
 
+
+
     var options = {
       title: "Descargas: " + $.number(descargas),
-      bar: {groupWidth: "95%"},
+      bar: {groupWidth: "30%"},
       legend: { position: "none" },
+      height: "500",
+      vAxis: {
+        gridlines: {count: 30},
+        format: 'short',
+        viewWindow: {
+                max:descargas,
+              }
+      },
+
     };
 
     var chart = new google.visualization.ColumnChart(document.getElementById("totalDownloadsChart"));
@@ -217,8 +241,13 @@ function drawTotalDownloadsMonthChart() {
 
   var options = {
     title: "Descargas: " + $.number(descargas),
-    bar: {groupWidth: "95%"},
+    bar: {groupWidth: "70%"},
     legend: { position: "none" },
+    height: "500",
+    vAxis: {
+      gridlines: {count: gridlinesCount},
+      format: 'short',
+    }
   };
 
   var chart = new google.visualization.ColumnChart(document.getElementById("totalDownloadsMonthChart"));
@@ -270,12 +299,17 @@ function drawCountryDownloadsChart() {
     2
   ]);
 
-  title = 'Top '+ (previewLimit - 1 ) + ' Países con mayores descargas. Descargas:' + $.number(descargas);
+  title = 'Países con mayores descargas. Descargas:' + $.number(descargas);
 
   var options = {
     title: title,
-    bar: {groupWidth: "95%"},
+    bar: {groupWidth: "70%"},
     legend: { position: "none" },
+    height: "500",
+    vAxis: {
+      gridlines: {count: gridlinesCount},
+      format: 'short',
+    }
   };
 
   var chart = new google.visualization.ColumnChart(document.getElementById("countryDownloadsChart"));
@@ -286,6 +320,43 @@ function drawCountryDownloadsChart() {
 
   chart.draw(view, options);
 }
+
+function drawChart() {
+  var data = google.visualization.arrayToDataTable([
+    ['Task', 'Hours per Day'],
+    ['Work',     11],
+    ['Eat',      2],
+    ['Commute',  2],
+    ['Watch TV', 2],
+    ['Sleep',    7]
+  ]);
+
+  var options = {
+    title: 'My Daily Activities',
+    is3D: true,
+  };
+
+  var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+  chart.draw(data, options);
+}
+
+$(".angle_panel_collapse").click(function(event) {
+  var parents = $(this).parentsUntil('.col-lg-12');
+  var parentElement = parents[parents.length - 1];
+  var panelBody = $(parentElement).find('div.panel-body');
+
+  var angleUP = '<i class="fa fa-angle-up fa-lg">';
+  var angleDown = '<i class="fa fa-angle-down fa-lg">';
+
+  if(panelBody.hasClass('collapse-up')) {
+    $(parentElement).find('div.panel-body').slideUp("slow").removeClass('collapse-up').addClass('collapse-down');
+    $(this).attr('title', 'Mostrar').html(angleDown);
+  } else if (panelBody.hasClass('collapse-down')) {
+    $(parentElement).find('div.panel-body').slideDown("slow").removeClass('collapse-down').addClass('collapse-up');
+    $(this).attr('title', 'Ocultar').html(angleUP);
+  }
+});
 
 $(".export-action").click(function() {
   var grafica = $(this).data("charttype");
@@ -344,6 +415,49 @@ $(".export-action").click(function() {
   console.log(chartCountryDownloadsImage);*/
 });
 
+$(".porcent").click(function() {
+  //google.charts.setOnLoadCallback(drawChart);
+  if($("#piechart").hasClass('hide')){
+    $("#piechart").css('display', 'block').removeClass('hide');
+  }
+
+  var porcent = $(this).data('porcent');
+
+  var downloads = parseFloat(descargas);
+  var total = Math.floor(porcent * downloads) / 100;
+  var totalDecimal = parseInt(total);
+  var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
+
+  var d = [
+    ['Task', 'Hours per Day'],
+  ];
+  var countDownloads = 0;
+  var restante = 0;
+  $.each(_countriesObj, function(index, v) {
+    color = colorHexa();
+    var descargas = v.downloads;
+    var pais = v.name;
+    if(descargas > 0){
+      countDownloads = countDownloads + descargas;
+      if(countDownloads < totalDecimal){
+        var bar = [pais + "("+abbreviateNumber(descargas)+")", descargas];
+        d.push(bar);
+      }
+    }
+  });
+
+  var data = google.visualization.arrayToDataTable(d);
+
+  var options = {
+    title: porcent + '% de descargas por países',
+    is3D: true,
+  };
+
+  var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+  chart.draw(data, options);
+});
+
 /*######### FUNCIONES EXTRA ###########*/
 function colorHexa(){
    hexadecimal = new Array("0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F")
@@ -372,4 +486,21 @@ function dynamicSort(property) {
       var result = (a[property] > b[property]) ? -1 : (a[property] < b[property]) ? 1 : 0;
       return result * sortOrder;
   }
+}
+
+function abbreviateNumber(value) {
+    var newValue = value;
+    if (value >= 1000) {
+        var suffixes = ["", "k", "m", "b","t"];
+        var suffixNum = Math.floor( (""+value).length/3 );
+        var shortValue = '';
+        for (var precision = 2; precision >= 1; precision--) {
+            shortValue = parseFloat( (suffixNum != 0 ? (value / Math.pow(1000,suffixNum) ) : value).toPrecision(precision));
+            var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g,'');
+            if (dotLessShortValue.length <= 2) { break; }
+        }
+        if (shortValue % 1 != 0)  shortNum = shortValue.toFixed(1);
+        newValue = shortValue+suffixes[suffixNum];
+    }
+    return newValue;
 }

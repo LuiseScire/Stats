@@ -16,29 +16,49 @@ function getList(){
 
       $.each(response.csvList, function(index, v) {
         var csvId = v.csv_id;
-        var csvName = v.csv_name;
+        var csvName = v.csv_front_name;
+        var csvDBName = v.csv_back_name;
         var csvPath = v.csv_path;
         var csvStatus = v.csv_status;
+        var csvVersion = v.csv_version;
+        var csvTimestamp = v.csv_timestamp;
+
+        var stringName;
+
+        if(csvVersion == null) {
+          stringName = csvName + " - " + csvTimestamp;
+        } else {
+          stringName = csvName + " - " + csvVersion + " - " + csvTimestamp;
+        }
+
+
 
         //console.log(v);
         var li = '<li class="list-group-item">';
-            li+=  '<a class="csv-file-item" data-csvname="'+csvName+'">';
-            li+=    '<label style="cursor:pointer"><i class="fa fa-file"></i> '+csvName+'</label>';
+            li+=  '<a class="csv-file-item" data-csvname="'+csvDBName+'">';
+            li+=    '<label style="cursor:pointer"><i class="fa fa-file"></i> '+stringName+'</label>';
             li+=  '</a>';//fa-ellipsis-v
-            li+= '<ul class="dropdown-menu dropdown-user">';
-            li+=  '<li>';
-            li+=      '<a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>';
-            li+=   ' </li>';
-              li+=  '<li>'
-              li+=    '<a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>'
-              li+=  '</li>';
-                li+='<li class="divider"></li>';
-                li+='<li>';
-                  li+='<a>';
-                    li+='<i class="fa fa-sign-out fa-fw"></i>';
-                  li+='</a>';
-                li+='</li>';
-            li+='</ul>';
+
+            li+=  '<div class="dropdown pull-right">';
+            li+=      '<a class="dropdown-toggle" data-toggle="dropdown" href="#">';
+            li+=          '<i class="fa fa-ellipsis-v"></i>';
+            li+=      '</a>';
+            li+=      '<ul class="dropdown-menu dropdown-user">';
+            li+=        '<li>';
+            li+=          '<a href="#"><i class="fa fa-trash fa-fw"></i> Eliminar</a>';
+            li+=        '</li>';
+            /*li+=        '<li>';
+            li+=          '<a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>';
+            li+=        '</li>';
+            li+=        '<li class="divider"></li>';
+            li+=        '<li>';
+            li+=          '<a>';
+            li+=            '<i class="fa fa-sign-out fa-fw"></i>';
+            li+=          '</a>';
+            li+=        '</li>';*/
+            li+=      '</ul>';
+            li+=   '</div>';
+
             li+= '</li>';
 
         $("#csvList").append(li);

@@ -1,5 +1,33 @@
 /*preloader*/
-.blur{
+#preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0,0.3);
+    z-index: 9999;
+}
+
+#loaderContent {
+    /*width: 200px;
+    height: 200px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background-image: url("");
+    background-repeat: no-repeat;
+    background-position: center;
+    margin: -100px 0 0 -100px;*/
+    font-size: 30px;
+    color: #FFFFFF;
+    font-style: italic;
+    position: absolute;
+    top: 50%;
+    left: 48%;
+    z-index: 999999;
+}
+/*.blur{
   -webkit-filter: blur(3px);
   -moz-filter: blur(3px);
   -ms-filter: blur(3px);
@@ -60,7 +88,7 @@
   25% {
     transform: scale(2);
   }
-}
+}*/
 
 /*end preloader*/
 
@@ -77,3 +105,92 @@
     z-index: 2;
 }
 /*btn go to top*/
+
+/*Adress Bar*/
+.address-bar-content-header > h1 {
+  padding-top: 15px;
+  margin: 2px;
+}
+
+.address-bar-content-header > .breadcrumb {
+  margin-top: 8px;
+  box-shadow: none;
+  /*padding-right: 0;*/
+  padding-left: 8px;
+  margin-bottom: 25px;
+  background-color: #F5F5F5;
+  border-radius: 0;
+}
+
+.address-bar-content-header > .breadcrumb > li > a,
+.address-bar-content-header > .breadcrumb > li {
+  color: #333;
+  text-decoration: none;
+}
+
+.address-bar-content-header > .breadcrumb > li > a:hover{
+  color: #337ab7;
+}
+
+.address-bar-content-header > .breadcrumb > li > a > .fa,
+.address-bar-content-header > .breadcrumb > li > a > .glyphicon {
+  margin-right: 5px;
+}
+
+.address-bar-content-header > .breadcrumb > li + li:before {
+  padding: 0 0.5rem;
+  content: '\2044';
+  font-size: 16px;
+  color: #333;
+}
+
+.address-bar-content-header > .breadcrumb > li.current-date:before {
+  padding: 0 0.5rem;
+  content: '';
+  font-size: 16px;
+  color: #333;
+}
+
+
+/*END NAVEGACIÓN*/
+
+/*BLUE NAVBAR*/
+.navbar-custom {
+  background-color:#337ab7;
+  color:#ffffff;
+  border-radius:0;
+}
+
+.navbar-custom .navbar-nav > li > a {
+  color:#fff;
+}
+
+.navbar-custom .navbar-nav > .active > a {
+  color: #ffffff;
+  background-color:transparent;
+}
+
+.navbar-custom .navbar-nav > li > a:hover,
+.navbar-custom .navbar-nav > li > a:focus,
+.navbar-custom .navbar-nav > .open > a:hover,
+.navbar-custom .navbar-nav > .open > a:focus,
+.navbar-custom .navbar-nav > .open > a {
+  text-decoration: none;
+  background-color: #23527c;
+  color: #ffffff;
+}
+
+.navbar-custom .navbar-brand {
+  color:#eeeeee;
+}
+.navbar-custom .navbar-toggle {
+  background-color:#eeeeee;
+}
+.navbar-custom .icon-bar {
+  background-color:#33aa33;
+}
+
+hr {
+  border-top: 1px solid #337ab7;
+}
+/*END BLUE NAVBAR*/

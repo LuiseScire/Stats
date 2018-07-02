@@ -7,14 +7,13 @@
 
         <title>Stats - @yield('title')</title>
 
+        <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
         <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
         <link rel="stylesheet" href="{{ asset('css/metisMenu.css') }}">
         <link rel="stylesheet" href="{{ asset('css/main.css') }}">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-        <!--<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
-        -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
         <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
         @yield('css')
         <style>
@@ -22,12 +21,9 @@
         </style>
     </head>
     <body>
-      <div class="preloader">
-        <div class="loader">
-          <div class="line"></div>
-          <div class="line"></div>
-          <div class="line"></div>
-          <div class="line"></div>
+      <div id="preloader">
+        <div id="loaderContent">
+          Cargando...
         </div>
       </div>
 
@@ -38,9 +34,9 @@
         </span>
       </a>
 
-      <div id="wrapper" class="blur">
+      <div id="wrapper">
         @section('sidebar')
-        <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
+        <nav class="navbar navbar-default navbar-custom navbar-static-top" role="navigation" style="margin-bottom: 0">
           <div class="navbar-header">
               <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                   <span class="sr-only">Toggle navigation</span>
@@ -58,7 +54,7 @@
               </a>
               <!-- -->
           </div>
-          <ul class="nav navbar-top-links navbar-right">
+          <ul class="nav navbar-nav navbar-top-links navbar-right">
               <li class="dropdown">
                   <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                       <i class="fa fa-user fa-fw"></i>{{ Auth::user()->name }} <i class="fa fa-caret-down"></i>
@@ -94,10 +90,29 @@
               <div class="sidebar-nav navbar-collapse">
                   <ul class="nav" id="side-menu">
                       <li>
-                          <a href="{{ url('home') }}"><i class="fa fa-home fa-fw"></i> Inicio</a>
+                          <a href="{{ url('home') }}"><i class="fa fa-home fa-fw"></i> Home</a>
                       </li>
                       <li>
                           <a href="{{ url('subircsv') }}"><i class="fa fa-upload fa-fw"></i> Subir CSV</a>
+                      </li>
+                      <li id="menuOptionCharts" style="display: none">
+                        <a href="#"><i class="fa fa-bar-chart"></i> Estadísticas<span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                          <li>
+                            <a href="#totalDownloadsPanel" class="link-menu"><i class="fa fa-bar-chart"></i> Descargas Totales</a>
+                          </li>
+                          <li>
+                            <a href="#totalDownloadsMonthPanel" class="link-menu"><i class="fa fa-bar-chart"></i> Descargas Mensuales</a>
+                          </li>
+                          <li>
+                            <a href="#countryDownloadsPanel" class="link-menu"><i class="fa fa-bar-chart"></i> Descargas por País</a>
+                          </li>
+                          <!-- Si se agrega otra opción también agregar en el menú de downstatscountry.js para la vista de los países-->
+                        </ul>
+                      </li>
+                      <li id="menuOptionChartsFromCountriesView" style="display: none">
+                        <a href="#"><i class="fa fa-bar-chart"></i> Estadísticas<span class="fa arrow"></span></a>
+                        <ul id="menuOptionChartsContent" class="nav nav-second-level"></ul>
                       </li>
                   </ul>
               </div>
@@ -106,7 +121,7 @@
           <!-- /.navbar-static-side -->
         </nav>
         @show
-        <div id="page-wrapper" style="padding-top: 5%;">
+        <div id="page-wrapper">
           @yield('content')
         </div>
       </div>
@@ -123,9 +138,18 @@
       <script>
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
         $(window).on('load', function(){
-           $(".preloader").fadeOut("slow");
-           $("#wrapper").removeClass("blur");
-         });
+           fadeOutLoader();
+        });
+
+        function fadeInLoader(){
+          $("#preloader").fadeIn("slow");
+          //$("wrapper").addClass("blur");
+        }
+
+        function fadeOutLoader(){
+          $("#preloader").fadeOut("slow");
+          //$("#wrapper").removeClass("blur");
+        }
 
         $(document).ready(function() {
           $('.ir-arriba').click(function(){
@@ -141,14 +165,40 @@
                   $('.ir-arriba').slideUp(600);
               }
           });
-
           /*hacia abajo*/
           $('.ir-abajo').click(function(){
               $('body, html').animate({
                     scrollTop: '1000px'
                 }, 1000);
-            });
           });
+
+
+
+          $('a.link-menu[href^="#"]').click(function() {
+            var target = $(this.hash);
+
+            $('html, body').animate({ scrollTop: target.offset().top }, 500);
+            return false;
+          });
+
+          $("#current-date").text(formatDate());
+        });
+
+        function formatDate() {
+          var date = new Date();
+          var monthNames = [
+            "Enero", "Febrero", "Marzo",
+            "Abril", "Mayo", "Junio", "Julio",
+            "Augosto", "Septimbre", "Octubre",
+            "Noviembre", "Diciembre"
+          ];
+
+          var day = date.getDate();
+          var monthIndex = date.getMonth();
+          var year = date.getFullYear();
+
+          return day + ' de ' + monthNames[monthIndex] + ' de ' + year;
+        }
       </script>
 
       @yield('javascript')
