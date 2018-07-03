@@ -36,7 +36,7 @@
 
       <div id="wrapper">
         @section('sidebar')
-        <nav class="navbar navbar-default navbar-custom navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <nav id="navBar" class="navbar navbar-default navbar-custom navbar-fixed-top" role="navigation" style="margin-bottom: 0">
           <div class="navbar-header">
               <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                   <span class="sr-only">Toggle navigation</span>
@@ -164,15 +164,17 @@
               } else {
                   $('.ir-arriba').slideUp(600);
               }
+
+              if($(this).scrollTop() > 100 ){
+                //$("#navBar").removeClass("navbar-static-top").addClass("navbar-fixed-top");
+              }
           });
           /*hacia abajo*/
-          $('.ir-abajo').click(function(){
+          /*$('.ir-abajo').click(function(){
               $('body, html').animate({
                     scrollTop: '1000px'
                 }, 1000);
-          });
-
-
+          });*/
 
           $('a.link-menu[href^="#"]').click(function() {
             var target = $(this.hash);

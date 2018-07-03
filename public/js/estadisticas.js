@@ -341,7 +341,7 @@ function drawChart() {
   chart.draw(data, options);
 }
 
-$(".angle_panel_collapse").click(function(event) {
+$(".angle-panel-collapse").click(function(event) {
   var parents = $(this).parentsUntil('.col-lg-12');
   var parentElement = parents[parents.length - 1];
   var panelBody = $(parentElement).find('div.panel-body');
@@ -355,6 +355,8 @@ $(".angle_panel_collapse").click(function(event) {
   } else if (panelBody.hasClass('collapse-down')) {
     $(parentElement).find('div.panel-body').slideDown("slow").removeClass('collapse-down').addClass('collapse-up');
     $(this).attr('title', 'Ocultar').html(angleUP);
+    $("html, body").animate({scrollTop: $(parentElement).offset().top}, 500);
+    return false;
   }
 });
 
@@ -415,12 +417,17 @@ $(".export-action").click(function() {
   console.log(chartCountryDownloadsImage);*/
 });
 
-$(".porcent").click(function() {
-  //google.charts.setOnLoadCallback(drawChart);
-  if($("#piechart").hasClass('hide')){
-    $("#piechart").css('display', 'block').removeClass('hide');
+$("#breakdownButton").click(function (){
+  var target = $("#countryDesglosDownloadsPanel");
+  if(target.hasClass('hide')){
+    target.css('display', 'block').removeClass('hide');
+    $(".porcent:first").click();
   }
+  $("html, body").animate({scrollTop: target.offset().top}, 500);
+  return false;
+});
 
+$(".porcent").click(function() {
   var porcent = $(this).data('porcent');
 
   var downloads = parseFloat(descargas);
