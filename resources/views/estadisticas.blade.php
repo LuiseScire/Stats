@@ -3,7 +3,7 @@
 @section('title', 'Estadísticas')
 
 @section('css')
-    <style media="screen">
+    <style>
       .chart-images{display: block;}
 
       .angle-panel-collapse{
@@ -12,7 +12,7 @@
         font-size: 20px;
       }
 
-      /*@media only screen and (max-width: 600px) {
+      @media (max-width: 600px) {
         .custom-btn-block{
           display: block;
           width: 100%;
@@ -20,7 +20,7 @@
         }
       }
 
-      @media only screen and(min-width: 600px) {
+      @media (min-width: 600px) {
         .custom-btn-block{
           display: block;
           width: 100%;
@@ -28,37 +28,31 @@
         }
       }
 
-      @media only screen and (min-width: 768px)  {
+      @media (min-width: 768px)  {
         .custom-btn-block{
           display: block;
           width: 100%;
-          margin-top: 10px;
         }
       }
 
-      @media only screen and (max-width: 768px)  {
+      @media (max-width: 768px)  {
         .custom-btn-block{
           display: block;
           width: 100%;
-          margin-top: 10px;
-        }
-      }*/
-
-      @media only screen and (max-width: 600px) {
-        .margin{
-          margin-top: 10px;
         }
       }
 
-      @media only screen and (min-width: 600px) {
-        .margin{
-          margin-top: 10px;
+      @media (min-width: 992px) {
+        .custom-btn-block {
+          display: inline-block;
+          width: auto;
         }
       }
 
-      @media only screen and (min-width: 768px) {
-        .margin{
-          margin-top: 10px;
+      @media (min-width: 1200px) {
+        .custom-btn-block {
+          display: inline-block;
+          width: auto;
         }
       }
     </style>
@@ -165,182 +159,25 @@
             <div id="countryDownloadsChart"></div>
             <!--<div id="piechart" style="width: 100%; height: 500px; display:none" class="hide"></div>-->
             <hr>
-            <div class="col-md-4">
-
-            </div>
-            <div class="col-md-4 col-lg-3 margin">
-              <a href="{{ url('estadisticas/descargasporpais/'.$filename) }}" class="btn btn-primary btn-block">Ver gráfica completa <i class="fa fa-external-link"></i></a>
-            </div>
-
-            <div class="col-md-4 col-lg-3 margin">
-              <button id="breakdownButton" class="btn btn-primary btn-block"><i class="fa fa-pie-chart"></i> Desglose por porcentaje</button>
-            </div>
-
-            <div class="col-md-4 col-lg-2 margin pull-right">
-              <div class="btn-group btn-block">
-                <div class="dropdown dropup">
-                  <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    Exportar como:
-                    <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    <li><a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
-                  </ul>
+            <div class="col-lg-12">
+              <div class="text-right">
+                <button id="breakdownButton" class="btn btn-primary custom-btn-block"><i class="fa fa-pie-chart"></i> Desglose por porcentaje</button>
+                <a href="{{ url('estadisticas/descargasporpais/'.$filename) }}" class="btn btn-primary custom-btn-block">Ver gráfica completa <i class="fa fa-external-link"></i></a>
+                <div class="btn-group">
+                  <div class="dropdown dropup">
+                    <button class="btn btn-primary custom-btn-block dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                      Exportar como:
+                      <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                      <li><a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
-
-
-
-
-
-            <!--<div class="col-md-4 col-lg-3 margin pull-right">
-              <button id="breakdownButton" class="btn btn-primary btn-block"><i class="fa fa-pie-chart"></i> Desglose por porcentaje</button>
-            </div>
-
-            <div class="col-md-4 col-lg-3 margin pull-right">
-              <a href="{{ url('estadisticas/descargasporpais/'.$filename) }}" class="btn btn-primary btn-block">Ver gráfica completa <i class="fa fa-external-link"></i></a>
-            </div>
-
-            <div class="col-md-4 col-lg-2 margin pull-right">
-              <div class="btn-group btn-block">
-                <div class="dropdown dropup">
-                  <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    Exportar como:
-                    <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    <li><a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
-                  </ul>
-                </div>
-              </div>
-            </div>-->
-
-            <!--<button id="breakdownButton" class="btn btn-primary btn-block"><i class="fa fa-pie-chart"></i> Desglose por porcentaje</button>
-            <a href="{{ url('estadisticas/descargasporpais/'.$filename) }}" class="btn btn-primary btn-block">Ver gráfica completa <i class="fa fa-external-link"></i></a>
-
-            <div class="btn-group btn-block">
-              <div class="dropdown dropup">
-                <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                  Exportar como:
-                  <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                  <li><a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
-                </ul>
-              </div>
-            </div>-->
-
-
-
-
-            <!--<div class="col-md-4 col-lg-3">
-
-                  <button id="breakdownButton" class="btn btn-primary col-md-4 col-lg-2 btn-block"><i class="fa fa-pie-chart"></i> Desglose por porcentaje</button>
-
-            </div>
-            <div class="col-md-3 col-lg-3">
-
-                <a href="{{ url('estadisticas/descargasporpais/'.$filename) }}" class="btn btn-primary col-md-4 col-lg-2 btn-block">Ver gráfica completa <i class="fa fa-external-link"></i></a>
-
-            </div>
-            <div class="col-md-3 col-lg-2">
-              <div class="btn-group btn-block">
-                <div class="dropdown dropup">
-                  <button class="btn btn-primary  dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    Exportar como:
-                    <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    <li><a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
-                  </ul>
-                </div>
-              </div>
-            </div>-->
-
-
-
-
-
-
-
-              <!--<div class="col-md-4">
-                <a href="{{ url('estadisticas/descargasporpais/'.$filename) }}" class="btn btn-primary btn-block">Ver gráfica completa <i class="fa fa-external-link"></i></a>
-              </div>-->
-
-            <!--<button id="breakdownButton" class="btn btn-primary col-xs-12 col-md-3 btn-block"><i class="fa fa-pie-chart"></i> Desglose por porcentaje</button>
-            <a href="{{ url('estadisticas/descargasporpais/'.$filename) }}" class="btn btn-primary col-xs-12 col-md-3 btn-block">Ver gráfica completa <i class="fa fa-external-link"></i></a>
--->
-            <!--<div class="col-xs-12 col-md-">
-              <button id="breakdownButton" class="btn btn-primary col-xs-12 col-md-3 btn-block"><i class="fa fa-pie-chart"></i> Desglose por porcentaje</button>
-            </div>
-            <div class="col-xs-12 col-md-3">
-              <a href="{{ url('estadisticas/descargasporpais/'.$filename) }}" class="btn btn-primary col-xs-12 col-md-3 btn-block">Ver gráfica completa <i class="fa fa-external-link"></i></a>
-            </div>-->
-            <!--<div class="col-xs-12 col-md-2">
-              <div class="btn-group">
-                <div class="dropdown dropup">
-                  <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    Exportar como:
-                    <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    <li><a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
-                  </ul>
-                </div>
-              </div>
-
-            </div>-->
-
-
-
-            <div  style="text-align: right;">
-
-
-
-              <!--<div class="btn-group">
-                <div class="dropdown dropup">
-                  <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    Exportar como:
-                    <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    <li><a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
-                  </ul>
-                </div>
-              </div>-->
-            </div>
-
-
-
-
-
-
-
-
-
-
-            <!--<div class="col-lg-12">
-              <button id="breakdownButton" type="button" name="button" class="btn btn-primary btn-block"><i class="fa fa-pie-chart"></i> Desglose por porcentaje</button>
-
-              <button type="button" name="button" class="btn btn-primary btn-block" onclick="location.href='{{ url('estadisticas/descargasporpais/'.$filename) }}'">Ver gráfica completa <i class="fa fa-external-link"></i></button>
-
-              <div class="btn-group btn-block">
-                <div class="dropdown dropup">
-                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    Exportar como:
-                    <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                    <li><a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
-                  </ul>
-                </div>
-
-              </div>
-            </div>-->
 
           </div>
-
         </div>
 
         <div id="countryDesglosDownloadsPanel" class="panel panel-primary hide" style="display:none">
@@ -354,32 +191,46 @@
           <div class="panel-body collapse-up">
             <div id="piechart" style="width: 100%; height: 500px;"></div>
             <hr>
-            <div class="col-lg-12" style="text-align: right">
-              <div class="dropdown dropup" style="display: inline-block">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                  Desglose por porcentaje:
-                  <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                  <li><a href="javascript:void(0)" class="porcent" data-porcent="90">90%</a></li>
-                  <li><a href="javascript:void(0)" class="porcent" data-porcent="80">80%</a></li>
-                  <li><a href="javascript:void(0)" class="porcent" data-porcent="70">70%</a></li>
-                  <li><a href="javascript:void(0)" class="porcent" data-porcent="60">60%</a></li>
-                  <li><a href="javascript:void(0)" class="porcent" data-porcent="50">50%</a></li>
-                </ul>
+            <div class="text-right">
+              <div class="btn-group custom-btn-block">
+                <div class="dropdown dropup">
+                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    Desglose por porcentaje:
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                    <li><a href="javascript:void(0)" class="porcent" data-porcent="90">90%</a></li>
+                    <li><a href="javascript:void(0)" class="porcent" data-porcent="80">80%</a></li>
+                    <li><a href="javascript:void(0)" class="porcent" data-porcent="70">70%</a></li>
+                    <li><a href="javascript:void(0)" class="porcent" data-porcent="60">60%</a></li>
+                    <li><a href="javascript:void(0)" class="porcent" data-porcent="50">50%</a></li>
+                  </ul>
+                </div>
               </div>
 
-              <div class="dropdown dropup" style="display: inline-block">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                  Exportar como:
-                  <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                  <li><a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
-                </ul>
+              <div class="btn-group custom-btn-block">
+                <div class="dropdown dropup">
+                  <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    Exportar como:
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                    <li><a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
+                  </ul>
+                </div>
               </div>
+            </div>
+
+
+            <!--<div class="col-md-4 col-lg-3 margin">
 
             </div>
+
+            <div class="col-md-3 col-lg-2 margin pull-right">
+
+            </div>-->
+
+
           </div>
         </div>
 

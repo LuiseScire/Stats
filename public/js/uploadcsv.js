@@ -58,12 +58,27 @@ function subirCsv() {
 			if(response.status == 'success'){
 				fileNameConfirmed = fileName;
 
+				fadeInLoader();
+				if($("#loadPreviewText").hasClass('alert-info')){
+					$("#loadPreviewText").removeClass('alert-info').addClass('alert-warning').html("Cargando vista previa del archivo");
+					$('#preView').empty();
+				}
+				if(changeFile == 1) {
+					$("#cambiarArchivo").attr('disabled', 'disabled');
+					$("#uploadFileConfirmed").attr('disabled', 'disabled');
+				}
+				$("#loadPreviewText").show();
 				setTimeout(function() {
-					$.ajax({
+					processPreview();
+
+					/*$.ajax({
 							type: "GET",
 							url: "/workspace/stats/public/csvfiles/tmp/" + fileName,
 							dataType: "text",
 							beforeSend: function(){
+								//mostrar el loader
+								fadeInLoader();
+
 								if($("#loadPreviewText").hasClass('alert-info')){
 									$("#loadPreviewText").removeClass('alert-info').addClass('alert-warning').html("Cargando vista previa del archivo");
 									$('#preView').empty();
@@ -73,15 +88,12 @@ function subirCsv() {
 									$("#uploadFileConfirmed").attr('disabled', 'disabled');
 								}
 								$("#loadPreviewText").show();
-
-								//mostrar el loader
-								fadeInLoader();
 							},
 							success: function(data) {
-								successFunction(data);
+								setTimeout(function(){successFunction(data);}, 2000);
 							}
-					 });
-				}, 1000);
+					 });*/
+				}, 2000);
 			}
 			if(response.status == "error") alert(response.message);
 		}
@@ -159,26 +171,112 @@ function abortHandler(event) {
   //$("#status").html("Subida Abortada");
 }
 
-function bytesToSize(bytes) {
-  var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  if (bytes == 0) return '0 Byte';
-  var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
-  return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+function processPreview(){
+	var url = "/workspace/stats/public/csvfiles/tmp/" + fileName;
+	var cabeceras = [];
+
+	d3.text(url, function(data) {
+			var parsedCSV = d3.csv.parseRows(data);
+			cabeceras.push(parsedCSV[5]);
+			parsedCSV.splice(0,5);
+			var container = d3.select(".js-pscroll")
+					.append("table")
+
+					.selectAll("tr")
+							.data(parsedCSV).enter()
+							.append("tr")
+
+					.selectAll("td")
+							.data(function(d) { return d; }).enter()
+							.append("td")
+							.text(function(d) { return d; });
+
+
+
+			//$("#preView > table > tr:first").addClass("thead");
+
+
+			$.each(cabeceras, function(index, arrgs) {
+				$.each(arrgs, function(index, v) {
+
+					var th = '<th class="cell100">'+v+'</th>';
+					$("tr.head").append(th);
+				});
+			});
+
+			$("#preView").show();
+
+			fadeOutLoader();
+
+			$("#progressBarContent").css('display', 'none');
+			$("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html("Vista Previa");
+			$("#confirmFileContent").show();
+			$("#strongFileName").text(fileNameConfirmed);
+
+			if(changeFile == 1) {
+				$("#cambiarArchivo").removeAttr('disabled');
+				$("#uploadFileConfirmed").removeAttr('disabled');
+			}
+	});
+
 }
 
+
 function successFunction(data) {
+	var url = "/workspace/stats/public/csvfiles/tmp/" + fileName;
+
+	d3.text(url, function(data) {
+		//console.log(data);
+      var parsedCSV = d3.csv.parseRows(data);
+			parsedCSV.splice(0,5);
+			//console.log(parsedCSV);
+      var container = d3.select("#preView")
+          .append("table").addClass("table table-striped")
+
+          .selectAll("tr")
+              .data(parsedCSV).enter()
+              .append("tr")
+
+          .selectAll("td")
+              .data(function(d) { return d; }).enter()
+              .append("td")
+              .text(function(d) { return d; });
+  });
+
+
+
+
   var allRows = data.split(/\r?\n|\r/);
-  var table = '<table class="table">';
+	var dataSet = [];
+  //var table = '<table class="table table-striped">';
   for (var singleRow = 0; singleRow < allRows.length; singleRow++) {
 		if(singleRow < 5 ) {
 			//se evitan las primeras 5 filas del documento.
 		} else {
-			if (singleRow === 5) {
+			parsedCSV = d3.csv.parseRows(allRows[singleRow]);
+			//dataSet.push(parsedCSV);
+			//console.log(allRows[singleRow]);
+			//console.log(parsedCSV);
+			/*var container = d3.select("#preView")
+          .append("table")
+
+          .selectAll("tr")
+              .data(parsedCSV).enter()
+              .append("tr")
+
+          .selectAll("td")
+              .data(function(d) { return d; }).enter()
+              .append("td")
+              .text(function(d) { return d; });*/
+
+			/*if (singleRow === 5) {
 	      table += '<thead>';
 	      table += '<tr>';
 	    } else {
 	      table += '<tr>';
 	    }
+
+
 	    var rowCells = allRows[singleRow].split(',');
 	    for (var rowCell = 0; rowCell < rowCells.length; rowCell++) {
 	      if (singleRow === 0) {
@@ -191,19 +289,33 @@ function successFunction(data) {
 	        table += '</td>';
 	      }
 	    }
-	    if (singleRow === 0) {
+
+	    if (singleRow === 5) {
 	      table += '</tr>';
 	      table += '</thead>';
 	      table += '<tbody>';
 	    } else {
 	      table += '</tr>';
-	    }
+	    }*/
+
 		}
   }
 
-  table += '</tbody>';
-  table += '</table>';
-  $('#preView').append(table);
+	/*var container = d3.select("#preView")
+			.append("table")
+
+			.selectAll("tr")
+					.data(dataSet).enter()
+					.append("tr")
+
+			.selectAll("td")
+					.data(function(d) { return d; }).enter()
+					.append("td")
+					.text(function(d) { return d; });*/
+
+  //table += '</tbody>';
+  //table += '</table>';
+  //$('#preView').append(table);
 
 	//ocultamos el loader
 	fadeOutLoader();
@@ -241,3 +353,10 @@ $("#cambiarArchivo").click(function(event) {
 	changeFile = 1;
 	$("#csvFile").val('').click();
 });
+
+function bytesToSize(bytes) {
+  var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  if (bytes == 0) return '0 Byte';
+  var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+  return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+}

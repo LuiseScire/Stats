@@ -126,15 +126,16 @@
         </div>
       </div>
 
-      <script src="https://code.jquery.com/jquery-3.3.1.js" charset="utf-8"></script>
+      <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
       <!--<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" charset="utf-8"></script>
-      --><script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" charset="utf-8"></script>
-      <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js" charset="utf-8"></script>
-      <script src="{{ asset('js/bootstrap.js') }}" charset="utf-8"></script>
-      <script src="{{ asset('js/metisMenu.js') }}" charset="utf-8"></script>
-      <script src="{{ asset('js/main.js') }}" charset="utf-8"></script>
-      <script src="{{ asset('js/pluggins/jquery.number.js') }}" charset="utf-8"></script>
-      <script src="https://www.gstatic.com/charts/loader.js" charset="utf-8"></script>
+      -->
+      <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+      <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+      <script src="{{ asset('js/bootstrap.js') }}"></script>
+      <script src="{{ asset('js/metisMenu.js') }}"></script>
+      <script src="{{ asset('js/main.js') }}"></script>
+      <script src="{{ asset('js/pluggins/jquery.number.js') }}"></script>
+      <script src="https://www.gstatic.com/charts/loader.js"></script>
       <script>
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
         $(window).on('load', function(){
