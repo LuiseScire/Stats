@@ -23,29 +23,33 @@ function getList(){
         var csvVersion = v.csv_version;
         var csvTimestamp = v.csv_timestamp;
 
-        var stringName;
+
+
+        var stringName, stringNameConfirm;
 
         if(csvVersion == null) {
-          stringName = csvName + " - " + csvTimestamp;
+          //stringName = csvName + " - " + dateFormat(csvTimestamp);
+          stringName ='<label style="cursor:pointer;"><i class="fa fa-file"></i> '+csvName + '</label> - <span style="color:gray">' + dateFormat(csvTimestamp)+'</label>';
+          stringNameConfirm = csvName;
         } else {
-          stringName = csvName + " - " + csvVersion + " - " + csvTimestamp;
+          //stringName = csvName + "(" + csvVersion + ") - " + dateFormat(csvTimestamp);
+          stringName = '<label style="cursor:pointer;"><i class="fa fa-file"></i> '+csvName+'('+csvVersion+')</label> - <span style="color:gray"> '+dateFormat(csvTimestamp)+'</span>'
+          stringNameConfirm = csvName + "(" + csvVersion + ")";
         }
 
-
-
         //console.log(v);
-        var li = '<li class="list-group-item">';
-            li+=  '<a class="csv-file-item" data-csvname="'+csvDBName+'">';
-            li+=    '<label style="cursor:pointer"><i class="fa fa-file"></i> '+stringName+'</label>';
+        var li = '<li id="itemFile'+csvId+'" class="list-group-item">';
+            li+=  '<a class="csv-file-item" data-csvname="'+csvDBName+'" style="text-decoration: none">';
+            li+=    stringName;
             li+=  '</a>';//fa-ellipsis-v
 
-            li+=  '<div class="dropdown pull-right">';
+            li+=  '<div class="dropdown pull-right" style="float:left">';
             li+=      '<a class="dropdown-toggle" data-toggle="dropdown" href="#">';
             li+=          '<i class="fa fa-ellipsis-v"></i>';
             li+=      '</a>';
             li+=      '<ul class="dropdown-menu dropdown-user">';
             li+=        '<li>';
-            li+=          '<a href="#"><i class="fa fa-trash fa-fw"></i> Eliminar</a>';
+            li+=          '<a href="#" onClick="deleteItem('+csvId+', '+"'"+stringNameConfirm+"'"+')"><i class="fa fa-trash fa-fw"></i> Eliminar</a>';
             li+=        '</li>';
             /*li+=        '<li>';
             li+=          '<a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>';
@@ -65,17 +69,6 @@ function getList(){
         count++;
       });
 
-      /*$.each(response.fileList, function(index, v){
-        count++;
-        var li = '<li class="list-group-item">';
-            li+=  '<a class="csv-file-item" data-csvname="'+v+'">';
-            li+=    '<label style="cursor:pointer"><i class="fa fa-file"></i> '+v+'</label>';
-            li+=  '</a>'//fa-ellipsis-v
-            li+=  '<i class="fa fa-ellipsis-v pull-right delete-csv-file-menu" data-csvname="'+v+'"></i>';
-            li+= '</li>';
-        $("#csvList").append(li);
-      });*/
-
       if(count > 0){
         $("#csvListContent").css('display', 'block');
         $("#noFiles").css('display', 'none');
@@ -86,11 +79,43 @@ function getList(){
   });
 }
 
+
+
+function deleteItem(csvId, fileName) {
+  var data = {'_token': CSRF_TOKEN, 'case':'delete', 'csv_id': csvId}
+
+  var _confirm = confirm("¿Está seguro que desea eliminar '"+fileName+"'?");
+  if(_confirm) {
+    $.post('listcsvfiles', data, function(response) {
+      var status = response.status;
+      var message = response.message;
+
+      if(status == "success") {
+        $("#itemFile"+csvId).slideUp("slow");
+        setTimeout(function() {
+          //alert(message);
+        }, 1000);
+      }
+
+      if(status == "error") {
+        alert(message);
+      }
+    });
+  }
+}
+
+function dateFormat(date){
+  var months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septimbre", "octube", "Nomviembre", "Diciembre"];
+
+  var date = new Date(date);
+
+  var dateFormat = "subido el " + date.getDate() + " de " + months[date.getMonth()] + " de " + date.getFullYear();
+      dateFormat += " " + date.toLocaleString('en-EU', { hour: 'numeric', minute: 'numeric', hour12: true });
+
+  return dateFormat;
+}
+
 $(document).on('click', '.csv-file-item', function() {
   var fileName = $(this).data('csvname');
   location.href = 'estadisticas/archivo/' + fileName;
-});
-
-$(document).on('click', '.delete-csv-file-menu', function() {
-
 });

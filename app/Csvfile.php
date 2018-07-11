@@ -11,11 +11,14 @@ class Csvfile extends Model
   protected $table = "csvfiles";
 
   protected $fillable = [
-    'csv_name',
+    'csv_id',
+    'csv_front_name',
+    'csv_back_name',
     'csv_path',
     'csv_user_id',
     'csv_status',
     'csv_version',
     'csv_timestamp',
+    'csv_indices'
   ];
 }

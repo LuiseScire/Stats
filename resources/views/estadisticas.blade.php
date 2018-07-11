@@ -86,6 +86,58 @@
   <div class="row">
     <div class="col-lg-12">
       <!--<div id="noDataText" class="alert alert-info" role="alert">Documento: <strong>{{ $filename }}</strong></div>-->
+        <div id="chartPanelTipo" class="panel panel-primary" style="display: none;">
+          <div class="panel-heading">
+            <h4>
+              <i class="fa fa-bar-chart"></i>
+              <span id="panelTitleTipo"></span>
+              <span class="pull-right angle-panel-collapse" title="Ocultar"><i class="fa fa-angle-up fa-lg"></i></span>
+            </h4>
+          </div>
+          <div class="panel-body collapse-up">
+            <div id="chartContentTipo"></div>
+            <hr>
+            <div class="col-lg-12">
+              <div class="dropdown pull-right">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  Exportar como:
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <li><a href="javascript:void(0)" class="export-action" data-charttype="total" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="chartPanelMonths" class="panel panel-primary" style="display: none">
+          <div class="panel-heading">
+            <h4>
+              <i class="fa fa-bar-chart"></i>
+              <span id="panelTitleMonths"></span>
+              <span class="pull-right angle-panel-collapse" title="Ocultar"><i class="fa fa-angle-up fa-lg"></i></span>
+            </h4>
+          </div>
+          <div class="panel-body collapse-up">
+            <div id="chartContentMonths"></div>
+            <hr>
+            <div class="col-lg-12">
+              <div class="dropdown pull-right">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  Exportar como:
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <li><a href="javascript:void(0)" class="export-action" data-charttype="total" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- deprecated -->
+
         <div id="totalDownloadsPanel" class="panel panel-primary">
           <div class="panel-heading">
             <h4>

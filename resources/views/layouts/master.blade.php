@@ -136,6 +136,8 @@
       <script src="{{ asset('js/main.js') }}"></script>
       <script src="{{ asset('js/pluggins/jquery.number.js') }}"></script>
       <script src="https://www.gstatic.com/charts/loader.js"></script>
+      <script src="http://d3js.org/d3.v3.min.js"></script>
+      
       <script>
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
         $(window).on('load', function(){

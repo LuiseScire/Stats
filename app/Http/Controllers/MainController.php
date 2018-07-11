@@ -28,27 +28,38 @@ class MainController extends Controller{
     return view('main');
   }
 
-  public function listcsvfiles(){
+  public function listcsvfiles(Request $request){
     #Model
     $csv_file_db = new Csvfile;
     #
 
     $auth_id = Auth::id();
 
-    $csv_list = $csv_file_db->where([['csv_user_id', $auth_id], ['csv_status', 'active']])->get();
+    $case = $request->case;
 
-    $file_list = [];
-    /*$directorio = opendir(public_path() . '/csvfiles/');
-    while ($archivo = readdir($directorio)){
-      if (strtolower(substr($archivo, -3) == 'csv')){
-        //echo $archivo . '<br />';
-        array_push($file_list, $archivo);
-      }
-    }*/
-    $response = array(
-      'fileList' => $file_list,
-      'csvList' => $csv_list
-    );
+    switch ($case) {
+      case "delete":
+        //$delete = $csv_file_db->where('csv_id', $request->csv_id)->update(['csv_status', 'deleted']);
+        $csv_id = $request->csv_id;
+        $delete = $csv_file_db->where('csv_id', $csv_id)->update(['csv_status' => 'deleted']);
+        if($delete){
+          $response = array('status' => 'success', 'message' => 'Archivo eliminado satisfactóriamete');
+        } else {
+          $response = array('status' => 'error', 'message' => 'Error al eliminar archivo');
+        }
+        break;
+      default:
+        $csv_list = $csv_file_db->where([['csv_user_id', $auth_id], ['csv_status', 'active']])->get();
+
+        $file_list = [];
+
+        $response = array(
+          'fileList' => $file_list,
+          'csvList' => $csv_list
+        );
+        break;
+    }
+
     return response()->json($response);
   }
 
@@ -65,14 +76,20 @@ class MainController extends Controller{
     switch ($action) {
       case 'uploadPreview':
         if(!empty($_FILES['csvFile']['name'])) {
-          $csv_file = '/csvfiles/tmp/' . $_FILES['csvFile']['name'];
-          $path = public_path() . $csv_file;
+          $file_name_gen = $this->randCode() . '.csv';
+
+          $file_name = $file_name_gen;//$_FILES['csvFile']['name'];
+          $url = '/csvfiles/tmp/' . $file_name;
+          $path = public_path() . $url;
+
+          //$csv_file = '/csvfiles/tmp/' . $_FILES['csvFile']['name'];
+          //$path = public_path() . $csv_file;
           if(move_uploaded_file($_FILES['csvFile']['tmp_name'], $path)){
             chmod($path, 0777);
             $response = array(
               'status'  => 'success',
               'message' => 'Archivo Subido correctamente',
-              'path' => $path,
+              'storageFileName' => $file_name,
             );
           } else {
             $response = array(
@@ -88,9 +105,17 @@ class MainController extends Controller{
         }
         break;
       case 'moveFromTemp':
+        $index_array = $request->indexArray;
+        /*foreach ($index_array as $key => $value) {
+          foreach ($value as $key => $v) {
+
+          }
+        }
+        $index_db = implode(",", $index_array);*/
         $file_name = $request->fileName;
-        $csv_file = '/csvfiles/tmp/' . $file_name;
-        $source_file = public_path() . $csv_file;
+        $storage_file_name = $request->storageFileName;
+        $csv_file = '/csvfiles/tmp/' . $storage_file_name;
+        $origin_path = public_path() . $csv_file;
 
         $search_match = $csv_file_db->where([
           ['csv_user_id', $auth_id],
@@ -108,15 +133,15 @@ class MainController extends Controller{
           $version = $count + 1;
         }
 
-        $file_name_gen = $this->randCode() . '.csv';
-        $csv_final_p = '/csvfiles/' . $file_name_gen;
-        $destination_path = public_path() . '/csvfiles/' . $file_name_gen;
-        if(rename($source_file, $destination_path)){
+        $csv_final_p = '/csvfiles/' . $storage_file_name;
+        $destination_path = public_path() . $csv_final_p;
+        if(rename($origin_path, $destination_path)){
           $csv_file_db->csv_front_name = $file_name;
-          $csv_file_db->csv_back_name = $file_name_gen;
+          $csv_file_db->csv_back_name = $storage_file_name;
           $csv_file_db->csv_path = $csv_final_p;
           $csv_file_db->csv_user_id = $auth_id;
           $csv_file_db->csv_version = $version;
+          $csv_file_db->csv_indices = json_encode($index_array);
 
           if($csv_file_db->save()){
             $response = array(
@@ -283,6 +308,18 @@ class MainController extends Controller{
     return view('downstatscountry', array('filename' => $filename));
   }
 
+  public function getdatacsv(Request $request) {
+    #Models
+    $csv_file_db = new Csvfile;
+    $auth_id = Auth::id();
+
+    $csv_back_name = $request->filename;
+
+    $csv_file_data = $csv_file_db->select()->where([['csv_back_name', $csv_back_name], ['csv_user_id', $auth_id]])->first();
+
+    return response()->json(array('csvFileData' => $csv_file_data));
+  }
+
   public function readcsv(Request $request){
     $response = array(
       'filename' => $request->filename
@@ -306,6 +343,7 @@ class MainController extends Controller{
 
       default:
         // code...
+
         break;
     }
 

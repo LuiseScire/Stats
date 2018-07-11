@@ -5,25 +5,7 @@
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/uploadcsvtables.css') }}">
 <style>
-  /*table {
-    border-radius: 5px;
-    font: 12px sans-serif;
- }
 
- .thead > td{
-   font-size: 18px;
-   color: #fff;
-   background-color: #337ab7;
-   padding-top: 18px;
-   padding-bottom: 18px;
- }
-
-td {
-  font-size: 15px;
-  color: #808080;
-  padding-top: 16px;
-  padding-bottom: 16px;
-}*/
 </style>
 @stop
 
@@ -48,6 +30,8 @@ td {
   <div id="inputFileContent" class="col-lg-12">
     <input type="file" id="csvFile" name="csvFile">
   </div>
+
+
 
   <div id="progressBarContent" class="col-lg-12" style="display: none">
     <div class="progress">
@@ -74,25 +58,41 @@ td {
     <div id="loadPreviewText" class="alert alert-warning" style="text-align: center; display:none" role="alert">
       <strong>Cargando vista previa del archivo</strong>
     </div>
+
+    <div class="contenedorexcel">
+
+    </div>
+    <!--
+    <iframe src="http://docs.google.com/gview?url=/workspace/stats/public/csvfiles/ejemplo.xlsx&embedded=true" style="width:600px; height:450px;" frameborder="0"></iframe>
+    -->
     <!-- class col-lg-12 removed-->
-    <div id="preView" style="display:none">
-      <div class="table100 ver1 m-b-110">
+    <div id="preView" style="display:none;">
+      
+      <table id="preViewTable" class="table table-striped">
+        <thead>
+
+        </thead>
+        <!--<tbody>
+
+        </tbody>-->
+      </table>
+      <!--<div class="table100 ver1 m-b-110">
 				<div class="table100-head">
 					<table>
 						<thead>
 							<tr class="row100 head">
-								<!--<th class="cell100 column1">Class name</th>
+								<th class="cell100 column1">Class name</th>
 								<th class="cell100 column2">Type</th>
 								<th class="cell100 column3">Hours</th>
 								<th class="cell100 column4">Trainer</th>
-								<th class="cell100 column5">Spots</th>-->
+								<th class="cell100 column5">Spots</th>
 							</tr>
 						</thead>
 					</table>
 				</div>
 
 				<div class="table100-body js-pscroll">
-					<!--<table>
+					<table>
 						<tbody>
 							<tr class="row100 body">
 								<td class="cell100 column1">Like a butterfly</td>
@@ -232,9 +232,9 @@ td {
 
 
 						</tbody>
-					</table>-->
+					</table>
 				</div>
-			</div>
+			</div>-->
     </div>
 
 
@@ -246,6 +246,9 @@ td {
 @stop
 
 @section('javascript')
-  <script src="http://d3js.org/d3.v3.min.js"></script>
   <script src="{{ asset('js/uploadcsv.js') }}"/></script>
+  <script type="text/javascript">
+
+  </script>
+
 @stop

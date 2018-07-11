@@ -1,0 +1,272 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <!-- provide the csrf token -->
+        <meta name="csrf-token" content="TyGQK4AULioV24ktk48PtW9M3mz4TerpqaGBOViF" />
+
+        <title>Stats - Estadísticas</title>
+
+        <link rel="stylesheet" href="http://localhost/workspace/stats/public/css/bootstrap.css">
+        <link rel="stylesheet" href="http://localhost/workspace/stats/public/css/metisMenu.css">
+        <link rel="stylesheet" href="http://localhost/workspace/stats/public/css/main.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+        <!--<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+        -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+        <link rel="stylesheet" href="http://localhost/workspace/stats/public/css/custom.css">
+            <style media="screen">
+      .chart-images{display: block;}
+    </style>
+        <style>
+
+        </style>
+    </head>
+    <body>
+      <div class="preloader">
+        <div class="loader">
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+          <div class="line"></div>
+        </div>
+      </div>
+
+      <a class="ir-arriba primary"  href="#" title="Volver arriba">
+        <span class="fa-stack">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-arrow-up fa-stack-1x fa-inverse"></i>
+        </span>
+      </a>
+
+      <div id="wrapper" class="blur">
+                    <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
+          <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+              </button>
+              <a id="navLinkHome" class="navbar-brand" href="http://localhost/workspace/stats/public/home">Stats</a>
+              <!-- show in downstatscountry view -->
+              <a id="navLinkBack" class="navbar-brand opc-nav-downstatscountry-view" href="javascript:void(0)" style="display:none">
+                <i class="fa fa-arrow-left"></i> Volver
+              </a>
+              <a id="navLinkFileName" class="navbar-brand opc-nav-downstatscountry-view" href="javascript:void(0)" style="display:none">
+                <i class="fa fa-file"></i> Documento: <span id="fileNameNavbar"></span>
+              </a>
+              <!-- -->
+          </div>
+          <!-- /.navbar-header -->
+          <!--float: left; text-align: center; width: 100%; margin: 0;-->
+          <div style="position: absolute;text-align: center; width: auto; margin: 15px; left: 44%;">
+            <a id="a" href="#" style="height: 50px; padding: 15px 15px; font-size: 18px; line-height: 20px;"></a>
+          </div>
+
+
+          <ul class="nav navbar-top-links navbar-right">
+              <li class="dropdown">
+                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                      <i class="fa fa-user fa-fw"></i>Luis Zacarías <i class="fa fa-caret-down"></i>
+                  </a>
+                  <ul class="dropdown-menu dropdown-user">
+                      <!--<li>
+                        <a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                      </li>
+                      <li>
+                        <a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+                      </li>
+                      <li class="divider"></li>-->
+                      <li>
+                        <a class="dropdown-item" href="http://localhost/workspace/stats/public/logout"
+                           onclick="event.preventDefault();
+                                         document.getElementById('logout-form').submit();">
+                            <i class="fa fa-sign-out fa-fw"></i>
+                            Salir
+                        </a>
+
+                        <form id="logout-form" action="http://localhost/workspace/stats/public/logout" method="POST" style="display: none;">
+                            <input type="hidden" name="_token" value="TyGQK4AULioV24ktk48PtW9M3mz4TerpqaGBOViF">                        </form>
+                      </li>
+                  </ul>
+                  <!-- /.dropdown-user -->
+              </li>
+              <!-- /.dropdown -->
+          </ul>
+          <!-- /.navbar-top-links -->
+
+          <div id="sidebar" class="navbar-default sidebar" role="navigation">
+              <div class="sidebar-nav navbar-collapse">
+                  <ul class="nav" id="side-menu">
+                      <li>
+                          <a href="http://localhost/workspace/stats/public/home"><i class="fa fa-home fa-fw"></i> Inicio</a>
+                      </li>
+                      <li>
+                          <a href="http://localhost/workspace/stats/public/subircsv"><i class="fa fa-upload fa-fw"></i> Subir CSV</a>
+                      </li>
+                  </ul>
+              </div>
+              <!-- /.sidebar-collapse -->
+          </div>
+          <!-- /.navbar-static-side -->
+        </nav>
+        
+        <div id="page-wrapper" style="padding-top: 5%;">
+          <div class="row">
+  <div class="col-lg-12">
+    <div id="noDataText" class="alert alert-info" role="alert">Documento: <strong>statistics-20180614.csv</strong></div>
+
+    <div id="chartsContent" class="row" style="display:none">
+      <div class="panel panel-default">
+        <div class="panel-heading">Descargas Totales</div>
+        <div class="panel-body">
+          <div id="totalDownloadsChart"></div>
+          <hr>
+          <div class="col-lg-12">
+            <div class="dropdown pull-right">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Exportar como:
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a href="javascript:void(0)" class="export-action" data-charttype="total" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
+              </ul>
+            </div>
+            <!-- /.dropdown-->
+          </div>
+          <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.panel-body -->
+
+        <!-- adicional data -> Table
+        <table class="table">
+          ...
+        </table>-->
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">Descargas Mensuales</div>
+        <div class="panel-body">
+          <div id="totalDownloadsMonthChart"></div>
+          <hr>
+          <div class="col-lg-12">
+            <div class="dropdown pull-right">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Exportar como:
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a href="javascript:void(0)" class="export-action" data-charttype="month" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
+              </ul>
+            </div>
+            <!-- /.dropdown -->
+          </div>
+          <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.panel-body -->
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">Descargas por País</div>
+        <div class="panel-body">
+          <div id="countryDownloadsChart"></div>
+          <hr>
+          <div class="col-lg-12">
+            <div class="dropdown pull-right">
+              <a href="http://localhost/workspace/stats/public/estadisticas/descargasporpais/statistics-20180614.csv">
+                <button type="button" name="button" class="btn btn-primary">Ver gráfica completa <i class="fa fa-external-link"></i></button>
+              </a>
+              <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Exportar como:
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
+              </ul>
+            </div>
+            <!-- /.dropdown -->
+          </div>
+          <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.panel-body -->
+      </div>
+
+    </div>
+
+  </div>
+
+  <!--MODALS-->
+  <div id="downloadChartImageModal" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">title</h4>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+        </div>
+      </div>
+
+      <script src="https://code.jquery.com/jquery-3.3.1.js" charset="utf-8"></script>
+      <!--<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" charset="utf-8"></script>
+      --><script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" charset="utf-8"></script>
+      <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js" charset="utf-8"></script>
+      <script src="http://localhost/workspace/stats/public/js/bootstrap.js" charset="utf-8"></script>
+      <script src="http://localhost/workspace/stats/public/js/metisMenu.js" charset="utf-8"></script>
+      <script src="http://localhost/workspace/stats/public/js/main.js" charset="utf-8"></script>
+      <script src="http://localhost/workspace/stats/public/js/pluggins/jquery.number.js" charset="utf-8"></script>
+      <script src="https://www.gstatic.com/charts/loader.js" charset="utf-8"></script>
+      <script>
+        var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
+        $(window).on('load', function(){
+           $(".preloader").fadeOut("slow");
+           $("#wrapper").removeClass("blur");
+         });
+
+        $(document).ready(function() {
+          $('.ir-arriba').click(function(){
+              $('body, html').animate({
+                  scrollTop: '0px'
+              }, 1000);
+          });
+
+          $(window).scroll(function(){
+              if( $(this).scrollTop() > 0 ){
+                  $('.ir-arriba').slideDown(600);
+              } else {
+                  $('.ir-arriba').slideUp(600);
+              }
+          });
+
+          /*hacia abajo*/
+          $('.ir-abajo').click(function(){
+              $('body, html').animate({
+                    scrollTop: '1000px'
+                }, 1000);
+            });
+          });
+      </script>
+
+      
+<script type="text/javascript">
+  var fileName = 'statistics-20180614.csv';
+</script>
+<script type="text/javascript" src="http://localhost/workspace/stats/public/js/pluggins/download.js"></script>
+<script type="text/javascript" src="http://localhost/workspace/stats/public/js/statsarrays.js"></script>
+<script type="text/javascript" src="http://localhost/workspace/stats/public/js/estadisticas.js"></script>
+
+    </body>
+</html>

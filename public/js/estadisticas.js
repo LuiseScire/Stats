@@ -7,6 +7,11 @@ var totalDownloadsImageChart,
 
 var gridlinesCount = 20;
 
+var indexArray = [];
+var dataArray = [];
+
+var dataSet = [];
+
 $(document).ready(function() {
   if(fileName != 'noData'){
     $("#menuOptionCharts").css('display', 'block').addClass('active').find('ul').addClass('in');
@@ -17,40 +22,139 @@ $(document).ready(function() {
     //$("#fileNameNavbar").text(fileName);
     //$("#a").text(fileName);
 
-    obtenerdatos();
+    var data = {'_token': CSRF_TOKEN, 'filename': fileName};
+    $.ajax({
+      type: "POST",
+      url: "getdatacsv",
+      data: data,
+      dataType: "JSON",
+      success: function(response) {
+        var csvIndices = response.csvFileData.csv_indices;
+        indexArray = JSON.parse("[" + csvIndices + "]");
+
+        console.log(indexArray);
+        //generateArrays();
+
+        //getCSV();
+        $.get(getCsvFile, function( response ) {
+          //generateArrays(response);
+          processCSVData(response);
+        });
+      }
+    });
+
   } else {
     $("#noDataText")
     .removeClass('alert-info')
     .addClass('alert-danger')
-    .html('<strong>Error al recibir los datos. Inténtelo de nuevo, por favor.</strong>')
+    .html('<strong>Error al recibir los datos. Inténtelo de nuevo, por favor.</strong>');
   }
 });
 
-function obtenerdatos(){
+/*function getCSV(){
   //var data = {'_token': CSRF_TOKEN, 'filename': fileName};
-
   $.ajax({
       type: "GET",
       url: getCsvFile,
       //url: "/workspace/stats/public/csvfiles/" + fileName,
       dataType: "text",
       success: function(response) {
-        procesarDatos(response);
+        //processCSVData(response);
+        generateArrays(response);
+
       }
    });
-  //console.log(data);
-  /*$.ajax({
-    type: "POST",
-    url: "readcsv",
-    data: data,
-    dataType: "JSON",
-    success: function(response) {
-      console.log(response);
-    }
-  });*/
+
+  $.get(getCsvFile, function( response ) {
+    generateArrays(response);
+    processCSVData(response);
+  });
+}*/
+
+function generateArrays() {
+  var headers = [];
+
+
+  var maxPreviewItems = 5;
+  var countItems = 0;
+
+
+  d3.text(getCsvFile, function(data) {
+      var parsedCSV = d3.csv.parseRows(data);
+      headers.push(parsedCSV[5]);
+      parsedCSV.splice(0,6);
+
+      $.each(parsedCSV, function(index, v){
+        //white-space: nowrap
+        //if(countItems < maxPreviewItems) {
+          //eliminar la columna vacía que esta al principio.
+          var temp = v;
+          temp.shift();
+          dataSet.push(temp);
+
+          //generar arreglos con las posiciones de las cabeceras para almacenar los respectivas datos
+            //de manera clasificada
+          /*$.each(v, function(index, v){
+            if(dataArray[index] != index){
+              dataArray[index] = [];
+            }
+          });*/
+        //}//end if
+        countItems++;
+      });//end each(parsedCSV)
+      //console.log(headers);
+      //console.log(dataArray);
+      //console.log(dataSet);
+      processData();
+  });//end d3.text()
 }
 
-function procesarDatos(data) {
+function processData() {
+  google.charts.load("current", {packages:['corechart']});
+
+  $.each(indexArray, function(index, values) {
+    $.each(values, function(i, v) {
+      //console.log(v.i + " => " + v.v);
+      switch(v.v){
+        case 'Tipo':
+          $("#chartPanelTipo").show();
+          $("#panelTitleTipo").text(v.v);
+          drawChartTipo(v.i);
+          break;
+        case 'Texto':
+          //console.log(v.v);
+          break;
+        case 'Revista':
+          //console.log(v.v);
+          break;
+        case 'Ciudad':
+          //console.log(v.v);
+          break;
+        case 'Número':
+          //console.log(v.v);
+          break;
+        case 'Ciudad':
+          //console.log(v.v);
+          break;
+        case 'País':
+          //console.log(v.v);
+          break;
+        case 'Mes':
+          $("#chartPanelMonths").show();
+          $("#panelTitleMonths").text(v.v);
+          processDataMonths(v.i);
+          //console.log(v.v);
+          break;
+        case 'Total':
+
+          //console.log(v.v);
+          break;
+      }
+    });
+  });
+}
+
+function processCSVData(data) {
   var cabeceras = [];
   var datos = [];
 
@@ -80,6 +184,7 @@ function procesarDatos(data) {
   datos.pop();
   var contador = 0;//var para pruebas
   $.each(datos, function(index, v){
+
     var descargasMensuales = parseInt(v[0]);
     var mes = parseInt(v[1].substr(5));
     var pais = v[2];
@@ -87,7 +192,12 @@ function procesarDatos(data) {
     var numero = v[4];
     //faltan obtner el tipo y texto
 
+    if(contador < 5){
+      console.log(v);
+    }
     contador++;
+
+
 
     /*################## DESCARGAS TOTALES ####################*/
     $.each(v, function(indexx, vv){
@@ -117,8 +227,8 @@ function procesarDatos(data) {
         }
       }
     });
-
   });
+
   google.charts.load("current", {packages:['corechart']});
   google.charts.setOnLoadCallback(drawTotalDownloadsChart);
   google.charts.setOnLoadCallback(drawTotalDownloadsMonthChart);
@@ -160,6 +270,130 @@ function procesarDatos(data) {
   }
 
 }*/
+
+function drawChartTipo(position) {
+  var types = [];
+  var count = 0;
+  var initialValue = 1;
+
+  $.each(dataSet, function(index, value) {
+    var i = index;
+    var v = String(value[position]);
+
+    if(count > 0){
+      $.each(types, function(index, value) {
+        var type = value.type;
+        if(type == v){
+          value.totals = value.totals + 1;
+        } else {
+          var a = {"type": v, "totals": initialValue};
+          types.push(a);
+        }
+      });
+    } else {
+      var a = {"type": v, "totals": initialValue};
+      types.push(a);
+    }
+
+    count++;
+  });
+  //console.log(types);
+}
+
+function processDataMonths(position) {
+  $.each(dataSet, function(index, value) {
+    var i = index;
+    //var ultimo = frutas[frutas.length - 1];
+    var month = parseInt(value[position].substr(5));
+    var downloads = parseInt(value[value.length -1]);
+    if(month == 1){
+      month = month - 1;
+    } else {
+      month = month - 1;
+    }
+
+    monthsObj[month].downloads = monthsObj[month].downloads + downloads;
+  });
+  //console.log(monthsObj);
+  google.charts.setOnLoadCallback(drawChartMonths);
+}
+
+function drawChartMonths(){
+  var d = [
+    ['Mes', 'Descargas', { role: 'style' }],
+  ];
+
+  $.each(monthsObj, function(index, v) {
+    color = colorHexa();
+  	var bar = [v.name, v.downloads, 'color: '+color ];
+  	d.push(bar);
+  })
+
+  var data = google.visualization.arrayToDataTable(d);
+
+  var view = new google.visualization.DataView(data);
+  view.setColumns([
+    0,
+    1,
+    {
+       calc: "stringify",
+       sourceColumn: 1,
+       type: "string",
+       role: "annotation"
+    },
+    2
+  ]);
+
+  var options = {
+    title: "Descargas: " + $.number(descargas),
+    bar: {groupWidth: "70%"},
+    legend: { position: "none" },
+    height: "500",
+    vAxis: {
+      gridlines: {count: gridlinesCount},
+      format: 'short',
+    }
+  };
+
+  var chart = new google.visualization.ColumnChart(document.getElementById("chartContentMonths"));
+
+  google.visualization.events.addListener(chart, 'ready', function () {
+    totalDownloadsMonthImageChart = chart.getImageURI();
+  });
+
+  chart.draw(view, options);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function drawTotalDownloadsChart() {
     var data = google.visualization.arrayToDataTable([
