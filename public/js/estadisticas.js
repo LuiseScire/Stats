@@ -10,6 +10,9 @@ var gridlinesCount = 20;
 var indexArray = [];
 var dataArray = [];
 
+var textArrg = [];
+var numberArrg = [];
+
 var dataSet = [];
 
 $(document).ready(function() {
@@ -37,8 +40,8 @@ $(document).ready(function() {
 
         //getCSV();
         $.get(getCsvFile, function( response ) {
-          //generateArrays(response);
-          processCSVData(response);
+          generateArrays(response);
+          //processCSVData(response);
         });
       }
     });
@@ -51,33 +54,11 @@ $(document).ready(function() {
   }
 });
 
-/*function getCSV(){
-  //var data = {'_token': CSRF_TOKEN, 'filename': fileName};
-  $.ajax({
-      type: "GET",
-      url: getCsvFile,
-      //url: "/workspace/stats/public/csvfiles/" + fileName,
-      dataType: "text",
-      success: function(response) {
-        //processCSVData(response);
-        generateArrays(response);
-
-      }
-   });
-
-  $.get(getCsvFile, function( response ) {
-    generateArrays(response);
-    processCSVData(response);
-  });
-}*/
-
 function generateArrays() {
   var headers = [];
 
-
   var maxPreviewItems = 5;
   var countItems = 0;
-
 
   d3.text(getCsvFile, function(data) {
       var parsedCSV = d3.csv.parseRows(data);
@@ -105,11 +86,11 @@ function generateArrays() {
       //console.log(headers);
       //console.log(dataArray);
       //console.log(dataSet);
-      processData();
+      validateData();
   });//end d3.text()
 }
 
-function processData() {
+function validateData() {
   google.charts.load("current", {packages:['corechart']});
 
   $.each(indexArray, function(index, values) {
@@ -119,24 +100,36 @@ function processData() {
         case 'Tipo':
           $("#chartPanelTipo").show();
           $("#panelTitleTipo").text(v.v);
-          drawChartTipo(v.i);
+          processDataType(v.i);
           break;
         case 'Texto':
+          $("#chartPanelText").show();
+          $("#panelTitleText").text(v.v);
+          processDataText(v.i);
           //console.log(v.v);
           break;
         case 'Revista':
+          $("#chartPanelJournal").show()
+          $("#panelTitleJournal").text(v.v);
+          processDataJournal(v.i);
           //console.log(v.v);
           break;
         case 'Ciudad':
           //console.log(v.v);
           break;
         case 'Número':
+          $("#chartPanelNumber").show();
+          $("#panelTitleNumber").text(v.v);
+          processDataNumber(v.i);
           //console.log(v.v);
           break;
         case 'Ciudad':
           //console.log(v.v);
           break;
         case 'País':
+          $("#chartPanelCountries").show();
+          $("#panelTitleCountries").text(v.v);
+          processDataCountries(v.i);
           //console.log(v.v);
           break;
         case 'Mes':
@@ -146,13 +139,467 @@ function processData() {
           //console.log(v.v);
           break;
         case 'Total':
-
+          $("#chartPanelTotal").show();
+          $("#panelTitleTotal").text(v.v)
+          processDataTotal(v.i);
           //console.log(v.v);
           break;
       }
     });
   });
 }
+
+//############## [Type Chart] #################
+//Por falta de datos Puede que hayan posibles errores por revisar.
+function processDataType(position) {
+  var types = [];
+  var count = 0;
+  var initialValue = 1;
+
+  $.each(dataSet, function(index, value) {
+    var i = index;
+    var v = String(value[position]);
+
+    if(count > 0){
+      $.each(types, function(index, value) {
+        var type = value.type;
+        if(new String(type).valueOf() == new String(v).valueOf()){
+          value.totals = value.totals + 1;
+        } else {
+          var a = {"type": v, "totals": initialValue};
+          types.push(a);
+        }
+      });
+    } else {
+      var a = {"type": v, "totals": initialValue};
+      types.push(a);
+    }
+    count++;
+  });
+  //console.log(types);
+  google.charts.setOnLoadCallback(drawChartType);
+}
+
+function drawChartType(){
+
+}
+
+//############## [Text Chart] #################
+function processDataText(position) {
+  var count = 0;
+  $.each(dataSet, function(index, value) {
+    var text = value[position];
+    var total = parseInt(value[value.length -1]);
+    //if(count > 30127) {
+      if(textArrg.length == 0){
+        var x = {"text": text, "total": total, "loops": 1};
+        textArrg.push(x);
+      } else {
+        var match = false;
+        for(i in textArrg) {
+          var loops = 0;
+          var _text = textArrg[i].text;
+
+          if(_text == text) {
+            match = true;
+            loops++;
+
+            textArrg[i].total = textArrg[i].total + total;
+            textArrg[i].loops = textArrg[i].loops + loops;
+          }
+        }//end for
+
+        if(!match) {
+          var x = {"text": text, "total": total, "loops": 1};
+          textArrg.push(x);
+        }
+      }// end if textArrg.length
+
+    //}//end if test
+    count++;
+  });
+  //console.log(textArrg);
+  google.charts.setOnLoadCallback(drawChartText);
+}
+
+function drawChartText() {
+  var title;
+  //console.log();
+  var _textArrg = textArrg.sort(dynamicSort("total"));
+
+  var d = [
+    ['Texto/Revistas', 'Totales', { role: 'style' }],
+  ];
+
+  var previewLimit = 16;
+  var countPreview = 0;
+  $.each(_textArrg, function(index, v) {
+    //console.log(v);
+    color = colorHexa();
+    var totals = v.total;
+    var text = v.text;
+    if(totals > 0){
+      //console.log(v);
+      countPreview++;
+      if(countPreview < previewLimit) {
+        //console.log(v);
+        var bar = [text, totals, 'color: '+color];
+        d.push(bar);
+      }
+    }
+  });
+
+  var data = google.visualization.arrayToDataTable(d);
+
+  var view = new google.visualization.DataView(data);
+  view.setColumns([
+    0,
+    1,
+    {
+      calc: "stringify",
+      sourceColumn: 1,
+      type: "string",
+      role: "annotation"
+    },
+    2
+  ]);
+
+  title = 'Principales';
+
+  var options = {
+    title: title,
+    bar: {groupWidth: "70%"},
+    legend: { position: "none" },
+    height: "500",
+    vAxis: {
+      gridlines: {count: gridlinesCount},
+      format: 'short',
+    }
+  };
+
+  var chart = new google.visualization.ColumnChart(document.getElementById("chartContentText"));
+
+  google.visualization.events.addListener(chart, 'ready', function () {
+    countryDownloadsImageChart = chart.getImageURI();
+  });
+
+  chart.draw(view, options);
+
+}
+
+//############## [Journal Chart] #################
+function processDataJournal(position) {
+  var data = [];
+  $.each(dataSet, function(index, v) {
+    console.log(v);
+    var journal = v[position];
+
+
+
+    console.log(journal);
+  });
+}
+
+function drawChartJournal() {
+
+}
+
+//############## [Number Chart] #################
+function processDataNumber(position) {
+  $.each(dataSet, function(index, v) {
+    var number = v[position];
+    var count = 0;
+
+    if(count < 100){
+      if(numberArrg.length == 0) {
+        var a = {'number': number, 'loops': 1};
+        numberArrg.push(a);
+      } else {
+        var match = false;
+        var loops = 0;
+        for(i in numberArrg) {
+          var _number = numberArrg[i].number;
+
+          if(number == _number){
+            match = true;
+            loops++;
+            numberArrg[i].loops = numberArrg[i].loops + loops;
+          }
+        }
+
+        if(!match){
+          //console.log(!!match);
+          var a = {'number': number, 'loops': 1};
+          numberArrg.push(a);
+        }
+      }
+    }
+    count++;
+  });
+
+  //console.log(numberArrg);
+  google.charts.setOnLoadCallback(drawChartNumber);
+}
+
+function drawChartNumber() {
+  var _numberArrg = numberArrg.sort(dynamicSort("number"));
+
+  var d = [
+    ['Número', 'Repeticiones', { role: 'style' }],
+  ];
+
+  var previewLimit = 16;
+  var countPreview = 0;
+  $.each(_numberArrg, function(index, v) {
+
+    color = colorHexa();
+    //var totals = v.total;
+    var loops = v.loops
+    var text = v.number;
+    if(loops > 0){
+      //console.log(v);
+      countPreview++;
+      if(countPreview < previewLimit) {
+        console.log(v);
+        var bar = [text, loops, 'color: '+color];
+        d.push(bar);
+      }
+    }
+  });
+}
+
+//############## [Countries Chart] #################
+function processDataCountries(position) {
+  $.each(dataSet, function(index, v) {
+    var country = v[position];
+    var downloads = parseInt(v[v.length -1]);
+    $.each(countriesObj, function(index, v) {
+      if(country == ''){
+        if(v.code == 'UNK'){
+          v.downloads = v.downloads + downloads;
+        }
+      } else {
+        if(country == v.code) {
+          v.downloads = v.downloads + downloads;
+        }
+      }
+    });
+  });
+  //console.log(countriesObj);
+  google.charts.setOnLoadCallback(drawChartCountries);
+}
+
+function drawChartCountries() {
+  var title;
+  //console.log();
+  var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
+
+  var d = [
+    ['País', 'Descargas', { role: 'style' }],
+  ];
+
+  var previewLimit = 16;
+  var countPreview = 0;
+  $.each(_countriesObj, function(index, v) {
+    color = colorHexa();
+    var downloads = v.downloads;
+    var country = v.name;
+    if(downloads > 0){
+      countPreview++;
+      if(countPreview < previewLimit) {
+        var bar = [country, downloads, 'color: '+color];
+        d.push(bar);
+      }
+    }
+  });
+
+  var data = google.visualization.arrayToDataTable(d);
+
+  var view = new google.visualization.DataView(data);
+  view.setColumns([
+    0,
+    1,
+    {
+      calc: "stringify",
+      sourceColumn: 1,
+      type: "string",
+      role: "annotation"
+    },
+    2
+  ]);
+
+  //title = 'Principales Países:' + $.number(descargas);
+  title = 'Principales Países';
+  var options = {
+    title: title,
+    bar: {groupWidth: "70%"},
+    legend: { position: "none" },
+    height: "500",
+    vAxis: {
+      gridlines: {count: gridlinesCount},
+      format: 'short',
+    }
+  };
+
+  var chart = new google.visualization.ColumnChart(document.getElementById("chartContentCountries"));
+
+  google.visualization.events.addListener(chart, 'ready', function () {
+    countryDownloadsImageChart = chart.getImageURI();
+  });
+
+  chart.draw(view, options);
+}
+
+//############## [Month Chart] #################
+function processDataMonths(position) {
+  $.each(dataSet, function(index, value) {
+    var i = index;
+    //var ultimo = frutas[frutas.length - 1];
+    var month = parseInt(value[position].substr(5));
+    var downloads = parseInt(value[value.length -1]);
+    if(month == 1){
+      month = month - 1;
+    } else {
+      month = month - 1;
+    }
+
+    monthsObj[month].downloads = monthsObj[month].downloads + downloads;
+  });
+  //console.log(monthsObj);
+  google.charts.setOnLoadCallback(drawChartMonths);
+}
+
+function drawChartMonths(){
+  var d = [
+    ['Mes', 'Descargas', { role: 'style' }],
+  ];
+
+  $.each(monthsObj, function(index, v) {
+    color = colorHexa();
+  	var bar = [v.name, v.downloads, 'color: '+color ];
+  	d.push(bar);
+  })
+
+  var data = google.visualization.arrayToDataTable(d);
+
+  var view = new google.visualization.DataView(data);
+  view.setColumns([
+    0,
+    1,
+    {
+       calc: "stringify",
+       sourceColumn: 1,
+       type: "string",
+       role: "annotation"
+    },
+    2
+  ]);
+
+  var options = {
+    title: "Meses",
+    bar: {groupWidth: "70%"},
+    legend: { position: "none" },
+    height: "500",
+    vAxis: {
+      gridlines: {count: gridlinesCount},
+      format: 'short',
+    }
+  };
+
+  var chart = new google.visualization.ColumnChart(document.getElementById("chartContentMonths"));
+
+  google.visualization.events.addListener(chart, 'ready', function () {
+    totalDownloadsMonthImageChart = chart.getImageURI();
+  });
+
+  chart.draw(view, options);
+}
+
+//############## [Type Total] #################
+function processDataTotal(position) {
+  var countTotals = 0;
+  $.each(dataSet, function(index, value) {
+    var totals = parseInt(value[position]);
+    countTotals = countTotals + totals;
+  });
+  //console.log(countTotals);
+  //google.charts.setOnLoadCallback(drawChartMonths);
+  //var countryDownloads = function() { drawChartCountryDownloads(print, tipoExport); }
+  var drawChartT = function(){ drawChartTotal(countTotals) };
+  google.charts.setOnLoadCallback(drawChartT);
+}
+
+function drawChartTotal(countTotals) {
+  var data = google.visualization.arrayToDataTable([
+    ["option", "total", { role: "style" } ],
+    ["Totales", countTotals, colorHexa()],
+  ]);
+
+  var view = new google.visualization.DataView(data);
+  view.setColumns([
+    0,
+    1,
+    {
+       calc: "stringify",
+       sourceColumn: 1,
+       type: "string",
+       role: "annotation"
+     },
+     2
+   ]);
+
+  var options = {
+    title: "Descargas: " + $.number(countTotals),
+    bar: {groupWidth: "30%"},
+    legend: { position: "none" },
+    height: "500",
+    vAxis: {
+      gridlines: {count: 30},
+      format: 'short',
+      viewWindow: {
+              max:countTotals,
+            }
+    },
+
+  };
+
+  var chart = new google.visualization.ColumnChart(document.getElementById("chartContentTotal"));
+
+  google.visualization.events.addListener(chart, 'ready', function () {
+    totalDownloadsImageChart = chart.getImageURI();
+  });
+  chart.draw(view, options);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function processCSVData(data) {
   var cabeceras = [];
@@ -271,98 +718,6 @@ function processCSVData(data) {
 
 }*/
 
-function drawChartTipo(position) {
-  var types = [];
-  var count = 0;
-  var initialValue = 1;
-
-  $.each(dataSet, function(index, value) {
-    var i = index;
-    var v = String(value[position]);
-
-    if(count > 0){
-      $.each(types, function(index, value) {
-        var type = value.type;
-        if(type == v){
-          value.totals = value.totals + 1;
-        } else {
-          var a = {"type": v, "totals": initialValue};
-          types.push(a);
-        }
-      });
-    } else {
-      var a = {"type": v, "totals": initialValue};
-      types.push(a);
-    }
-
-    count++;
-  });
-  //console.log(types);
-}
-
-function processDataMonths(position) {
-  $.each(dataSet, function(index, value) {
-    var i = index;
-    //var ultimo = frutas[frutas.length - 1];
-    var month = parseInt(value[position].substr(5));
-    var downloads = parseInt(value[value.length -1]);
-    if(month == 1){
-      month = month - 1;
-    } else {
-      month = month - 1;
-    }
-
-    monthsObj[month].downloads = monthsObj[month].downloads + downloads;
-  });
-  //console.log(monthsObj);
-  google.charts.setOnLoadCallback(drawChartMonths);
-}
-
-function drawChartMonths(){
-  var d = [
-    ['Mes', 'Descargas', { role: 'style' }],
-  ];
-
-  $.each(monthsObj, function(index, v) {
-    color = colorHexa();
-  	var bar = [v.name, v.downloads, 'color: '+color ];
-  	d.push(bar);
-  })
-
-  var data = google.visualization.arrayToDataTable(d);
-
-  var view = new google.visualization.DataView(data);
-  view.setColumns([
-    0,
-    1,
-    {
-       calc: "stringify",
-       sourceColumn: 1,
-       type: "string",
-       role: "annotation"
-    },
-    2
-  ]);
-
-  var options = {
-    title: "Descargas: " + $.number(descargas),
-    bar: {groupWidth: "70%"},
-    legend: { position: "none" },
-    height: "500",
-    vAxis: {
-      gridlines: {count: gridlinesCount},
-      format: 'short',
-    }
-  };
-
-  var chart = new google.visualization.ColumnChart(document.getElementById("chartContentMonths"));
-
-  google.visualization.events.addListener(chart, 'ready', function () {
-    totalDownloadsMonthImageChart = chart.getImageURI();
-  });
-
-  chart.draw(view, options);
-}
 
 
 
@@ -413,8 +768,6 @@ function drawTotalDownloadsChart() {
        },
        2
      ]);
-
-
 
     var options = {
       title: "Descargas: " + $.number(descargas),

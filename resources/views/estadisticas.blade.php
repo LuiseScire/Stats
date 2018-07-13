@@ -86,6 +86,8 @@
   <div class="row">
     <div class="col-lg-12">
       <!--<div id="noDataText" class="alert alert-info" role="alert">Documento: <strong>{{ $filename }}</strong></div>-->
+
+        <!-- [CHART TIPO] -->
         <div id="chartPanelTipo" class="panel panel-primary" style="display: none;">
           <div class="panel-heading">
             <h4>
@@ -111,6 +113,112 @@
           </div>
         </div>
 
+        <!-- [CHART TEXTO] -->
+        <div id="chartPanelText" class="panel panel-primary" style="display: none">
+          <div class="panel-heading">
+            <h4>
+              <i class="fa fa-bar-chart"></i>
+              <span id="panelTitleText"></span>
+              <span class="pull-right angle-panel-collapse" title="Ocultar"><i class="fa fa-angle-up fa-lg"></i></span>
+            </h4>
+          </div>
+          <div class="panel-body collapse-up">
+            <div id="chartContentText"></div>
+            <hr>
+            <div class="col-lg-12">
+              <div class="dropdown pull-right">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  Exportar como:
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <li><a href="javascript:void(0)" class="export-action" data-charttype="total" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- [CHART REVISTA] -->
+        <div id="chartPanelJournal" class="panel panel-primary" style="display: none">
+          <div class="panel-heading">
+            <h4>
+              <i class="fa fa-bar-chart"></i>
+              <span id="panelTitleJournal"></span>
+              <span class="pull-right angle-panel-collapse" title="Ocultar"><i class="fa fa-angle-up fa-lg"></i></span>
+            </h4>
+          </div>
+          <div class="panel-body collapse-up">
+            <div id="chartContentJournal"></div>
+            <hr>
+            <div class="col-lg-12">
+              <div class="dropdown pull-right">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  Exportar como:
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <li><a href="javascript:void(0)" class="export-action" data-charttype="total" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- [CHART NÚMERO] -->
+        <div id="chartPanelNumber" class="panel panel-primary" style="display: none">
+          <div class="panel-heading">
+            <h4>
+              <i class="fa fa-bar-chart"></i>
+              <span id="panelTitleNumber"></span>
+              <span class="pull-right angle-panel-collapse" title="Ocultar"><i class="fa fa-angle-up fa-lg"></i></span>
+            </h4>
+          </div>
+          <div class="panel-body collapse-up">
+            <div id="chartContentNumber"></div>
+            <hr>
+            <div class="col-lg-12">
+              <div class="dropdown pull-right">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  Exportar como:
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <li><a href="javascript:void(0)" class="export-action" data-charttype="total" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- [CHART PAÍS] -->
+        <div id="chartPanelCountries" class="panel panel-primary" style="display: none">
+          <div class="panel-heading">
+            <h4>
+              <i class="fa fa-bar-chart"></i>
+              <span id="panelTitleCountries"></span>
+              <span class="pull-right angle-panel-collapse" title="Ocultar"><i class="fa fa-angle-up fa-lg"></i></span>
+            </h4>
+          </div>
+          <div class="panel-body collapse-up">
+            <div id="chartContentCountries"></div>
+            <hr>
+            <div class="col-lg-12">
+              <div class="dropdown pull-right">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  Exportar como:
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <li><a href="javascript:void(0)" class="export-action" data-charttype="total" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- [CHART MES] -->
         <div id="chartPanelMonths" class="panel panel-primary" style="display: none">
           <div class="panel-heading">
             <h4>
@@ -135,6 +243,34 @@
             </div>
           </div>
         </div>
+
+        <!-- [CHART TOTAL] -->
+        <div id="chartPanelTotal" class="panel panel-primary" style="display: none">
+          <div class="panel-heading">
+            <h4>
+              <i class="fa fa-bar-chart"></i>
+              <span id="panelTitleTotal"></span>
+              <span class="pull-right angle-panel-collapse" title="Ocultar"><i class="fa fa-angle-up fa-lg"></i></span>
+            </h4>
+          </div>
+          <div class="panel-body collapse-up">
+            <div id="chartContentTotal"></div>
+            <hr>
+            <div class="col-lg-12">
+              <div class="dropdown pull-right">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  Exportar como:
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <li><a href="javascript:void(0)" class="export-action" data-charttype="total" data-typeexport="png"><i class="fa fa-image"></i> Imagen PNG</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
 
         <!-- deprecated -->
 
