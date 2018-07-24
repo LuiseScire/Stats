@@ -9,6 +9,10 @@ var preViewTable;
 
 var indexArray = [];
 
+function starInputFile(){
+    $("#csvFile").click();
+}
+
 $("#csvFile").change(function() {
 	var _this = $(this),
 		file = this.files[0],
@@ -90,7 +94,7 @@ function uploadProgressHandler(event) {
   var percent = (event.loaded / event.total) * 100;
   var progress = Math.round(percent);
 
-	$("#inputFileContent").hide();
+	$("#uploadFilesContent").hide();
 
   $("#progressBarContent").css('display', 'block');
   $("#uploadProgressBar").css("width", progress + "%").html("Progreso: " + progress + "%");
@@ -117,7 +121,7 @@ function abortHandler(event) {
 }
 
 function processPreview(){
-	var url = "/workspace/stats/public/csvfiles/tmp/" + storageFileName;
+	var url = "/public/csvfiles/tmp/" + storageFileName;
 	var headers = [];
 	var columns = [];
 	var dataSet = [];
@@ -168,9 +172,19 @@ function processPreview(){
 
 			$("#progressBarContent").css('display', 'none');
 
-			var alertContent = '<strong>Vista Previa</strong>';
-			alertContent += '<p>Seleccione el tipo de estadísticas que desea generar</p>';
-			alertContent += checkboxTitles;
+			var alertContent = '<p><strong>Generar gráficas por:</strong></p>';
+				alertContent += checkboxTitles;
+				alertContent += '<p><select id="selectReportType">';
+				alertContent += '<option>-- Tipo de informe --</option>';
+				alertContent += '<option value="0">Descargas del archivo del artículo</option>';
+				alertContent += '<option value="1">Visitas a la página del resumen del artículo</option>';
+				alertContent += '<option value="2">Descargas de Archivo del número</option>';
+				alertContent += '<option value="3">Visitas a la página de la tabla de contenidos del número</option>';
+				alertContent += '<option value="4">Visitas a la página principal de la revista</option>';
+				alertContent +=	'</select></p>';
+				alertContent += '<p><button id="uploadFileConfirmed" class="btn btn-primary btn-xs">Continuar <i class="fa fa-arrow-right"></i> </button></p>';
+				alertContent += '<hr>';
+				alertContent += '<p><strong>Vista Previa</strong></p>';
 
 			$("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html(alertContent);
 			$("#confirmFileContent").show();
@@ -183,139 +197,39 @@ function processPreview(){
 	});
 }
 
-//función obsoleta
-function successFunction(data) {
-	var url = "/workspace/stats/public/csvfiles/tmp/" + fileName;
-
-	d3.text(url, function(data) {
-		//console.log(data);
-      var parsedCSV = d3.csv.parseRows(data);
-			parsedCSV.splice(0,5);
-			//console.log(parsedCSV);
-      var container = d3.select("#preView")
-          .append("table").addClass("table table-striped")
-
-          .selectAll("tr")
-              .data(parsedCSV).enter()
-              .append("tr")
-
-          .selectAll("td")
-              .data(function(d) { return d; }).enter()
-              .append("td")
-              .text(function(d) { return d; });
-  });
-
-
-
-
-  var allRows = data.split(/\r?\n|\r/);
-	var dataSet = [];
-  //var table = '<table class="table table-striped">';
-  for (var singleRow = 0; singleRow < allRows.length; singleRow++) {
-		if(singleRow < 5 ) {
-			//se evitan las primeras 5 filas del documento.
-		} else {
-			parsedCSV = d3.csv.parseRows(allRows[singleRow]);
-			//dataSet.push(parsedCSV);
-			//console.log(allRows[singleRow]);
-			//console.log(parsedCSV);
-			/*var container = d3.select("#preView")
-          .append("table")
-
-          .selectAll("tr")
-              .data(parsedCSV).enter()
-              .append("tr")
-
-          .selectAll("td")
-              .data(function(d) { return d; }).enter()
-              .append("td")
-              .text(function(d) { return d; });*/
-
-			/*if (singleRow === 5) {
-	      table += '<thead>';
-	      table += '<tr>';
-	    } else {
-	      table += '<tr>';
-	    }
-
-
-	    var rowCells = allRows[singleRow].split(',');
-	    for (var rowCell = 0; rowCell < rowCells.length; rowCell++) {
-	      if (singleRow === 0) {
-	        table += '<th>';
-	        table += rowCells[rowCell];
-	        table += '</th>';
-	      } else {
-	        table += '<td>';
-	        table += rowCells[rowCell];
-	        table += '</td>';
-	      }
-	    }
-
-	    if (singleRow === 5) {
-	      table += '</tr>';
-	      table += '</thead>';
-	      table += '<tbody>';
-	    } else {
-	      table += '</tr>';
-	    }*/
-
-		}
-  }
-
-	/*var container = d3.select("#preView")
-			.append("table")
-
-			.selectAll("tr")
-					.data(dataSet).enter()
-					.append("tr")
-
-			.selectAll("td")
-					.data(function(d) { return d; }).enter()
-					.append("td")
-					.text(function(d) { return d; });*/
-
-  //table += '</tbody>';
-  //table += '</table>';
-  //$('#preView').append(table);
-
-	//ocultamos el loader
-	fadeOutLoader();
-
-	$("#progressBarContent").css('display', 'none');
-	$("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html("Vista Previa");
-	$("#confirmFileContent").show();
-	$("#strongFileName").text(fileNameConfirmed);
-
-	if(changeFile == 1) {
-		$("#cambiarArchivo").removeAttr('disabled');
-		$("#uploadFileConfirmed").removeAttr('disabled');
-	}
-}
-
-$("#uploadFileConfirmed").click(function(event){
+$(document).on('click', '#uploadFileConfirmed', function (event) {
+//$("#uploadFileConfirmed").click(function(event){
+	var typeReportAllowed = $("#selectReportType").val();
+	var typeReport = $("#selectReportType :selected").text();
 	if(indexArray.length > 0){
-		var data = {
-			'_token': CSRF_TOKEN,
-			'action': 'moveFromTemp',
-			'fileName': fileNameConfirmed,
-			'storageFileName': storageFileName,
-			'indexArray': indexArray
-		}
+		if(!isNaN(typeReportAllowed)){
+            var data = {
+                '_token': CSRF_TOKEN,
+                'action': 'moveFromTemp',
+                'fileName': fileNameConfirmed,
+                'storageFileName': storageFileName,
+				'typeReport': typeReport,
+				'typeReportIndex': typeReportAllowed,
+                'indexArray': indexArray
+            };
 
-		$.ajax({
-			type: "POST",
-			url: "uploadcsv",
-			data: data,
-			dataType: "JSON",
-			success: function(response){
-				if(response.status == 'success'){
-					location.href = 'home';
-				}
-			}
-		});
+            $.ajax({
+                type: "POST",
+                url: "uploadcsv",
+                data: data,
+                dataType: "JSON",
+                success: function(response){
+                    if(response.status == 'success'){
+                        //location.href = 'home';
+                        location.href = 'estadisticas/archivo/' + storageFileName;
+                    }
+                }
+            });
+		} else {
+            alert("Debe seleccionar el tipo de informe que desea subir");
+        }
 	} else {
-		alert("Debe seleccionar al menos un opción de la lista para para generar estadísticas")
+		alert("Debe seleccionar al menos una casilla de selección para generar gráficas");
 	}
 
 });
@@ -330,7 +244,7 @@ $(document).on("click", "input[name='indices[]']", function() {
 	var value = $(this).attr("value");
 
 	if($(this).is(":checked")){
-		var dataArrg = {"i": index, "v": value}
+		var dataArrg = {"i": index, "v": value};
 		indexArray.push(dataArrg);
 	} else {
 		for(var i in indexArray){

@@ -1,10 +1,13 @@
-
-$(document).ready(function(){
-  getList();
+$(window).on('load', function(){
+    fadeOutLoader();
 });
 
-function getList(){
-  var data = {'_token': CSRF_TOKEN}
+$(document).ready(function(){
+    validateExistFiles();
+});
+
+function validateExistFiles(){
+  var data = {'_token': CSRF_TOKEN};
   $.ajax({
     type: "POST",
     url: "listcsvfiles",
@@ -13,109 +16,142 @@ function getList(){
     success: function(response){
       //console.log(response.csvDBList);
       var count = 0;
-
       $.each(response.csvList, function(index, v) {
-        var csvId = v.csv_id;
-        var csvName = v.csv_front_name;
-        var csvDBName = v.csv_back_name;
-        var csvPath = v.csv_path;
-        var csvStatus = v.csv_status;
-        var csvVersion = v.csv_version;
-        var csvTimestamp = v.csv_timestamp;
-
-
-
-        var stringName, stringNameConfirm;
-
-        if(csvVersion == null) {
-          //stringName = csvName + " - " + dateFormat(csvTimestamp);
-          stringName ='<label style="cursor:pointer;"><i class="fa fa-file"></i> '+csvName + '</label> - <span style="color:gray">' + dateFormat(csvTimestamp)+'</label>';
-          stringNameConfirm = csvName;
-        } else {
-          //stringName = csvName + "(" + csvVersion + ") - " + dateFormat(csvTimestamp);
-          stringName = '<label style="cursor:pointer;"><i class="fa fa-file"></i> '+csvName+'('+csvVersion+')</label> - <span style="color:gray"> '+dateFormat(csvTimestamp)+'</span>'
-          stringNameConfirm = csvName + "(" + csvVersion + ")";
-        }
-
-        //console.log(v);
-        var li = '<li id="itemFile'+csvId+'" class="list-group-item">';
-            li+=  '<a class="csv-file-item" data-csvname="'+csvDBName+'" style="text-decoration: none">';
-            li+=    stringName;
-            li+=  '</a>';//fa-ellipsis-v
-
-            li+=  '<div class="dropdown pull-right" style="float:left">';
-            li+=      '<a class="dropdown-toggle" data-toggle="dropdown" href="#">';
-            li+=          '<i class="fa fa-ellipsis-v"></i>';
-            li+=      '</a>';
-            li+=      '<ul class="dropdown-menu dropdown-user">';
-            li+=        '<li>';
-            li+=          '<a href="#" onClick="deleteItem('+csvId+', '+"'"+stringNameConfirm+"'"+')"><i class="fa fa-trash fa-fw"></i> Eliminar</a>';
-            li+=        '</li>';
-            /*li+=        '<li>';
-            li+=          '<a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>';
-            li+=        '</li>';
-            li+=        '<li class="divider"></li>';
-            li+=        '<li>';
-            li+=          '<a>';
-            li+=            '<i class="fa fa-sign-out fa-fw"></i>';
-            li+=          '</a>';
-            li+=        '</li>';*/
-            li+=      '</ul>';
-            li+=   '</div>';
-
-            li+= '</li>';
-
-        $("#csvList").append(li);
-        count++;
+          count++;
       });
 
       if(count > 0){
-        $("#csvListContent").css('display', 'block');
-        $("#noFiles").css('display', 'none');
+          var lastElement = response.csvList[0];
+          var typeReport = lastElement.csv_type_report_index;
+          var getCsvFile = '/public'+lastElement.csv_path;
+
+          getCsv(getCsvFile, typeReport);
+        //$("#csvListContent").css('display', 'block');
+        //$("#noFiles").css('display', 'none');
       } else {
-        $("#noFiles").css('display', 'block');
+        //$("#noFiles").css('display', 'block');
       }
     }
   });
 }
 
+function getCsv(getCsvFile, typeReport) {
+    var headers = [];
+    var dataSet = [];
+
+    var maxPreviewItems = 5;
+    var countItems = 0;
+
+    var typeReport;
+    var totalsIcon;
+    var totals = 0;
 
 
-function deleteItem(csvId, fileName) {
-  var data = {'_token': CSRF_TOKEN, 'case':'delete', 'csv_id': csvId}
+    d3.text(getCsvFile, function(data) {
+        var parsedCSV = d3.csv.parseRows(data);
+        headers.push(parsedCSV[5]);
+        parsedCSV.splice(0,6);
 
-  var _confirm = confirm("¿Está seguro que desea eliminar '"+fileName+"'?");
-  if(_confirm) {
-    $.post('listcsvfiles', data, function(response) {
-      var status = response.status;
-      var message = response.message;
+        $.each(parsedCSV, function(index, v){
+            var temp = v;
+            temp.shift();
+            temp.reverse();
+            //datos.push(rowCells);
+            dataSet.push(temp);
+        });//end each(parsedCSV)
+        //validateData();
+        $.each(dataSet, function (index, v) {
+            //var total = v[v.length -1];
+            var total = v[0];
+            var country = v[2];
+            //var totals = parseInt(v[v.length -1]);
+            //console.log(total);
+            totals = parseInt(totals) + parseInt(total);
 
-      if(status == "success") {
-        $("#itemFile"+csvId).slideUp("slow");
-        setTimeout(function() {
-          //alert(message);
-        }, 1000);
-      }
+            $.each(countriesObj, function(index, v) {
+                if(country == ''){
+                    if(v.code == 'UNK'){
+                        v.downloads = v.downloads + parseInt(total);
+                    }
+                } else {
+                    if(country == v.code) {
+                        v.downloads = v.downloads + parseInt(total);
+                    }
+                }
+            });
+        });
 
-      if(status == "error") {
-        alert(message);
-      }
-    });
-  }
+        /* **************************************/
+        switch (typeReport){
+            case 0:
+            case 2:
+                typeReport = "Descargas";
+                totalsIcon = '<i class="fa fa-download fa-5x"></i>';
+                break;
+            case 1:
+            case 3:
+            case 4:
+                typeReport = "Visitas";
+                totalsIcon = '<i class="fa fa-eye fa-5x"></i>';
+                break;
+        }
+
+        $('#panelTotalIcon').html(totalsIcon);
+        $('#panelTotals').text(abbreviateNumber(totals));
+        $('#panelTotalsText').text(typeReport);
+
+        /* **************************************/
+        var countCountries = 0;
+        var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
+        $.each(_countriesObj, function(index, v) {
+            var downloads = v.downloads;
+            if(downloads > 0){
+                countCountries++;
+            }
+        });
+        $('#panelCountries').html('<i class="fa fa-plus"></i> de ' + countCountries);
+
+        /* **************************************/
+        var mainCountry = _countriesObj[0];
+        var nameCountry = mainCountry.name;
+        var totls = $.number(mainCountry.downloads);
+
+        $('#panelMainCountry').text(nameCountry);
+        $('#panelMainCountryText').text('País con '+totls+' '+typeReport);
+        /* **************************************/
+        $("#panelsHeading").css('display', 'block');
+
+    });//end d3.text()
 }
 
-function dateFormat(date){
-  var months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septimbre", "octube", "Nomviembre", "Diciembre"];
-
-  var date = new Date(date);
-
-  var dateFormat = "subido el " + date.getDate() + " de " + months[date.getMonth()] + " de " + date.getFullYear();
-      dateFormat += " " + date.toLocaleString('en-EU', { hour: 'numeric', minute: 'numeric', hour12: true });
-
-  return dateFormat;
+function abbreviateNumber(value) {
+    var newValue = value;
+    if (value >= 1000) {
+        var suffixes = ["", "k", "m", "b","t"];
+        var suffixNum = Math.floor( (""+value).length/3 );
+        var shortValue = '';
+        for (var precision = 2; precision >= 1; precision--) {
+            shortValue = parseFloat( (suffixNum != 0 ? (value / Math.pow(1000,suffixNum) ) : value).toPrecision(precision));
+            var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g,'');
+            if (dotLessShortValue.length <= 2) { break; }
+        }
+        if (shortValue % 1 != 0)  shortNum = shortValue.toFixed(1);
+        newValue = shortValue+suffixes[suffixNum];
+    }
+    return newValue;
 }
 
-$(document).on('click', '.csv-file-item', function() {
-  var fileName = $(this).data('csvname');
-  location.href = 'estadisticas/archivo/' + fileName;
-});
+function dynamicSort(property) {
+    var sortOrder = 1;
+    if(property[0] === "-") {
+        sortOrder = -1;
+        property = property.substr(1);
+    }
+    return function (a,b) {
+        var result = (a[property] > b[property]) ? -1 : (a[property] < b[property]) ? 1 : 0;
+        return result * sortOrder;
+    }
+}
+/*---------------------------------*/
+
+

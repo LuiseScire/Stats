@@ -15,6 +15,15 @@ var monthsObj = [
   {name: 'Dic',   downloads: 0}
 ];
 
+var continentsObj = [
+    {name: 'Asia',      totals: 0},
+    {name: 'Europa',    totals: 0},
+    {name: 'África',    totals: 0},
+    {name: 'América',   totals: 0},
+    {name: 'Antártida', totals: 0},
+    {name: 'Oceanía',   totals: 0}
+];
+
 var countriesObj = [
   {code : 'UNK', downloads: 0,continent: 'Desconocido',  name: 'Desconocido'},
 

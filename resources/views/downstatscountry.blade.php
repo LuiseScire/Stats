@@ -18,9 +18,9 @@
 <div class="row">
   <div class="col-lg-12">
     <div class="address-bar-content-header">
-        <h1>Estadísticas por países</h1>
+        <h1 id="titlePage"></h1>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ url('home') }}"><i class="fa fa-home"></i> Home</a></li>
+          <li class="breadcrumb-item"><a href="{{ url('home') }}"><i class="fa fa-home"></i> Inicio</a></li>
           <li class="breadcrumb-item"><a id="backToStats"><i class="fa fa-bar-chart"></i> Estadísticas</a></li>
           <li class="breadcrumb-item"><label><i class="fa fa-table"></i> Estadísticas por países</label></li>
           <li class="current-date pull-right"><span><i class="fa fa-calendar"></i> <span id="current-date"></span></span></li>
@@ -30,8 +30,8 @@
 
   <div class="col-lg-12">
     <ul class="nav nav-tabs">
-  		<li class="active"><a  href="#paisesConDescargas" data-toggle="tab">Países con descargas <span id="badgeWith" class="badge"></span></a></li>
-  		<li><a id="aPaisesSinDescargas" href="#paisesSinDescargas" data-toggle="tab">Países sin descargas <span id="badgeWithout" class="badge"></span></a></li>
+  		<li class="active"><a  href="#paisesConDescargas" data-toggle="tab">Países con <span class="tabTypeReport"></span> <span id="badgeWith" class="badge"></span></a></li>
+  		<li><a id="aPaisesSinDescargas" href="#paisesSinDescargas" data-toggle="tab">Países sin <span class="tabTypeReport"></span> <span id="badgeWithout" class="badge"></span></a></li>
   	</ul>
 
     <div class="tab-content">

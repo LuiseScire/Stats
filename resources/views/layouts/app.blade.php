@@ -20,6 +20,15 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <style>
+        /*body{
+            background-image: url("{{ asset('images/chart-placeholder2.jpg') }}");
+            background-repeat: no-repeat;
+            background-position: right bottom;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }*/
+    </style>
 </head>
 <body>
     <div id="app">
@@ -43,12 +52,12 @@
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
                         @guest
-                            <li class="nav-item">
+                            <!--<li class="nav-item">
                                 <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                            </li>
+                            </li>-->
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

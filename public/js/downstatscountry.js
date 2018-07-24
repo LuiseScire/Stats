@@ -2,8 +2,13 @@ var descargas = 0;
 var countryDownloadsTable;
 var chartWithout;
 
+var globalTypeReport;
 var countriesWithDownloadsImageChart,
     countriesWithoutDownloadsImageChart;
+
+$(window).on('load', function(){
+    fadeOutLoader();
+});
 
 $(document).ready(function() {
   /*$("#sidebar").hide();
@@ -27,7 +32,7 @@ $(document).ready(function() {
 });
 
 function createOptionsMenu() {
-  var ulContent = '<li>'+
+  /*var ulContent = '<li>'+
                     '<a href="'+backLocation+'/totalDownloadsPanel" class="link-menu"><i class="fa fa-bar-chart"></i> Descargas Totales</a>'+
                   '</li>'+
                   '<li>'+
@@ -38,7 +43,104 @@ function createOptionsMenu() {
                   '</li>';
 
   $("#menuOptionChartsContent").append(ulContent);
-  $("#menuOptionChartsFromCountriesView").css('display', 'block').addClass('active').find('ul').addClass('in');
+  $("#menuOptionChartsFromCountriesView").css('display', 'block').addClass('active').find('ul').addClass('in');*/
+    var data = {'_token': CSRF_TOKEN, 'filename': fileName};
+    $.ajax({
+        type: "POST",
+        url: "getdatacsv2",
+        data: data,
+        dataType: "JSON",
+        success: function(response) {
+            var csvIndices = response.csvFileData.csv_indices;
+            indexArray = JSON.parse("[" + csvIndices + "]");
+
+            var typeReportIndex = response.csvFileData.csv_type_report_index;
+            var typeReport = response.csvFileData.csv_type_report;
+            $("#titlePage").text(typeReport);
+
+            switch (typeReportIndex){
+                case 0:
+                case 2:
+                    globalTypeReport = "Descargas";
+                    break;
+                case 1:
+                case 3:
+                case 4:
+                    globalTypeReport = "Visitas";
+                    break;
+            }
+            $(".tabTypeReport").text(globalTypeReport);
+            //console.log(indexArray);
+            var item;
+            indexArray.forEach(function(objects) {
+                objects.forEach(function(v) {
+                    switch(v.v){
+                        case 'Tipo':
+                            $("#chartPanelTipo").show();
+                            $("#panelTitleTipo").text(v.v);
+                            item ='<li>';
+                            item+= '<a href="'+backLocation+'/chartPanelTipo" class="link-menu"><i class="fa fa-bar-chart"></i> '+v.v;
+                            item+='</li>';
+                            break;
+                        case 'Texto':
+                            $("#chartPanelText").show();
+                            $("#panelTitleText").text(v.v);
+                            item ='<li>';
+                            item+= '<a href="'+backLocation+'/chartPanelText" class="link-menu"><i class="fa fa-bar-chart"></i> '+v.v;
+                            item+='</li>';
+                            break;
+                        case 'Revista':
+                            $("#chartPanelJournal").show();
+                            $("#panelTitleJournal").text(v.v);
+                            item ='<li>';
+                            item+= '<a href="'+backLocation+'/chartPanelJournal" class="link-menu"><i class="fa fa-bar-chart"></i> '+v.v;
+                            item+='</li>';
+                            break;
+                        case 'Número':
+                            $("#chartPanelNumber").show();
+                            $("#panelTitleNumber").text(v.v);
+                            item ='<li>';
+                            item+= '<a href="'+backLocation+'/chartPanelNumber" class="link-menu"><i class="fa fa-hash"></i> '+v.v;
+                            item+='</li>';
+                            break;
+                        case 'Ciudad':
+                            $("#chartPanelCity").show();
+                            $("#panelTitleCity").text(v.v);
+                            item ='<li>';
+                            item+= '<a href="'+backLocation+'/chartPanelCity" class="link-menu"><i class="fa fa-bar-chart"></i> '+v.v;
+                            item+='</li>';
+                            break;
+                        case 'País':
+                            $("#chartPanelCountries").show();
+                            $("#panelTitleCountries").text(v.v);
+                            item ='<li>';
+                            item+= '<a href="'+backLocation+'/chartPanelCountries" class="link-menu"><i class="fa fa-globe"></i> '+v.v;
+                            item+='</li>';
+                            break;
+                        case 'Mes':
+                            $("#chartPanelMonths").show();
+                            $("#panelTitleMonths").text(v.v);
+                            item ='<li>';
+                            item+= '<a href="'+backLocation+'/chartPanelMonths" class="link-menu"><i class="fa fa-calendar"></i> '+v.v;
+                            item+='</li>';
+                            break;
+                        case 'Total':
+                            $("#chartPanelTotal").show();
+                            $("#panelTitleTotal").text(v.v);
+                            item ='<li>';
+                            item+= '<a href="'+backLocation+'/chartPanelTotal" class="link-menu"><i class="fa fa-circle"></i> '+v.v;
+                            item+='</li>';
+                            break;
+                    }// end switch
+                    //$("#menuOptionCharts").find("ul").append(item);
+                    //$("#menuOptionChartsContent").append(item);
+                    //$("#menuOptionChartsFromCountriesView").css('display', 'block').addClass('active').find('ul').addClass('in');
+                });
+            });
+            //$("#menuOptionCharts").css('display', 'block').addClass('active').find('ul').addClass('in');
+
+        }
+    });
 }
 
 function procesarDatos(data) {
@@ -135,7 +237,7 @@ function loadCountryDownloadsTable(dataSet, dataSetWithout) {
       { title: 'Continente' },
       { title: 'Código País' },
       { title: 'País' },
-      { title: 'Descargas' },
+      { title: globalTypeReport },
     ],
     "order": [[ 3, "desc" ]],
     "language": {
@@ -232,12 +334,12 @@ function drawCountryDownloadsChart() {
                      role: "annotation" },
                    2]);
   var optionsWithout = {
-     title: "Descargas por país. Total: 0",
+     title: globalTypeReport + "por país. Total: 0",
      bar: {groupWidth: "60%"},
      legend: { position: "none" },
      fontSize: 14,
      hAxis: {
-       title: 'Total de descargas: 0',
+       title: 'Total de '+globalTypeReport+': 0',
        minValue: 0
      },
      vAxis: {
@@ -264,12 +366,12 @@ $(".export-action").click(function() {
   switch (grafica) {
     case 'with':
       imagen = countriesWithDownloadsImageChart;
-      nombre = 'paises-con-descargas.png';
+      nombre = globalTypeReport + '-por-paises.png';
       continuar = true;
       break;
     case 'without':
       imagen = countriesWithoutDownloadsImageChart;
-      nombre = 'paises-sin-descargas.png';
+      nombre = 'paises-sin-'+globalTypeReport+'.png';
       continuar = true;
       break;
     default:

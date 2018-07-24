@@ -19,6 +19,8 @@ class Csvfile extends Model
     'csv_status',
     'csv_version',
     'csv_timestamp',
-    'csv_indices'
+    'csv_indices',
+    'csv_type_report',
+    'csv_type_report_index'
   ];
 }

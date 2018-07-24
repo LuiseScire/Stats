@@ -4,6 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <!-- provide the csrf token -->
         <meta name="csrf-token" content="{{ csrf_token() }}" />
+        <link rel="icon" href="{{ asset('images/graph.svg') }}">
 
         <title>Stats - @yield('title')</title>
 
@@ -17,13 +18,21 @@
         <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
         @yield('css')
         <style>
+            #sidebar > .sidebar-nav > .nav> li > a,
+            #sidebar > .sidebar-nav > .nav> li > .nav-second-level > li > a{
+                color: #000000;
+            }
 
         </style>
+        <script>
+
+        </script>
     </head>
     <body>
       <div id="preloader">
         <div id="loaderContent">
-          Cargando...
+            <!--<img src="{{ asset('images/Preloader_7.gif') }}" alt="Preloader">-->
+            <p>Cargando...</p>
         </div>
       </div>
 
@@ -86,19 +95,22 @@
           </ul>
           <!-- /.navbar-top-links -->
 
-          <div id="sidebar" class="navbar-default sidebar" role="navigation">
+          <div id="sidebar" class="navbar-default sidebar" role="navigation" style="background-color: #fff; color: #000">
               <div class="sidebar-nav navbar-collapse">
-                  <ul class="nav" id="side-menu">
+                  <ul class="nav nav-colors" id="side-menu">
                       <li>
-                          <a href="{{ url('home') }}"><i class="fa fa-home fa-fw"></i> Home</a>
+                          <a href="{{ url('home') }}"><i class="fa fa-home fa-fw" style="color: #337ab7;"></i> Inicio</a>
                       </li>
-                      <li>
+                      <!--<li>
                           <a href="{{ url('subircsv') }}"><i class="fa fa-upload fa-fw"></i> Subir CSV</a>
+                      </li>-->
+                      <li>
+                          <a href="{{ url('historial') }}"><i class="fa fa-list"></i> Historial</a>
                       </li>
                       <li id="menuOptionCharts" style="display: none">
-                        <a href="#"><i class="fa fa-bar-chart"></i> Estadísticas<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                          <li>
+                        <a href="#"><i class="fa fa-bar-chart" style="color: rebeccapurple;"></i> Estadísticas<span class="fa arrow"></span></a>
+                        <ul  class="nav nav-second-level nav-colors">
+                          <!--<li>
                             <a href="#totalDownloadsPanel" class="link-menu"><i class="fa fa-bar-chart"></i> Descargas Totales</a>
                           </li>
                           <li>
@@ -106,7 +118,7 @@
                           </li>
                           <li>
                             <a href="#countryDownloadsPanel" class="link-menu"><i class="fa fa-bar-chart"></i> Descargas por País</a>
-                          </li>
+                          </li>-->
                           <!-- Si se agrega otra opción también agregar en el menú de downstatscountry.js para la vista de los países-->
                         </ul>
                       </li>
@@ -137,12 +149,12 @@
       <script src="{{ asset('js/pluggins/jquery.number.js') }}"></script>
       <script src="https://www.gstatic.com/charts/loader.js"></script>
       <script src="http://d3js.org/d3.v3.min.js"></script>
-      
+
       <script>
         var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-        $(window).on('load', function(){
+        /*$(window).on('load', function(){
            fadeOutLoader();
-        });
+        });*/
 
         function fadeInLoader(){
           $("#preloader").fadeIn("slow");
@@ -179,7 +191,7 @@
                 }, 1000);
           });*/
 
-          $('a.link-menu[href^="#"]').click(function() {
+          $(document).on('click', 'a.link-menu[href^="#"]', function() {
             var target = $(this.hash);
 
             $('html, body').animate({ scrollTop: target.offset().top }, 500);
@@ -187,6 +199,16 @@
           });
 
           $("#current-date").text(formatDate());
+
+          //$("#side-menu > li > a > i").css('color', colorHexa());
+
+            /*setTimeout(function () {
+                $(".nav-colors li").each(function(n) {
+                    $(this).find('a').find('i').css('color', colorHexa());
+                });
+            }, 500);*/
+
+
         });
 
         function formatDate() {
@@ -203,6 +225,23 @@
           var year = date.getFullYear();
 
           return day + ' de ' + monthNames[monthIndex] + ' de ' + year;
+        }
+
+        function colorHexa(){
+            hexadecimal = new Array("0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F")
+            color_aleatorio = "#";
+            for (i=0;i<6;i++){
+                posarray = aleatorio(0,hexadecimal.length);
+                color_aleatorio += hexadecimal[posarray];
+            }
+            return color_aleatorio;
+        }
+
+        function aleatorio(inferior,superior){
+            numPosibilidades = superior - inferior;
+            aleat = Math.random() * numPosibilidades;
+            aleat = Math.floor(aleat);
+            return parseInt(inferior) + aleat;
         }
       </script>
 

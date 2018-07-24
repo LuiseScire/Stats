@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\csvfile;
+use App\Csvfile;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,8 +24,18 @@ class MainController extends Controller{
     return view('uploadcsv');
   }
 
+  /*
+   * public function downstatscountry($filename = "noData") {
+    return view('downstatscountry', array('filename' => $filename));
+  }
+   * */
+
   public function home(){
     return view('main');
+  }
+
+  public function historial(){
+      return view('history');
   }
 
   public function listcsvfiles(Request $request){
@@ -49,7 +59,7 @@ class MainController extends Controller{
         }
         break;
       default:
-        $csv_list = $csv_file_db->where([['csv_user_id', $auth_id], ['csv_status', 'active']])->get();
+        $csv_list = $csv_file_db->where([['csv_user_id', $auth_id], ['csv_status', 'active']]) ->orderBy('csv_timestamp', 'desc')->get();
 
         $file_list = [];
 
@@ -114,6 +124,8 @@ class MainController extends Controller{
         $index_db = implode(",", $index_array);*/
         $file_name = $request->fileName;
         $storage_file_name = $request->storageFileName;
+        $type_report = $request->typeReport;
+        $type_report_index = $request->typeReportIndex;
         $csv_file = '/csvfiles/tmp/' . $storage_file_name;
         $origin_path = public_path() . $csv_file;
 
@@ -142,6 +154,8 @@ class MainController extends Controller{
           $csv_file_db->csv_user_id = $auth_id;
           $csv_file_db->csv_version = $version;
           $csv_file_db->csv_indices = json_encode($index_array);
+          $csv_file_db->csv_type_report = $type_report;
+          $csv_file_db->csv_type_report_index = $type_report_index;
 
           if($csv_file_db->save()){
             $response = array(
@@ -316,9 +330,22 @@ class MainController extends Controller{
     $csv_back_name = $request->filename;
 
     $csv_file_data = $csv_file_db->select()->where([['csv_back_name', $csv_back_name], ['csv_user_id', $auth_id]])->first();
+    $type_report = $csv_file_data->csv_type_report;
 
     return response()->json(array('csvFileData' => $csv_file_data));
   }
+    public function getdatacsv2(Request $request) {
+        #Models
+        $csv_file_db = new Csvfile;
+        $auth_id = Auth::id();
+
+        $csv_back_name = $request->filename;
+
+        $csv_file_data = $csv_file_db->select()->where([['csv_back_name', $csv_back_name], ['csv_user_id', $auth_id]])->first();
+        $type_report = $csv_file_data->csv_type_report;
+
+        return response()->json(array('csvFileData' => $csv_file_data));
+}
 
   public function readcsv(Request $request){
     $response = array(

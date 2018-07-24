@@ -38,7 +38,7 @@
       <div id="uploadProgressBar" class="progress-bar progress-bar-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
       </div>
     </div>
-	</div>
+  </div>
 
   <div id="confirmFileContent" class="col-lg-12" style="display:none">
     <div id="loadInfoText" class="alert alert-success" role="alert">
