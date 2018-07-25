@@ -179,7 +179,7 @@ function generateArrays() {
           globalTotals = globalTotals + totals;
       });
 
-      validateData();
+      //validateData();
   });//end d3.text()
 }
 

@@ -4,8 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <!-- provide the csrf token -->
         <meta name="csrf-token" content="{{ csrf_token() }}" />
-        <link rel="icon" href="{{ asset('images/graph.svg') }}">
-
+        <link rel="icon" type="image/jpg" href="{{ asset('images/icon.png') }}"/>
         <title>Stats - @yield('title')</title>
 
         <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->

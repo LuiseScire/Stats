@@ -1,18 +1,18 @@
 // https://country-code.cl/es/
 //objetos
 var monthsObj = [
-  {name: 'Ene',   downloads: 0},
-  {name: 'Feb',   downloads: 0},
-  {name: 'Mar',   downloads: 0},
-  {name: 'Abr',   downloads: 0},
-  {name: 'May',   downloads: 0},
-  {name: 'Jun',   downloads: 0},
-  {name: 'Jul',   downloads: 0},
-  {name: 'Ago',   downloads: 0},
-  {name: 'Sep',   downloads: 0},
-  {name: 'Oct',   downloads: 0},
-  {name: 'Nov',   downloads: 0},
-  {name: 'Dic',   downloads: 0}
+  {name: 'Enero',     shortname: 'Ene',   downloads: 0},
+  {name: 'Febrero',   shortname: 'Feb',   downloads: 0},
+  {name: 'Marzo',     shortname: 'Mar',   downloads: 0},
+  {name: 'Abril',     shortname: 'Abr',   downloads: 0},
+  {name: 'Mayo',      shortname: 'May',   downloads: 0},
+  {name: 'Junio',     shortname: 'Jun',   downloads: 0},
+  {name: 'Julio',     shortname: 'Jul',   downloads: 0},
+  {name: 'Agosto',    shortname: 'Ago',   downloads: 0},
+  {name: 'Septiembre',shortname: 'Sep',   downloads: 0},
+  {name: 'Octubre',   shortname: 'Oct',   downloads: 0},
+  {name: 'Octubre',   shortname: 'Nov',   downloads: 0},
+  {name: 'Diciembre', shortname: 'Dic',   downloads: 0}
 ];
 
 var continentsObj = [

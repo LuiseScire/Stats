@@ -45,6 +45,13 @@
           </div>
         </div>
       </div>
+      <a id="panelTotalsDetails">
+        <div class="panel-footer">
+          <span class="pull-left">Ver Detalles</span>
+          <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+          <div class="clearfix"></div>
+        </div>
+      </a>
     </div>
   </div>
   <div class="col-lg-4 col-md-8">
@@ -60,6 +67,13 @@
           </div>
         </div>
       </div>
+      <a id="panelCountriesDetails">
+        <div class="panel-footer">
+          <span class="pull-left">Ver Detalles</span>
+          <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+          <div class="clearfix"></div>
+        </div>
+      </a>
     </div>
   </div>
   <div class="col-lg-4 col-md-8">
@@ -75,6 +89,13 @@
           </div>
         </div>
       </div>
+      <a id="panelMainCountryDetails">
+        <div class="panel-footer">
+          <span class="pull-left">Ver Detalles</span>
+          <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+          <div class="clearfix"></div>
+        </div>
+      </a>
     </div>
   </div>
   <!--<div class="col-lg-3 col-md-6">

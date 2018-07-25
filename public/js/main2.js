@@ -24,8 +24,9 @@ function validateExistFiles(){
           var lastElement = response.csvList[0];
           var typeReport = lastElement.csv_type_report_index;
           var getCsvFile = '/public'+lastElement.csv_path;
+          var fileName = lastElement.csv_back_name;
 
-          getCsv(getCsvFile, typeReport);
+          getCsv(getCsvFile, typeReport, fileName);
         //$("#csvListContent").css('display', 'block');
         //$("#noFiles").css('display', 'none');
       } else {
@@ -35,7 +36,7 @@ function validateExistFiles(){
   });
 }
 
-function getCsv(getCsvFile, typeReport) {
+function getCsv(getCsvFile, typeReport, fileName) {
     var headers = [];
     var dataSet = [];
 
@@ -113,13 +114,18 @@ function getCsv(getCsvFile, typeReport) {
 
         /* **************************************/
         var mainCountry = _countriesObj[0];
+        console.log(mainCountry);
         var nameCountry = mainCountry.name;
+        nameCountry = (mainCountry.name.length > 8) ? mainCountry.code : nameCountry;
         var totls = $.number(mainCountry.downloads);
 
         $('#panelMainCountry').text(nameCountry);
+
         $('#panelMainCountryText').text('País con '+totls+' '+typeReport);
         /* **************************************/
         $("#panelsHeading").css('display', 'block');
+
+        $('#panelTotalsDetails, #panelCountriesDetails, #panelMainCountryDetails').attr('href', 'estadisticas/archivo/'+fileName);
 
     });//end d3.text()
 }

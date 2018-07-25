@@ -110,66 +110,74 @@
 </div>
 
 <div id="chartsContent" style="display:none">
+
+  <div id="chartPanelTotal" class="row">
+    <div class="col-lg-4 col-md-6">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <div class="row">
+            <div id="panelTotalIcon" class="col-xs-3">
+              <i class="fa fa-globe fa-5x"></i>
+            </div>
+            <div class="col-xs-9 text-right">
+              <div id="panelCountContinents" class="huge">0</div>
+              <div>Continentes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="panel panel-green">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-3">
+              <i class="fa fa-flag fa-5x"></i>
+            </div>
+            <div class="col-xs-9 text-right">
+              <div id="panelCountCountries" class="huge">0</div>
+              <div>Países</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-3">
+              <i id="panelTypeReport" class="fa fa-5x"></i>
+            </div>
+            <div class="col-xs-9 text-right">
+              <div id="panelTotalType" class="huge">0</div>
+              <div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--<div class="col-lg-3 col-md-6">
+      <div class="panel panel-yellow">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-3">
+              <i class="fa fa-trophy fa-5x"></i>
+            </div>
+            <div class="col-xs-9 text-right">
+              <div id="panelMainCountry" class="huge">0</div>
+              <div id="panelMainCountryText"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>-->
+  </div>
+
+
   <div class="row">
     <div class="col-lg-12">
       <!--<div id="noDataText" class="alert alert-info" role="alert">Documento: <strong>{{ $filename }}</strong></div>-->
-
-
-
-        <!-- [CHART TEXTO] -->
-        <div id="chartPanelText" class="panel" style="display: none">
-          <div class="panel-heading">
-            <h4>
-              <i class="fa fa-bar-chart"></i>
-              <span id="panelTitleText"></span>
-
-              <div class="dropdown pull-right">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                  <span class="fa fa-bars"></span>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                  <li><a href="javascript:void(0)" class="export-action" data-charttype="text" data-typeexport="png"><i class="fa fa-image"></i> Descargar Imagen PNG</a></li>
-                  <!--<li class="divider"></li>
-                  <li>
-                    <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
-                  </li>-->
-                </ul>
-              </div>
-
-              <!--<span class="pull-right" title="Opciones" style="margin-left: 5px;"><i class="fa fa-bars"></i></span>
-              <span class="pull-right angle-panel-collapse" title="Ocultar"><i class="fa fa-angle-up fa-lg"></i></span>-->
-            </h4>
-          </div>
-          <div class="panel-body collapse-up">
-            <div id="chartContentText"></div>
-          </div>
-        </div>
-
-        <!-- [CHART TIPO] -->
-        <div id="chartPanelTipo" class="panel" style="display: none;">
-          <div class="panel-heading">
-            <h4>
-              <i class="fa fa-bar-chart"></i>
-              <span id="panelTitleTipo"></span>
-              <span class="pull-right" title="Opciones"><i class="fa fa-bars fa-lg"></i></span>
-              <div class="dropdown pull-right">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                  <span class="fa fa-bars"></span>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                  <li><a href="javascript:void(0)" class="export-action" data-charttype="type" data-typeexport="png"><i class="fa fa-image"></i> Descargar Imagen PNG</a></li>
-                  <!--<li class="divider"></li>
-                  <li>
-                    <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
-                  </li>-->
-                </ul>
-              </div>
-            </h4>
-          </div>
-          <div class="panel-body collapse-up">
-            <div id="chartContentTipo"></div>
-          </div>
-        </div>
 
         <!-- [CHART PAÍS] -->
         <div id="chartPanelCountries" class="panel" style="display: none">
@@ -197,15 +205,19 @@
             <div class="col-md-8 col-xs-12">
               <div id="chartContentCountries"></div>
             </div>
-            <div id="countriesList" class="col-md-4 col-xs-12" style="overflow: auto; max-height: 400px;">
-              <!--<h5 style="color: #72777a; font-weight: bold">100K</h5>
-              <small style="color: #72777a">Visitantes de </small>
-              <span class="pull-right">50%</span>
-              <div class="c-progress">
-                <div class="c-progress-bar">
-                </div>
-              </div>-->
-            </div>
+            <div class="col-md-4 col-xs-12">
+                <input id="searchCountry" type="text" class="form-control" style="font-family: Arial, FontAwesome" placeholder="&#xF002; Buscar país">
+                <div id="countriesList"  style="overflow: auto; max-height: 400px;">
+                    <!--<h5 style="color: #72777a; font-weight: bold">100K</h5>
+                    <small style="color: #72777a">Visitantes de </small>
+                    <span class="pull-right">50%</span>
+                    <div class="c-progress">
+                      <div class="c-progress-bar">
+                      </div>
+                    </div>-->
+                </div>    
+            </div>  
+            
 
             <div class="col-md-12 text-center" style="display: inline-block">
               <hr>
@@ -258,9 +270,29 @@
             </h4>
           </div>
           <div class="panel-body collapse-up">
-            <div id="chartContentMonths"></div>
+              <div class="col-md-8">
+                  <div id="chartContentMonths"></div>
+              </div>
+              <div id="monthsList" class="col-md-4 col-xs-12" style="overflow: auto; max-height: 400px;"></div>
+
+              <div class="col-md-12 text-center" style="display: inline-block">
+                  <hr>
+              </div>
+              <div class="col-md-12 text-center">
+                  <div class="col-md-6 totalType">
+                      <i id="itotalTypeMonth" class="fa"></i>
+                      <span id="totalMonth" style="color: #72777a; font-weight: bold;"></span>
+                      <span style="color: #72777a;"></span>
+                  </div>
+                  <div class="col-md-6">
+                      <span id="monthUp" style="color: #72777a; font-weight: bold;"></span>
+                      <span style="color: #72777a">  </span>
+                      <i class="fa fa-level-up fa-lg" style="color: green;"></i>
+                  </div>
+              </div>
 
           </div>
+
         </div>
 
         <!-- [CHART REVISTA] -->
@@ -342,9 +374,65 @@
           </div>
         </div>
 
+        <!-- [CHART TEXTO] -->
+        <div id="chartPanelText" class="panel" style="display: none">
+          <div class="panel-heading">
+            <h4>
+              <i class="fa fa-bar-chart"></i>
+              <span id="panelTitleText"></span>
+
+              <div class="dropdown pull-right">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  <span class="fa fa-bars"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <li><a href="javascript:void(0)" class="export-action" data-charttype="text" data-typeexport="png"><i class="fa fa-image"></i> Descargar Imagen PNG</a></li>
+                  <!--<li class="divider"></li>
+                  <li>
+                    <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
+                  </li>-->
+                </ul>
+              </div>
+
+              <!--<span class="pull-right" title="Opciones" style="margin-left: 5px;"><i class="fa fa-bars"></i></span>
+              <span class="pull-right angle-panel-collapse" title="Ocultar"><i class="fa fa-angle-up fa-lg"></i></span>-->
+            </h4>
+          </div>
+          <div class="panel-body collapse-up">
+            <div id="chartContentText"></div>
+            <table id="tableContentText" class="table table-striped table-bordered" style="width:100%"></table>
+          </div>
+        </div>
+
+        <!-- [CHART TIPO] -->
+        <div id="chartPanelTipo" class="panel" style="display: none;">
+          <div class="panel-heading">
+            <h4>
+              <i class="fa fa-bar-chart"></i>
+              <span id="panelTitleTipo"></span>
+              <span class="pull-right" title="Opciones"><i class="fa fa-bars fa-lg"></i></span>
+              <div class="dropdown pull-right">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  <span class="fa fa-bars"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                  <li><a href="javascript:void(0)" class="export-action" data-charttype="type" data-typeexport="png"><i class="fa fa-image"></i> Descargar Imagen PNG</a></li>
+                  <!--<li class="divider"></li>
+                  <li>
+                    <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
+                  </li>-->
+                </ul>
+              </div>
+            </h4>
+          </div>
+          <div class="panel-body collapse-up">
+            <div id="chartContentTipo"></div>
+          </div>
+        </div>
+
 
         <!-- [CHART TOTAL] -->
-        <div id="chartPanelTotal" class="panel" style="display: none">
+        <div id="chartPanelTotal_" class="panel" style="display: none">
           <div class="panel-heading">
             <h4>
               <i class="fa fa-circle"></i>
@@ -582,6 +670,6 @@
 </script>
 <script type="text/javascript" src="{{ asset('js/pluggins/download.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/statsarrays.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/estadisticas.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/stats.js') }}"></script>
 
 @stop

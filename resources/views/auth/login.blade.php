@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+
+<!--<div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
@@ -39,7 +40,7 @@
                             </div>
                         </div>
 
-                        <!--<div class="form-group row">
+                        <div class="form-group row">
                             <div class="col-md-6 offset-md-4">
                                 <div class="checkbox">
                                     <label>
@@ -47,7 +48,7 @@
                                     </label>
                                 </div>
                             </div>
-                        </div>-->
+                        </div>
 
                         <div class="form-group row mb-0">
                             <div class="col-md-8 offset-md-4">
@@ -55,9 +56,9 @@
                                     {{ __('Entrar') }}
                                 </button>
 
-                                <!--<a class="btn btn-link" href="{{ route('password.request') }}">
+                                <a class="btn btn-link" href="{{ route('password.request') }}">
                                     {{ __('Forgot Your Password?') }}
-                                </a>-->
+                                </a>
                             </div>
                         </div>
                     </form>
@@ -65,5 +66,66 @@
             </div>
         </div>
     </div>
+</div>-->
+
+<div class="limiter">
+    <div class="container-login100">
+        <div class="wrap-login100">
+            <div class="login100-form-title" style="background-image: url({{ asset('images/bg.jpg') }});">
+					<span class="login100-form-title-1">
+						eScire Stats
+					</span>
+            </div>
+
+            <form method="POST" action="{{ route('login') }}" aria-label="{{ __('Login') }}" class="login100-form validate-form">
+                @csrf
+                <div class="wrap-input100 validate-input m-b-26" data-validate="Username is required">
+                    <span class="label-input100">{{ __('Correo electrónico') }}</span>
+                    <input id="email" type="email" class="input100{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus>
+                    @if ($errors->has('email'))
+                        <!--<span class="invalid-feedback" role="alert">
+                                        <strong></strong>
+                                    </span>-->
+                        <span class="focus-input100">{{ $errors->first('email') }}</span>
+                    @endif
+
+                </div>
+
+                <div class="wrap-input100 validate-input m-b-18" data-validate = "Password is required">
+                    <span class="label-input100">{{ __('Contraseña') }}</span>
+                    <input id="password" type="password" class="input100{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
+                    @if ($errors->has('password'))
+                       <!-- <span class="invalid-feedback" role="alert">
+                                        <strong></strong>
+                                    </span>-->
+                        <span class="focus-input100">{{ $errors->first('password') }}</span>
+                    @endif
+
+                </div>
+
+                <!--<div class="flex-sb-m w-full p-b-30">
+                    <div class="contact100-form-checkbox">
+                        <input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">
+                        <label class="label-checkbox100" for="ckb1">
+                            Remember me
+                        </label>
+                    </div>
+
+                    <div>
+                        <a href="#" class="txt1">
+                            Forgot Password?
+                        </a>
+                    </div>
+                </div>-->
+
+                <div class="container-login100-form-btn">
+                    <button type="submit" class="login100-form-btn">
+                        {{ __('Entrar') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
 @endsection
