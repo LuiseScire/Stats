@@ -1,18 +1,18 @@
 // https://country-code.cl/es/
 //objetos
 var monthsObj = [
-  {name: 'Enero',     shortname: 'Ene',   downloads: 0},
-  {name: 'Febrero',   shortname: 'Feb',   downloads: 0},
-  {name: 'Marzo',     shortname: 'Mar',   downloads: 0},
-  {name: 'Abril',     shortname: 'Abr',   downloads: 0},
-  {name: 'Mayo',      shortname: 'May',   downloads: 0},
-  {name: 'Junio',     shortname: 'Jun',   downloads: 0},
-  {name: 'Julio',     shortname: 'Jul',   downloads: 0},
-  {name: 'Agosto',    shortname: 'Ago',   downloads: 0},
-  {name: 'Septiembre',shortname: 'Sep',   downloads: 0},
-  {name: 'Octubre',   shortname: 'Oct',   downloads: 0},
-  {name: 'Octubre',   shortname: 'Nov',   downloads: 0},
-  {name: 'Diciembre', shortname: 'Dic',   downloads: 0}
+  {name: 'Enero',     shortname: 'Ene',   downloads: 0, index: 0},
+  {name: 'Febrero',   shortname: 'Feb',   downloads: 0, index: 1},
+  {name: 'Marzo',     shortname: 'Mar',   downloads: 0, index: 2},
+  {name: 'Abril',     shortname: 'Abr',   downloads: 0, index: 3},
+  {name: 'Mayo',      shortname: 'May',   downloads: 0, index: 4},
+  {name: 'Junio',     shortname: 'Jun',   downloads: 0, index: 5},
+  {name: 'Julio',     shortname: 'Jul',   downloads: 0, index: 6},
+  {name: 'Agosto',    shortname: 'Ago',   downloads: 0, index: 7},
+  {name: 'Septiembre',shortname: 'Sep',   downloads: 0, index: 8},
+  {name: 'Octubre',   shortname: 'Oct',   downloads: 0, index: 9},
+  {name: 'Noviembre',   shortname: 'Nov',   downloads: 0, index: 10},
+  {name: 'Diciembre', shortname: 'Dic',   downloads: 0, index: 11},
 ];
 
 var continentsObj = [

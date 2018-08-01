@@ -1,9 +1,17 @@
 var descargas = 0;//Descargas totales
 var color;
 
+var globalCSVID = 0;
+
 var globalTypeReport;
 
 var globalTotals = 0;
+var globaltotalCountries = 0;
+
+//{text: ".NET", weight: 13},
+var wordsCountry = [];
+var wordsMonth = [];
+var wordsNumber = [];
 
 var imageChartType,
     imageChartText,
@@ -28,6 +36,9 @@ var indexArray = [];//almacena los índices del documento seleccionados cuando s
 var dataSet = [];//alamacena todos los datos parseados del csv
 var showCharts = [];
 $(document).ready(function() {
+    $('.home-item-menu').css('display', 'none');
+    $('.global-item-menu').css('display', 'block');
+
     if(fileName != 'noData'){
         $("#chartsContent").css('display', 'block');
         $("#noDataText").css('display', 'none');
@@ -35,7 +46,6 @@ $(document).ready(function() {
         //$("#fileNameNavbar").text(fileName);
         //$("#a").text(fileName);
         getDataDB();
-
     } else {
         $("#noDataText")
             .removeClass('alert-info')
@@ -52,6 +62,7 @@ function getDataDB() {
         data: data,
         dataType: "JSON",
         success: function(response) {
+            globalCSVID = response.csvFileData.csv_id;
             var csvIndices = response.csvFileData.csv_indices;
             indexArray = JSON.parse("[" + csvIndices + "]");
 
@@ -64,7 +75,6 @@ function getDataDB() {
             alertContent += '<option value="3">Visitas a la página de la tabla de contenidos del número</option>';
             alertContent += '<option value="4">Visitas a la página principal de la revista</option>';
   */
-
             switch (typeReportIndex){
                 case 0:
                 case 2:
@@ -77,16 +87,6 @@ function getDataDB() {
                     break;
             }
             generateArrays();
-            //console.log(indexArray);
-
-            //getCSV();
-            /*$.get(getCsvFile, function( response ) {
-              generateArrays(response);
-              //processCSVData(response);
-            });*/
-
-
-            //validateData();
         }
     });
 }
@@ -97,22 +97,12 @@ function generateArrays() {
 
     d3.text(getCsvFile, function(data) {
         var parsedCSV = d3.csv.parseRows(data);
-        var h = parsedCSV[5];
-        h.shift();
-        headers.push(h);
-        parsedCSV.splice(0,6);
 
-        var indexType = 0;
-        var indexText = 0;
-        var indexJournal = 0;
         var indexNumber = 0;
         var indexCity = 0;
         var indexMonth = 0;
         var indexCountry = 0;
 
-        var chartType = 0;
-        var chartText = 0;
-        var chartJournal = 0;
         var chartNumber = 0;
         var chartCity = 0;
         var chartMonth = 0;
@@ -122,18 +112,18 @@ function generateArrays() {
             values.forEach(function (value) {
                 var index = value.i;
                 switch(value.v){
-                    case 'Tipo':
+                    /*case 'Tipo':
                         indexType = index;
                         chartType = 1;
-                        break;
+                        break;*/
                     case 'Texto':
                         indexText = index;
                         chartText = 1;
                         break;
-                    case 'Revista':
+                    /*case 'Revista':
                         indexJournal = index;
                         chartJournal = 1;
-                        break;
+                        break;*/
                     case 'Número':
                         indexNumber = index;
                         chartNumber = 1;
@@ -154,79 +144,456 @@ function generateArrays() {
             })
         });
 
+        /*var h = parsedCSV[5];
+        h.shift();
+        headers.push(h);*/
+
+        var unusableData = 1;
+        if (parsedCSV[0].length > 1) {
+            unusableData = 0;
+        }
+
+        var contador = 0;
         $.each(parsedCSV, function(index, v){
-
             var temp = v;
-            temp.shift();
-
-            var last = temp[temp.length -1];
-            var months = temp[temp.length -2];
-            var country = temp[temp.length -3];
-
-            //TOTALES
-            var totals = parseInt(last);
-            globalTotals = globalTotals + totals;
-
-            //MESES
-            var month = parseInt(months.substr(5));
-            if(month == 1){
-                month = month - 1;
-            } else {
-                month = month - 1;
-            }
-            monthsObj[month].downloads = monthsObj[month].downloads + totals;
-
-            //PAISES
-            $.each(countriesObj, function(index, v) {
-                if(country == ''){
-                    if(v.code == 'UNK'){
-                        v.downloads = v.downloads + totals;
-                    }
-                } else {
-                    if(country == v.code) {
-                        v.downloads = v.downloads + totals;
-                    }
+            if(temp.length > 1) {
+                if (unusableData) {
+                    temp.shift();
                 }
-            });
+
+                if(contador > 0){
+
+                    var last = temp[temp.length -1];
+                    var months = temp[temp.length -2];
+                    var country = temp[temp.length -3];
+
+                    //TOTALES
+                    var totals = parseInt(last);
+                    globalTotals = globalTotals + totals;
+
+                    //MESES
+                    //if(chartMonth == 1) {
+                    var month = parseInt(months.substr(5));
+                    if(month == 1){
+                        month = month - 1;
+                    } else {
+                        month = month - 1;
+                    }
+                    monthsObj[month].downloads = monthsObj[month].downloads + totals;
+                    //}
+
+                    //globales
+                    //if(chartCountry == 1) {
+
+                    $.each(countriesObj, function(index, v) {
+                        if(country == ''){
+                            if(v.code == 'UNK'){
+                                v.downloads = v.downloads + totals;
+                            }
+                        } else {
+                            if(country == v.code) {
+                                v.downloads = v.downloads + totals;
+
+                            }
+                        }
+                    });
+                    //}
+
+                    //number
+                    if(chartNumber == 1) {
+                        var number = temp[indexNumber];
+
+                        if(numberArrg.length == 0) {
+                            var a = {'number': number, totals: totals, 'loops': 1};
+                            numberArrg.push(a);
+
+                        } else {
+                            var match = false;
+                            var loops = 0;
+
+                            for(i in numberArrg) {
+                                var _number = numberArrg[i].number;
+
+                                if(number == _number){
+                                    match = true;
+                                    loops++;
+                                    numberArrg[i].loops = numberArrg[i].loops + loops;
+                                    numberArrg[i].totals = numberArrg[i].totals + totals;
+                                }
+                            }
+
+                            if(!match){
+                                //console.log(!!match);
+                                var a = {'number': number, totals: totals, 'loops': 1};
+                                numberArrg.push(a);
+                            }
+
+                        }
+                    }// end if chartNumber
+
+                    /*Chart City*/
+                    if(chartCity == 1) {
+                        var city = temp[indexCity];
+                        var _country = country;
+                        var continent;
+
+                        $.each(countriesObj, function(index, v) {
+                            if(country == ''){
+                                _country = 'UNK';
+                                continent = 'UNK';
+                            } else {
+                                if(_country == v.code) {
+                                    continent = v.continent;
+                                    _country = v.name;
+                                }
+                            }
+
+                        });
+
+                        //if(count < 10){
+                        if(city.trim().length > 0) {
+                            if(citiesArrg.length == 0) {
+                                var o = {'city': city, 'totals': totals,  'loops': 1, 'country': _country, 'continent': continent};
+                                citiesArrg.push(o);
+                                //console.log(citiesArrg);
+                            } else {
+                                var match = false;
+                                var loops = 0;
+                                for(i in citiesArrg){
+                                    var _city = citiesArrg[i].city;
+                                    if(_city == city) {
+                                        match = true;
+                                        loops++;
+                                        citiesArrg[i].loops = citiesArrg[i].loops + loops;
+                                        citiesArrg[i].totals = citiesArrg[i].totals + totals;
+                                        //console.log("valor encontrado");
+                                    }
+
+                                }
+
+                                if(!match) {
+                                    var o = {'city': city, 'totals': totals, 'loops': 1, 'country': _country, 'continent': continent};
+                                    citiesArrg.push(o);
+                                    //console.log("agrega: " + city);
+                                }
+
+                            }
+
+                        }
+                        //}
+                    }// end if chartCity
+                }
+                contador++;
+
+                dataSet.push(temp);
+            }
+
+        });//end each(parsedCSV)
+        $.each(countriesObj, function(index, v) {
+            var totals = parseInt(v.downloads);
+            var code = v.code;
+            var continent = v.continent;
+            if(code != 'UNK'){
+                if (totals > 0) {
+                    globaltotalCountries++;
+                    $.each(continentsObj, function (index, vv) {
+                        if(vv.name == continent && vv.totals != 1) {
+                            vv.totals = 1;
+                        }
+                    });
+                }
+            }
+
+        });
+
+        headers = dataSet[0];
+        dataSet.shift();
+        switchData();
+    });//end d3.text()
+}
+
+function switchData() {
+    google.charts.load("current", {packages:['corechart']});
+    indexArray.forEach(function(objects) {
+        objects.forEach(function(v) {
+            showCharts.push(v.v);
+            switch(v.v){
+                /*case 'Tipo':
+                    $("#chartPanelTipo").show();
+                    $("#panelTitleTipo").text(v.v);
+                    var item ='<li>';
+                    item+= '<a href="#chartPanelTipo" class="link-menu"><i class="fa fa-bar-chart"></i> '+v.v;
+                    item+='</li>';
+                    break;*/
+                case 'Texto':
+                    $("#chartPanelText").show();
+                    $("#panelTitleText").text(v.v);
+                    /*item ='<li>';
+                    item+= '<a href="#chartPanelText" class="link-menu"><i class="fa fa-bar-chart"></i> '+v.v;
+                    item+='</li>';*/
+                    $('#liMenuChartText').show();
+                    processDataText(v.i);
+                    break;
+                /*case 'Revista':
+                    $("#chartPanelJournal").show();
+                    $("#panelTitleJournal").text(v.v);
+                    item ='<li>';
+                    item+= '<a href="#chartPanelJournal" class="link-menu"><i class="fa fa-bar-chart"></i> '+v.v;
+                    item+='</li>';
+                    break;*/
+                case 'Número':
+                    $("#chartPanelNumber").show();
+                    $("#panelTitleNumber").text(v.v);
+                    $('#liMenuChartNumber').show();
+                    /*item ='<li>';
+                    item+= '<a href="#chartPanelNumber" class="link-menu"><i class="fa fa-hashtag" style="color: darkgreen"></i> '+v.v;
+                    item+='</li>';*/
+                    processDataNumber(v.i);
+                    break;
+                case 'Ciudad':
+                    $("#chartPanelCity").show();
+                    $("#panelTitleCity").text(v.v);
+                    $('#liMenuChartCity').show();
+                    /*item ='<li>';
+                    item+= '<a href="#chartPanelCity" class="link-menu"><i class="fa fa-bar-chart"></i> '+v.v;
+                    item+='</li>';*/
+                    processDataCities(v.i);
+                    break;
+                case 'País':
+                    $("#chartPanelCountries").show();
+                    $("#panelTitleCountries").text(v.v);
+                    $('#liMenuChartCountry').show();
+                    /*item ='<li>';
+                    item+= '<a href="#chartPanelCountries" class="link-menu"><i class="fa fa-globe" style="color: dodgerblue;"></i> '+v.v;
+                    item+='</li>';*/
+
+                    processDataCountries(v.i);
+                    break;
+                case 'Mes':
+                    $("#chartPanelMonths").show();
+                    $("#panelTitleMonths").text(v.v);
+                    $('#liMenuChartMonth').show();
+                    /*item ='<li>';
+                    item+= '<a href="#chartPanelMonths" class="link-menu"><i class="fa fa-calendar" style="color: darkred"></i> '+v.v;
+                    item+='</li>';*/
+                    processDataMonths(v.i);
+                    break;
+                case 'Total':
+                    $("#chartPanelTotal").show();
+                    $("#panelTitleTotal").text(v.v);
+                    $('#liMenuChartTotal').show();
+                    /*item ='<li>';
+                    item+= '<a href="#chartPanelTotal" class="link-menu"><i class="fa fa-circle" style="color: darkgreen;"></i> '+v.v;
+                    item+='</li>';*/
+                    processDataTotal(v.i);
+                    break;
+            }// end switch
+            //$("#menuOptionCharts").find("ul").append(item);
+        });
+    });
+    $("#menuOptionCharts").css('display', 'block').addClass('active').find('ul').addClass('in');
+
+    fadeOutLoader();
+}
+
+//############## [Countries Chart] #################
+$("#searchCountry").keyup(function() {
+    _this = this;
+    // Show only matching TR, hide rest of them
+    $.each($("#countriesList > div"), function() {
+        if ($(this).data('country').toLowerCase().indexOf($(_this).val().toLowerCase()) === -1)
+            $(this).hide();
+        else
+            $(this).show();
+    });
+});
+function processDataCountries(position) {
+    /*$.each(dataSet, function(index, v) {
+        var country = v[position];
+        var downloads = parseInt(v[v.length -1]);
+        $.each(countriesObj, function(index, v) {
+            if(country == ''){
+                if(v.code == 'UNK'){
+                    v.downloads = v.downloads + downloads;
+                }
+            } else {
+                if(country == v.code) {
+                    v.downloads = v.downloads + downloads;
+                }
+            }
+        });
+    });*/
+    //console.log(countriesObj);
+    google.charts.load('current', {
+        'packages':['geochart'],
+        // Note: you will need to get a mapsApiKey for your project.
+        // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
+        'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
+    });
+    google.charts.setOnLoadCallback(drawChartCountries);
+}
+
+function drawChartCountries() {
+    var title;
+    //console.log();
+    var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
+
+    var d = [
+        ['País', globalTypeReport, 'Porcentaje'],
+    ];
+
+    var previewLimit = 16;
+    var countPreview = 0;
+    var countCountries = 0;
+    var unknowTotals = 0;
+    $.each(_countriesObj, function(index, v) {
+        color = colorHexa();
+        var totals = parseInt(v.downloads);
+        var country = v.name;
+        var continent = v.continent;
+        if(totals > 0){
+            countPreview++;
+            //if(countPreview < previewLimit) {
+            if(country != 'Desconocido'){
+                countCountries++;
+                var per = (totals / globalTotals) * 100;
+
+                if(per < parseFloat(1.0)) {
+                    per = 1;
+                } else {
+                    per = Math.round(per);
+                }
+
+                var bar = [country, totals, per];
+                d.push(bar);
+
+                /*$.each(continentsObj, function (index, vv) {
+                    if(vv.name == continent && vv.totals != 1) {
+                        vv.totals = 1;
+                    }
+                });*/
+
+                var layer = '<div data-country="'+country+'"><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
+                    '              <small style="color: #72777a">'+ globalTypeReport+' de <span style="font-weight: bold; color: #000">'+country+'</span></small>\n' +
+                    '              <span class="pull-right">'+per+'%</span>\n' +
+                    '              <div class="c-progress">\n' +
+                    '                <div class="c-progress-bar" style="width: '+per+'%;">\n' +
+                    '                </div>\n' +
+                    '              </div></div>';
+
+                $("#countriesList").append(layer);
 
 
-            if(chartNumber == 1) {
-                var number = temp[indexNumber];
+                var word = {text: country, weight: totals};
+                wordsCountry.push(word);
+            } else {
+                unknowTotals = totals;
+                unknowPercent = Math.round((totals / globalTotals) * 100);
+            }
 
-                var city = temp[indexCity];
+            //}
+        }
+    });
 
-                if(numberArrg.length == 0 && citiesArrg.length == 0) {
-                    var a = {'number': number, totals: totals, 'loops': 1};
-                    numberArrg.push(a);
+    var mainData = d[1];
 
+    var mainCountry =  mainData[0];
+    var mainTotals = mainData[1];
+    var mainPercent = mainData[2];
+
+    var continents = 0;
+    $.each(continentsObj, function (index, v) {
+        var theyreThere = Boolean(v.totals);
+        if(theyreThere){
+            continents++;
+        }
+    });
+
+    /*********************/
+    $('#totalContinentes').text(continents);
+
+    /*********************/
+    $('#totalCountries').text(countCountries);
+
+    /*********************/
+    if(globalTypeReport == 'Visitas') {
+        $('#itotalType, #itotalTypeUnk').addClass('fa-eye');
+    } else {
+        $('#itotalType, #itotalTypeUnk').addClass('fa-download');
+    }
+
+    $('#totalType').text(abbreviateNumber(globalTotals)).next('span').text(' '+globalTypeReport);
+
+    /*********************/
+    var str = mainCountry+' '+abbreviateNumber(mainTotals)+' ';
+    $('#mainCountry').text(str).next('span').text(globalTypeReport +', '+mainPercent+'%');
+
+    /*********************/
+
+    $('#totalTypeUnk').text(abbreviateNumber(unknowTotals)).next('span')
+        .text(' '+globalTypeReport + ' sin especificar, ' +unknowPercent+ '%');
+
+    var data = google.visualization.arrayToDataTable(d);
+
+    /*var view = new google.visualization.DataView(data);
+    view.setColumns([
+      0,
+      1,
+      {
+        calc: "stringify",
+        sourceColumn: 1,
+        type: "string",
+        role: "annotation"
+      },
+      2
+    ]);*/
+
+    title = '';
+    var options = {
+        title: title,
+        bar: {groupWidth: "70%"},
+        legend: { position: "none" },
+        height: "400",
+        vAxis: {
+            gridlines: {count: gridlinesCount},
+            format: 'short',
+        },
+        colorAxis: {colors: ['#E05740', '#A41C1E']},
+        animation:{
+            duration: 1000,
+            easing: 'out',
+        },
+        //colorAxis: {colors: ['blue', 'green']}
+    };
+
+    var chart = new google.visualization.GeoChart(document.getElementById("chartContentCountries"));
+
+    google.visualization.events.addListener(chart, 'ready', function () {
+        imageChartCountry = chart.getImageURI();
+    });
+
+    chart.draw(data, options);
+    $('#cloudWordsCountry').jQCloud(wordsCountry);
+}
+
+//############## [Cities Chart] #################
+var citiesArrg = [];
+function processDataCities(position) {
+    /*var citiesArrg = [];
+    var count = 0;
+    $.each(dataSet, function(index, v) {
+        var city = v[position];
+        var totals =  parseInt(v[v.length -1]);
+
+        //if(count < 10){
+            if(city.trim().length > 0) {
+                if(citiesArrg.length == 0) {
                     var o = {'city': city, 'totals': totals,  'loops': 1};
                     citiesArrg.push(o);
-
+                    //console.log(citiesArrg);
                 } else {
                     var match = false;
                     var loops = 0;
-
-                    var matchCity = false;
-                    var loopsCity = 0;
-
-                    for(i in numberArrg) {
-                        var _number = numberArrg[i].number;
-
-                        if(number == _number){
-                            match = true;
-                            loops++;
-                            numberArrg[i].loops = numberArrg[i].loops + loops;
-                            numberArrg[i].totals = numberArrg[i].totals + totals;
-                        }
-                    }
-
-                    if(!match){
-                        //console.log(!!match);
-                        var a = {'number': number, totals: totals, 'loops': 1};
-                        numberArrg.push(a);
-                    }
-
-
                     for(i in citiesArrg){
                         var _city = citiesArrg[i].city;
                         if(_city == city) {
@@ -246,225 +613,695 @@ function generateArrays() {
                     }
 
                 }
-            }// end if chartNumber
-
-            /*Chart City*/
-            if(chartCity == 1) {
-                var city = temp[indexCity];
-                //if(count < 10){
-                if(city.trim().length > 0) {
-                    if(citiesArrg.length == 0) {
-                        var o = {'city': city, 'totals': totals,  'loops': 1};
-                        citiesArrg.push(o);
-                        //console.log(citiesArrg);
-                    } else {
-                        var match = false;
-                        var loops = 0;
-                        for(i in citiesArrg){
-                            var _city = citiesArrg[i].city;
-                            if(_city == city) {
-                                match = true;
-                                loops++;
-                                citiesArrg[i].loops = citiesArrg[i].loops + loops;
-                                citiesArrg[i].totals = citiesArrg[i].totals + totals;
-                                //console.log("valor encontrado");
-                            }
-
-                        }
-
-                        if(!match) {
-                            var o = {'city': city, 'totals': totals, 'loops': 1};
-                            citiesArrg.push(o);
-                            //console.log("agrega: " + city);
-                        }
-
-                    }
-
-                }
-                //}
-            }// end if chartCity
-
-
-            if(chartType == 1) {
-                var type = indexType;
 
             }
+        //}
+    });*/
 
+    //console.log(citiesArrg);
+    //google.charts.setOnLoadCallback(drawChartCities);
 
-            if(chartText == 1) {
-                var text = indexText;
-            } // end if chartText
-
-            if(chartJournal == 1) {
-                var journal = indexJournal;
-            } //end if chartJournal
-
-
-
-            dataSet.push(temp);
-        });//end each(parsedCSV)
-        switchData();
-
-    });//end d3.text()
+    /*google.charts.load('current', {packages: ['treemap']});
+    google.charts.setOnLoadCallback(drawChartCities);*/
+    /*var chart = function(){ drawChartCities(citiesArrg) };
+    google.charts.setOnLoadCallback(drawChartCities);*/
+    google.charts.setOnLoadCallback(drawChartCitiesFull);
 }
 
-function switchData() {
-    google.charts.load("current", {packages:['corechart']});
-    indexArray.forEach(function(objects) {
-        objects.forEach(function(v) {
-            showCharts.push(v.v);
-            switch(v.v){
-                case 'Tipo':
-                    $("#chartPanelTipo").show();
-                    $("#panelTitleTipo").text(v.v);
-                    var item ='<li>';
-                    item+= '<a href="#chartPanelTipo" class="link-menu"><i class="fa fa-bar-chart"></i> '+v.v;
-                    item+='</li>';
-                    break;
-                case 'Texto':
-                    $("#chartPanelText").show();
-                    $("#panelTitleText").text(v.v);
-                    item ='<li>';
-                    item+= '<a href="#chartPanelText" class="link-menu"><i class="fa fa-bar-chart"></i> '+v.v;
-                    item+='</li>';
-                    processDataText(v.i);
-                    break;
-                case 'Revista':
-                    $("#chartPanelJournal").show();
-                    $("#panelTitleJournal").text(v.v);
-                    item ='<li>';
-                    item+= '<a href="#chartPanelJournal" class="link-menu"><i class="fa fa-bar-chart"></i> '+v.v;
-                    item+='</li>';
-                    break;
-                case 'Número':
-                    $("#chartPanelNumber").show();
-                    $("#panelTitleNumber").text(v.v);
-                    item ='<li>';
-                    item+= '<a href="#chartPanelNumber" class="link-menu"><i class="fa fa-hashtag" style="color: darkgreen"></i> '+v.v;
-                    item+='</li>';
-                    processDataNumber(v.i);
-                    break;
-                case 'Ciudad':
-                    $("#chartPanelCity").show();
-                    $("#panelTitleCity").text(v.v);
-                    item ='<li>';
-                    item+= '<a href="#chartPanelCity" class="link-menu"><i class="fa fa-bar-chart"></i> '+v.v;
-                    item+='</li>';
-                    processDataCities(v.i);
-                    break;
-                case 'País':
-                    $("#chartPanelCountries").show();
-                    $("#panelTitleCountries").text(v.v);
-                    item ='<li>';
-                    item+= '<a href="#chartPanelCountries" class="link-menu"><i class="fa fa-globe" style="color: dodgerblue;"></i> '+v.v;
-                    item+='</li>';
-                    processDataCountries(v.i);
-                    break;
-                case 'Mes':
-                    $("#chartPanelMonths").show();
-                    $("#panelTitleMonths").text(v.v);
-                    item ='<li>';
-                    item+= '<a href="#chartPanelMonths" class="link-menu"><i class="fa fa-calendar" style="color: darkred"></i> '+v.v;
-                    item+='</li>';
-                    processDataMonths(v.i);
-                    break;
-                case 'Total':
-                    $("#chartPanelTotal").show();
-                    $("#panelTitleTotal").text(v.v);
-                    item ='<li>';
-                    item+= '<a href="#chartPanelTotal" class="link-menu"><i class="fa fa-circle" style="color: darkgreen;"></i> '+v.v;
-                    item+='</li>';
-                    processDataTotal(v.i);
-                    break;
-            }// end switch
-            $("#menuOptionCharts").find("ul").append(item);
-        });
-    });
-    $("#menuOptionCharts").css('display', 'block').addClass('active').find('ul').addClass('in');
+function drawChartCitiesFull() {
+    var dataSet = [];
+    $.each(citiesArrg, function(index, v) {
+        var totals = parseInt(v.totals);
+        var city = v.city;
+        var country = v.country;
+        if(totals > 0) {
+            //if(countPreview < previewLimit) {
 
-    fadeOutLoader();
-}
+            var data = [city, country,  $.number(totals)];
+            //console.log(data);
+            dataSet.push(data);
+            //}
 
-function validateData() {
-    google.charts.load("current", {packages:['corechart']});
-
-    $.each(indexArray, function(index, values) {
-        $.each(values, function(i, v) {
-
-            switch(v.v){
-                case 'Tipo':
-                    processDataType(v.i);
-                    //console.log("tipo");
-                    break;
-                case 'Texto':
-                    processDataText(v.i);
-                    //console.log("texto");
-                    break;
-                case 'Revista':
-                    processDataJournal(v.i);
-                    //console.log("revista");
-                    break;
-                case 'Número':
-                    processDataNumber(v.i);
-                    //console.log("número");
-                    break;
-                case 'Ciudad':
-                    //processDataCities(v.i);
-                    //console.log("ciudad");
-                    break;
-                case 'País':
-                    processDataCountries(v.i);
-                    //console.log("país");
-                    break;
-                case 'Mes':
-                    processDataMonths(v.i);
-                    //console.log("mes");
-                    break;
-                case 'Total':
-                    processDataTotal(v.i);
-                    //console.log("total");
-                    break;
-            }
-        });
-    });
-    fadeOutLoader();
-}
-
-
-
-//############## [Type Chart] #################
-//Por falta de datos Puede que hayan posibles errores por revisar.
-function processDataType(position) {
-    var types = [];
-    var count = 0;
-    var initialValue = 1;
-
-    $.each(dataSet, function(index, value) {
-        var i = index;
-        var v = String(value[position]);
-
-        if(count > 0){
-            $.each(types, function(index, value) {
-                var type = value.type;
-                if(new String(type).valueOf() == new String(v).valueOf()){
-                    value.totals = value.totals + 1;
-                } else {
-                    var a = {"type": v, "totals": initialValue};
-                    types.push(a);
-                }
-            });
-        } else {
-            var a = {"type": v, "totals": initialValue};
-            types.push(a);
         }
-        count++;
     });
-    //console.log(types);
-    google.charts.setOnLoadCallback(drawChartType);
+
+    var x = $("#tableContentCities").DataTable({
+        data : dataSet,
+        columns: [
+            { title: 'Ciudad' },
+            { title: 'País'},
+            { title: globalTypeReport }
+        ],
+        "order": [[ 2, "desc" ]],
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+        }
+    });
 }
 
-function drawChartType(){
+function drawChartCities() {
+    var title;
+    //console.log();
+    /*var _citiesArrg = citiesArrg.sort(dynamicSort("totals"));*/
 
+    /*var d = [
+        ['País', 'Totals', { role: 'style' }],
+    ];*/
+
+    var d = [
+        ['Location', 'Parent', 'Market trade volume (size)', 'Market increase/decrease (color)'],
+        ['Global',    null,                 0,                               0],
+    ];
+
+    var continents = 0;
+    $.each(continentsObj, function (index, v) {
+        var theyreThere = Boolean(v.totals);
+        if(theyreThere){
+            var data = [v.name, 'Global', 0, 0];
+            d.push(data);
+        }
+    });
+
+    var totalCountries = countriesObj.length;
+    var size = Math.round(totalCountries / 100);
+    $.each(countriesObj, function(index, v) {
+        color = colorHexa();
+        var totals = parseInt(v.downloads);
+        var country = v.name;
+        var continent = v.continent;
+        if (totals > 0) {
+            //countPreview++;
+            //if(countPreview < previewLimit) {
+            if (country != 'Desconocido') {
+                var data = [country, continent, size, size];
+                d.push(data);
+            }
+        }
+    });
+
+    countPreview = 0;
+    previewLimit = 100;
+
+    var totalCities = citiesArrg.length;
+    var size = Math.round(totalCities / 100);
+    $.each(citiesArrg, function(index, v) {
+        var totals = parseInt(v.totals);
+        var city = v.city;
+        var country = v.country;
+        if(totals > 0) {
+            //if(countPreview < previewLimit) {
+            var data = [city, country, size, size];
+            //console.log(data);
+            d.push(data);
+            //}
+            countPreview++
+        }
+        console.log(city);
+    });
+
+    var previewLimit = 200;
+    var countPreview = 0;
+    /*$.each(_citiesArrg, function(index, v) {
+        color = colorHexa();
+        var downloads = parseInt(v.totals);
+        var city = v.city;
+        if(downloads > 0){
+            countPreview++;
+            if(countPreview < previewLimit) {
+                var bar = [city, downloads, 'color: '+color];
+                d.push(bar);
+            }
+        }
+    });*/
+
+    //console.log(_citiesArrg);
+
+    /*var datax = google.visualization.arrayToDataTable([
+        ['Location', 'Parent', 'Market trade volume (size)', 'Market increase/decrease (color)'],
+        ['Global',    null,                 0,                               0],
+        ['America',   'Global',             0,                               0],
+        ['Europe',    'Global',             0,                               0],
+        ['Asia',      'Global',             0,                               0],
+        ['Australia', 'Global',             0,                               0],
+        ['Africa',    'Global',             0,                               0],
+        ['Brazil',    'America',            11,                              10],
+        ['USA',       'America',            52,                              31],
+        ['Mexico',    'America',            24,                              12],
+        ['Canada',    'America',            16,                              -23],
+        ['France',    'Europe',             42,                              -11],
+        ['Germany',   'Europe',             31,                              -2],
+        ['Sweden',    'Europe',             22,                              -13],
+        ['Italy',     'Europe',             17,                              4],
+        ['UK',        'Europe',             21,                              -5],
+        ['China',     'Asia',               36,                              4],
+        ['Japan',     'Asia',               20,                              -12],
+        ['India',     'Asia',               40,                              63],
+        ['Laos',      'Asia',               4,                               34],
+        ['Mongolia',  'Asia',               1,                               -5],
+        ['Israel',    'Asia',               12,                              24],
+        ['Iran',      'Asia',               18,                              13],
+        ['Pakistan',  'Asia',               11,                              -52],
+        ['Egypt',     'Africa',             21,                              0],
+        ['S. Africa', 'Africa',             30,                              43],
+        ['Sudan',     'Africa',             12,                              2],
+        ['Congo',     'Africa',             10,                              12],
+        ['Zaire',     'Africa',             8,                               10]
+    ]);*/
+
+    var data = google.visualization.arrayToDataTable(d);
+
+    tree = new google.visualization.TreeMap(document.getElementById('chartContentCities'));
+
+    tree.draw(data, {
+        midColor: '#E05740',
+        maxColor: '#A41C1E',
+        headerHeight: 15,
+        fontColor: 'white',
+        showScale: true
+    });
+    //['#E05740', '#A41C1E']
+
+    /*var data = google.visualization.arrayToDataTable(d);
+
+    var view = new google.visualization.DataView(data);
+    view.setColumns([0, 1,
+        { calc: "stringify",
+            sourceColumn: 1,
+            type: "string",
+            role: "annotation" },
+        2]);
+
+    var options = {
+        //title: "Descargas por país. Total " + $.number(descargas),
+        bar: {groupWidth: "60%"},
+        legend: { position: "none" },
+        fontSize: 14,
+        hAxis: {
+            title: 'Total de ' + globalTypeReport + ': ' + $.number(descargas),
+            minValue: 0,
+            format: 'short'
+        },
+        vAxis: {
+            title: 'Ciudad',
+
+        },
+        chartArea: {width: '90%', height: '95%', left: 100},
+    };
+
+    var chart = new google.visualization.BarChart(document.getElementById("chartContentCities"));
+    google.visualization.events.addListener(chart, 'ready', function () {
+        countriesWithDownloadsImageChart = chart.getImageURI();
+    });
+    chart.draw(view, options);*/
+}
+
+/*function drawChartCities(citiesArrg) {
+    var title;
+    //console.log();
+    var _citiesArrg = citiesArrg.sort(dynamicSort("totals"));
+
+    var d = [
+        ['País', 'Totals', { role: 'style' }],
+    ];
+
+    var previewLimit = 16;
+    var countPreview = 0;
+    $.each(_citiesArrg, function(index, v) {
+        color = colorHexa();
+        var downloads = parseInt(v.totals);
+        var city = v.city;
+        if(downloads > 0){
+            countPreview++;
+            if(countPreview < previewLimit) {
+                var bar = [city, downloads, 'color: '+color];
+                d.push(bar);
+            }
+        }
+    });
+
+    var data = google.visualization.arrayToDataTable(d);
+
+    var view = new google.visualization.DataView(data);
+    view.setColumns([
+        0,
+        1,
+        {
+            calc: "stringify",
+            sourceColumn: 1,
+            type: "string",
+            role: "annotation"
+        },
+        2
+    ]);
+
+    //title = 'Principales Países:' + $.number(descargas);
+    title = 'Principales Ciudades con mayores' + globalTypeReport;
+    var options = {
+        title: title,
+        bar: {groupWidth: "70%"},
+        legend: { position: "none" },
+        height: "500",
+        vAxis: {
+            gridlines: {count: gridlinesCount},
+            format: 'short',
+        },
+        animation:{
+            duration: 1000,
+            easing: 'out',
+        },
+    };
+
+    var chart = new google.visualization.ColumnChart(document.getElementById("chartContentCities"));
+
+    google.visualization.events.addListener(chart, 'ready', function () {
+        imageChartCity = chart.getImageURI();
+    });
+
+    chart.draw(view, options);
+}*/
+
+//############# [Month Chart] #################
+var monthsChartDraw = 'pie';
+$('.switchMonthChart').click(function () {
+    monthsChartDraw = $(this).data('chart');
+
+    if(!$(this).hasClass('btn-primary')) {
+        $('.switchMonthChart').removeClass('btn-primary').addClass('btn-default');
+        $(this).addClass('btn-primary');
+        var data = $(this).data('sort');
+    }
+
+    google.charts.setOnLoadCallback(drawChartMonths);
+});
+
+function processDataMonths(position) {
+    /*$.each(dataSet, function(index, value) {
+        var month = parseInt(value[position].substr(5));
+        var downloads = parseInt(value[value.length -1]);
+        if(month == 1){
+            month = month - 1;
+        } else {
+            month = month - 1;
+        }
+
+        monthsObj[month].downloads = monthsObj[month].downloads + downloads;
+    });*/
+    //console.log(monthsObj);
+    google.charts.setOnLoadCallback(drawChartMonths);
+
+}
+
+function drawChartMonths(){
+
+    var d;
+    switch (monthsChartDraw) {
+        case 'pie':
+            d = [
+                ['Mes', globalTypeReport],
+            ];
+            break;
+        case 'column':
+        case 'line':
+            d = [
+                ['Mes', globalTypeReport, { role: "style" }],
+            ];
+            break;
+    }
+
+    var colors = [];
+
+    $('#monthsList').empty();
+
+    var count = 0;
+    var maxValue = 0;
+    var maxMonth;
+    $.each(monthsObj, function(index, v) {
+        colorHex = colorHexa();
+        var percent = Math.round((v.downloads / globalTotals) * 100);
+
+        switch (monthsChartDraw){
+            case 'pie':
+                var bar = [v.name, v.downloads];
+                var color = {color: colorHex};
+                colors.push(color);
+                break;
+            case 'column':
+            case 'line':
+                var bar = [v.shortname, v.downloads, colorHex];
+                //progressColor = colorHex;
+                break;
+        }
+
+        if(bar[1] > maxValue){
+            maxValue = bar[1];
+            maxMonth = bar;
+        }
+
+        var layer = '<h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(v.downloads)+'</h5>\n' +
+            '              <small style="color: #72777a">'+globalTypeReport+' en <span style="font-weight: bold; color: #000">'+v.name+'</span></small>\n' +
+            '              <span class="pull-right">'+percent+'%</span>\n' +
+            '              <div class="c-progress">\n' +
+            '                <div class="c-progress-bar" style="width: '+percent+'%; background: '+colorHex+' !important;">\n' +
+            '                </div>\n' +
+            '              </div>';
+
+        d.push(bar);
+        $('#monthsList').append(layer);
+
+        var word = {text: v.name, weight: v.downloads};
+        wordsMonth.push(word);
+    });
+
+    if(globalTypeReport == 'Visitas') {
+        $('#itotalTypeMonth').addClass('fa-eye');
+    } else {
+        $('#itotalTypeMonth').addClass('fa-download');
+    }
+
+    $('#totalMonth').text(abbreviateNumber(globalTotals) + ' ' + globalTypeReport).next('span').text($.number(globalTotals));
+
+
+    var mData = maxMonth;
+    var maxName = mData[0];
+    var maxTotals = mData[1];
+    var percent = Math.round((maxTotals / globalTotals) * 100);
+
+
+    $('#monthUp').text(maxName + ' ' + abbreviateNumber(maxTotals) + ' ' + globalTypeReport).next('span').text(percent + '%');
+
+
+    var data = google.visualization.arrayToDataTable(d);
+
+    var view = new google.visualization.DataView(data);
+
+    switch (monthsChartDraw){
+        case 'column':
+        case 'line':
+            view.setColumns([
+                0,
+                1,
+                {
+                    calc: "stringify",
+                    sourceColumn: 1,
+                    type: "string",
+                    role: "annotation"
+                },
+                2
+            ]);
+            break;
+    }
+
+    var options = {
+        title: "",
+        bar: {groupWidth: "70%"},
+        legend: { position: "none" },
+        pieSliceText: 'label',
+        height: "500",
+        animation:{
+            duration: 1000,
+            easing: 'out',
+        },
+        is3D: true,
+        slices: colors
+    };
+
+
+    switch (monthsChartDraw) {
+        case 'pie':
+            var chart = new google.visualization.PieChart(document.getElementById("chartContentMonths"));
+            break;
+        case 'column':
+            var chart = new google.visualization.ColumnChart(document.getElementById("chartContentMonths"));
+            break;
+        case 'line':
+            var chart = new google.visualization.LineChart(document.getElementById("chartContentMonths"));
+            break;
+    }
+
+    google.visualization.events.addListener(chart, 'ready', function () {
+        imageChartMonth = chart.getImageURI();
+    });
+
+    chart.draw(view, options);
+    $('#cloudWordsMonth').jQCloud(wordsMonth);
+}
+
+//############## [Number Chart] #################
+$("#searchNumber").keyup(function() {
+    _this = this;
+    // Show only matching TR, hide rest of them
+    $.each($(".md-chips > div, #numbersList > div"), function() {
+        if (String($(this).data('number')).indexOf(String($(_this).val())) === -1 )
+            $(this).hide();
+        else
+            $(this).show();
+    });
+});
+
+var numberArrg = [];
+function processDataNumber(position) {
+
+    //var count = 0;
+    /*$.each(dataSet, function(index, v) {
+        var number = v[position];
+        var totals = parseInt(v[v.length -1]);
+
+        //if(count < 10){
+            if(numberArrg.length == 0) {
+                var a = {'number': number, totals: totals, 'loops': 1};
+                numberArrg.push(a);
+            } else {
+                var match = false;
+                var loops = 0;
+                for(i in numberArrg) {
+                    var _number = numberArrg[i].number;
+
+                    if(number == _number){
+                        match = true;
+                        loops++;
+                        numberArrg[i].loops = numberArrg[i].loops + loops;
+                        numberArrg[i].totals = numberArrg[i].totals + totals;
+                    }
+                }
+
+                if(!match){
+                    //console.log(!!match);
+                    var a = {'number': number, totals: totals, 'loops': 1};
+                    numberArrg.push(a);
+                }
+            }
+        //}
+        //count++;
+    });*/
+
+    //console.log(numberArrg);
+    //google.charts.setOnLoadCallback(drawChartNumber);
+
+    //var order = 'desc';
+    var chart = function() { drawChartNumber() };
+    google.charts.setOnLoadCallback(chart);
+    /*var order = 'desc';
+    drawChartNumber(order);*/
+
+}
+
+var numbersChartDraw = 'column';
+$('.switchNumberChart').click(function () {
+    numbersChartDraw = $(this).data('chart');
+
+    if(!$(this).hasClass('btn-primary')) {
+        $('.switchNumberChart').removeClass('btn-primary').addClass('btn-default');
+        $(this).addClass('btn-primary');
+        var data = $(this).data('sort');
+    }
+    console.log(numbersChartDraw);
+
+    google.charts.setOnLoadCallback(drawChartNumber);
+});
+
+/*$('.btn-sort-numbers').click( function () {
+    if(!$(this).hasClass('btn-primary')){
+        $('.btn-sort-numbers').removeClass('btn-primary').addClass('btn-default');
+        $(this).addClass('btn-primary');
+        var data = $(this).data('sort');
+
+        var order;
+        if(data == 'desc'){
+            order = 'desc';
+        } else {
+            order = 'asc';
+        }
+        drawChartNumber(order);
+    }
+});*/
+
+function drawChartNumber() {
+    var totalNumbers = 0;
+    var ratingdov = 0;
+    var _numberArrg = numberArrg.sort(dynamicSort("totals"));
+    /*if(order == 'desc'){
+        var _numberArrg = numberArrg.sort(dynamicSort("totals"));
+    } else {
+        var _numberArrg = numberArrg.sort(dynamicSortMenor("totals"));
+    }*/
+
+    //$('#sorterByTypeReport').text(globalTypeReport);
+
+    /*var faIcon;
+    if (globalTypeReport == 'Descargas') {
+        faIcon = '<i class="fa fa-download"></i>';
+    } else {
+        faIcon = '<i class="fa fa-eye"></i>';
+    }*/
+    var dataArrg;
+    switch (numbersChartDraw) {
+        case 'pie':
+            dataArrg = [
+                ['Mes', globalTypeReport],
+            ];
+            break;
+        case 'column':
+        case 'line':
+            dataArrg = [
+                ['Número', 'Totales', { role: 'style' }],
+            ];
+            break;
+    }
+
+    var colors = [];
+
+    /*var dataArrg = [
+        ['Número', 'Totales', { role: 'style' }],
+    ];*/
+
+    var previewLimit = 10;
+    var countPreview = 0;
+
+
+
+    $('.md-chips, #numbersList').empty();
+    $.each(_numberArrg, function(index, v) {
+        var colorhexa = colorHexa();
+        //var totals = v.total;
+        var totals = parseInt(v.totals);
+        var text = v.number;
+        if(totals > 0){
+            //console.log(v);
+            if(countPreview < previewLimit) {
+                //console.log(v);
+                ratingdov = ratingdov + totals;
+                //var bar = ['#' + text, totals, 'color: '+color];
+
+                switch (numbersChartDraw){
+                    case 'pie':
+                        var bar = ['#' + text, totals];
+                        var color = {color: colorhexa};
+                        colors.push(color);
+                        break;
+                    case 'column':
+                        var bar = ['#' + text, totals, 'color: '+colorhexa];
+                        break;
+                    case 'line':
+                        colorhexa = '#A41C1E';
+                        var bar = ['#' + text, totals, 'color: '+colorhexa];
+                        //progressColor = colorHex;
+                        break;
+                }
+                dataArrg.push(bar);
+            }
+            countPreview++;
+            /*var chip = '<div class="md-chip col-md-2 col-xs-12" data-number="'+text+'">\n' +
+                '                <div class="md-chip-icon">#'+text+'</div>\n' +
+                '                ' + abbreviateNumber(totals) + ' ' + faIcon +
+                '              </div>';
+            $('.md-chips').append(chip);*/
+
+            var per = (totals / globalTotals) * 100;
+
+            if(per < parseFloat(1.0)) {
+                per = 1;
+            } else {
+                per = Math.round(per);
+            }
+            var layer = '<div data-number="'+text+'"><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
+                '              <small style="color: #72777a">'+ globalTypeReport+' del <span style="font-weight: bold; color: #000">#'+text+'</span></small>\n' +
+                '              <span class="pull-right">'+per+'%</span>\n' +
+                '              <div class="c-progress">\n' +
+                '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorhexa+' !important">\n' +
+                '                </div>\n' +
+                '              </div></div>';
+
+
+            $('#numbersList').append(layer);
+
+            totalNumbers++;
+        }
+    });// end each
+
+    $('#totalNumbers').text(totalNumbers);
+
+    var data = google.visualization.arrayToDataTable(dataArrg);
+
+    var view = new google.visualization.DataView(data);
+
+    switch (numbersChartDraw){
+        case 'column':
+        case 'line':
+            view.setColumns([0, 1,
+                { calc: "stringify",
+                    sourceColumn: 1,
+                    type: "string",
+                    role: "annotation" },
+                2]);
+            break;
+    }
+
+    /*downloads or views*/
+    var dov = (globalTypeReport == 'descargas') ? 'descargados' : 'visitados';
+    var ratingPercent = Math.round((ratingdov / globalTotals) * 100);
+
+
+    var options = {
+        title: 'Rating de los '+ previewLimit +' números más ' + dov + ' ('+ ratingPercent +'%)',
+        subtitle: 'Números totales:' + totalNumbers,
+        bar: {groupWidth: "70%"},
+        legend: { position: "none" },
+        pieSliceText: 'label',
+        height: "500",
+        hAxis: {
+            title: 'Números',
+
+        },
+        vAxis: {
+            title: globalTypeReport,
+            gridlines: {count: gridlinesCount},
+            format: 'short',
+        },
+        animation:{
+            duration: 1000,
+            easing: 'out',
+        },
+        is3D: true,
+        slices: colors
+    };
+
+    switch (numbersChartDraw) {
+        case 'pie':
+            var chart = new google.visualization.PieChart(document.getElementById("chartContentNumber"));
+            break;
+        case 'column':
+            var chart = new google.visualization.ColumnChart(document.getElementById("chartContentNumber"));
+            break;
+        case 'line':
+            var chart = new google.visualization.AreaChart(document.getElementById("chartContentNumber"));
+            break;
+    }
+
+
+    google.visualization.events.addListener(chart, 'ready', function () {
+        imageChartNumber = chart.getImageURI();
+    });
+    chart.draw(view, options);
 }
 
 //############## [Text Chart] #################
@@ -507,7 +1344,8 @@ function processDataText(position) {
     var data = [];
     $.each(textArrg, function (index, v) {
 
-        var d = [v.text, v.loops, $.number(v.total)];
+        //var d = [v.text, v.loops, $.number(v.total)];
+        var d = [v.text, $.number(v.total)];
         data.push(d);
         /*$.each(values, function (i, v) {
 
@@ -517,11 +1355,11 @@ function processDataText(position) {
     var x = $("#tableContentText").DataTable({
         data : data,
         columns: [
-            { title: 'Artículo' },
-            { title: 'Repeticiones'},
+            { title: 'Texto' },
+            /*{ title: 'Repeticiones'},*/
             { title: globalTypeReport }
         ],
-        "order": [[ 2, "desc" ]],
+        "order": [[ 1, "desc" ]],
         "language": {
             "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
         }
@@ -530,7 +1368,6 @@ function processDataText(position) {
 
     /*var chart = function() { drawChartText(textArrg) };
     google.charts.setOnLoadCallback(chart);*/
-
 
 }
 
@@ -599,344 +1436,46 @@ function drawChartText(textArrg) {
 
 }
 
-//############## [Journal Chart] #################
-function processDataJournal(position) {
-    var data = [];
-    $.each(dataSet, function(index, v) {
-        console.log(v);
-        var journal = v[position];
 
 
 
-        console.log(journal);
-    });
-}
 
-function drawChartJournal(position, type) {
 
-}
 
-//############## [Number Chart] #################
-var numberArrg = [];
-function processDataNumber(position) {
 
-    var count = 0;
-    /*$.each(dataSet, function(index, v) {
-        var number = v[position];
-        var totals = parseInt(v[v.length -1]);
 
-        //if(count < 10){
-            if(numberArrg.length == 0) {
-                var a = {'number': number, totals: totals, 'loops': 1};
-                numberArrg.push(a);
-            } else {
-                var match = false;
-                var loops = 0;
-                for(i in numberArrg) {
-                    var _number = numberArrg[i].number;
 
-                    if(number == _number){
-                        match = true;
-                        loops++;
-                        numberArrg[i].loops = numberArrg[i].loops + loops;
-                        numberArrg[i].totals = numberArrg[i].totals + totals;
-                    }
-                }
+//############## [Type Total] #################
+function processDataTotal(position) {
+    //totals
+    if(globalTypeReport == 'Visitas') {
+        $('#panelTotalIcon, #panelUnknowsIcon').addClass('fa-eye');
+    } else {
+        $('#panelTotalIcon, #panelUnknowsIcon').addClass('fa-download');
+    }
+    $('#panelTotals').text(abbreviateNumber(globalTotals));
+    $('#panelTotalsTypeReport').text(globalTypeReport + '(' + $.number(globalTotals) + ')');
 
-                if(!match){
-                    //console.log(!!match);
-                    var a = {'number': number, totals: totals, 'loops': 1};
-                    numberArrg.push(a);
-                }
-            }
-        //}
-        //count++;
-    });*/
-
-    //console.log(numberArrg);
-    //google.charts.setOnLoadCallback(drawChartNumber);
-
-    var chart = function() { drawChartNumber(numberArrg) };
-    google.charts.setOnLoadCallback(chart);
-
-}
-
-function drawChartNumber(numberArrg) {
-    var _numberArrg = numberArrg.sort(dynamicSort("totals"));
-
-    var d = [
-        ['Número', 'Totales', { role: 'style' }],
-    ];
-
-    var previewLimit = 16;
-    var countPreview = 0;
-    $.each(_numberArrg, function(index, v) {
-
-        color = colorHexa();
-        //var totals = v.total;
-        var totals = parseInt(v.totals);
-        var text = v.number;
-        if(totals > 0){
-            //console.log(v);
-            countPreview++;
-            if(countPreview < previewLimit) {
-                //console.log(v);
-                var bar = [text, totals, 'color: '+color];
-                d.push(bar);
-            }
-        }
-    });// end each
-
-    var data = google.visualization.arrayToDataTable(d);
-
-    var view = new google.visualization.DataView(data);
-    view.setColumns([
-        0,
-        1,
-        {
-            calc: "stringify",
-            sourceColumn: 1,
-            type: "string",
-            role: "annotation"
-        },
-        2
-    ]);
-
-    title = '';
-
-    var options = {
-        title: title,
-        bar: {groupWidth: "70%"},
-        legend: { position: "none" },
-        height: "500",
-        vAxis: {
-            gridlines: {count: gridlinesCount},
-            format: 'short',
-        },
-        animation:{
-            duration: 1000,
-            easing: 'out',
-        },
-    };
-
-    var chart = new google.visualization.ColumnChart(document.getElementById("chartContentNumber"));
-
-    google.visualization.events.addListener(chart, 'ready', function () {
-        imageChartNumber = chart.getImageURI();
-    });
-
-    chart.draw(view, options);
-
-}
-
-//############## [Cities Chart] #################
-var citiesArrg = [];
-function processDataCities(position) {
-    /*var citiesArrg = [];
-    var count = 0;
-    $.each(dataSet, function(index, v) {
-        var city = v[position];
-        var totals =  parseInt(v[v.length -1]);
-
-        //if(count < 10){
-            if(city.trim().length > 0) {
-                if(citiesArrg.length == 0) {
-                    var o = {'city': city, 'totals': totals,  'loops': 1};
-                    citiesArrg.push(o);
-                    //console.log(citiesArrg);
-                } else {
-                    var match = false;
-                    var loops = 0;
-                    for(i in citiesArrg){
-                        var _city = citiesArrg[i].city;
-                        if(_city == city) {
-                            match = true;
-                            loops++;
-                            citiesArrg[i].loops = citiesArrg[i].loops + loops;
-                            citiesArrg[i].totals = citiesArrg[i].totals + totals;
-                            //console.log("valor encontrado");
-                        }
-
-                    }
-
-                    if(!match) {
-                        var o = {'city': city, 'totals': totals, 'loops': 1};
-                        citiesArrg.push(o);
-                        //console.log("agrega: " + city);
-                    }
-
-                }
-
-            }
-        //}
-    });*/
-
-    //console.log(citiesArrg);
-    //google.charts.setOnLoadCallback(drawChartCities);
-
-    var chart = function(){ drawChartCities(citiesArrg) };
-    google.charts.setOnLoadCallback(chart);
-}
-
-function drawChartCities(citiesArrg) {
-    var title;
-    //console.log();
-    var _citiesArrg = citiesArrg.sort(dynamicSort("totals"));
-
-    var d = [
-        ['País', 'Totals', { role: 'style' }],
-    ];
-
-    var previewLimit = 16;
-    var countPreview = 0;
-    $.each(_citiesArrg, function(index, v) {
-        color = colorHexa();
-        var downloads = parseInt(v.totals);
-        var city = v.city;
-        if(downloads > 0){
-            countPreview++;
-            if(countPreview < previewLimit) {
-                var bar = [city, downloads, 'color: '+color];
-                d.push(bar);
-            }
+    //months
+    var totalMonths = 0;
+    $.each(monthsObj, function(index, v) {
+        if(v.downloads > 0){
+            totalMonths++;
         }
     });
+    $('#panelMonths').text(totalMonths);
 
-    var data = google.visualization.arrayToDataTable(d);
+    //countries
+    $('#panelCountries').text(globaltotalCountries);
 
-    var view = new google.visualization.DataView(data);
-    view.setColumns([
-        0,
-        1,
-        {
-            calc: "stringify",
-            sourceColumn: 1,
-            type: "string",
-            role: "annotation"
-        },
-        2
-    ]);
-
-    //title = 'Principales Países:' + $.number(descargas);
-    title = 'Principales Ciudades con mayores' + globalTypeReport;
-    var options = {
-        title: title,
-        bar: {groupWidth: "70%"},
-        legend: { position: "none" },
-        height: "500",
-        vAxis: {
-            gridlines: {count: gridlinesCount},
-            format: 'short',
-        },
-        animation:{
-            duration: 1000,
-            easing: 'out',
-        },
-    };
-
-    var chart = new google.visualization.ColumnChart(document.getElementById("chartContentCities"));
-
-    google.visualization.events.addListener(chart, 'ready', function () {
-        imageChartCity = chart.getImageURI();
-    });
-
-    chart.draw(view, options);
-}
-
-//############## [Countries Chart] #################
-$("#searchCountry").keyup(function() {
-    _this = this;
-    // Show only matching TR, hide rest of them
-    $.each($("#countriesList > div"), function() {
-        if ($(this).data('country').toLowerCase().indexOf($(_this).val().toLowerCase()) === -1)
-            $(this).hide();
-        else
-            $(this).show();
-    });
-});
-function processDataCountries(position) {
-    /*$.each(dataSet, function(index, v) {
-        var country = v[position];
-        var downloads = parseInt(v[v.length -1]);
-        $.each(countriesObj, function(index, v) {
-            if(country == ''){
-                if(v.code == 'UNK'){
-                    v.downloads = v.downloads + downloads;
-                }
-            } else {
-                if(country == v.code) {
-                    v.downloads = v.downloads + downloads;
-                }
-            }
-        });
-    });*/
-    //console.log(countriesObj);
-    google.charts.load('current', {
-        'packages':['geochart'],
-        // Note: you will need to get a mapsApiKey for your project.
-        // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
-        'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
-    });
-    google.charts.setOnLoadCallback(drawChartCountries);
-}
-
-function drawChartCountries() {
-    var title;
-    //console.log();
-    var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
-
-    var d = [
-        ['País', globalTypeReport, 'Porcentaje'],
-    ];
-
-    var previewLimit = 16;
-    var countPreview = 0;
-    var countCountries = 0;
-    $.each(_countriesObj, function(index, v) {
-        color = colorHexa();
-        var totals = parseInt(v.downloads);
-        var country = v.name;
-        var continent = v.continent;
-        if(totals > 0){
-            countPreview++;
-            //if(countPreview < previewLimit) {
-            if(country != 'Desconocido'){
-                countCountries++;
-                var per = (totals / globalTotals) * 100;
-
-                if(per < parseFloat(1.0)) {
-                    per = 1;
-                } else {
-                    per = Math.round(per);
-                }
-
-                var bar = [country, totals, per];
-                d.push(bar);
-
-                $.each(continentsObj, function (index, vv) {
-                    if(vv.name == continent && vv.totals != 1) {
-                        vv.totals = 1;
-                    }
-                });
-
-                var layer = '<div data-country="'+country+'"><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
-                    '              <small style="color: #72777a">'+ globalTypeReport+' de <span style="font-weight: bold; color: #000">'+country+'</span></small>\n' +
-                    '              <span class="pull-right">'+per+'%</span>\n' +
-                    '              <div class="c-progress">\n' +
-                    '                <div class="c-progress-bar" style="width: '+per+'%;">\n' +
-                    '                </div>\n' +
-                    '              </div></div>';
-
-                $("#countriesList").append(layer);
+    /*var unKnows = countriesObj[0];
+    var unktotals = unKnows.downloads;
+    var percent = Math.round((unktotals / globalTotals) * 100);
+    $('#panelUnknows').text($.number(unktotals));
+    $('#panelUnknowsSpan').text(percent);*/
 
 
-            }
-
-            //}
-        }
-    });
-
-    var mainData = d[1];
+    /*var mainData = d[1];
 
     var mainCountry =  mainData[0];
     var mainTotals = mainData[1];
@@ -950,15 +1489,15 @@ function drawChartCountries() {
         }
     });
 
-    /***************************************/
+
     $('#totalContinentes, #panelCountContinents').text(continents);
 
 
-    /***************************************/
+
     $('#totalCountries, #panelCountCountries').text(countCountries);
 
 
-    /***************************************/
+
     if(globalTypeReport == 'Visitas') {
         $('#itotalType, #panelTypeReport').addClass('fa-eye');
     } else {
@@ -968,163 +1507,12 @@ function drawChartCountries() {
     $('#totalType').text(abbreviateNumber(globalTotals)).next('span').text(' '+globalTypeReport);
     $('#panelTotalType').text(abbreviateNumber(globalTotals)).next('div').text(globalTypeReport);
 
-    /***************************************/
+
 
     var str = mainCountry+' '+abbreviateNumber(mainTotals)+' '+globalTypeReport;
-    $('#mainCountry').text(str).next('span').text(' '+mainPercent+'%');
+    $('#mainCountry').text(str).next('span').text(' '+mainPercent+'%');*/
 
 
-    var data = google.visualization.arrayToDataTable(d);
-
-    /*var view = new google.visualization.DataView(data);
-    view.setColumns([
-      0,
-      1,
-      {
-        calc: "stringify",
-        sourceColumn: 1,
-        type: "string",
-        role: "annotation"
-      },
-      2
-    ]);*/
-
-    title = '';
-    var options = {
-        title: title,
-        bar: {groupWidth: "70%"},
-        legend: { position: "none" },
-        height: "400",
-        vAxis: {
-            gridlines: {count: gridlinesCount},
-            format: 'short',
-        },
-        colorAxis: {colors: ['#E05740', '#A41C1E']},
-        animation:{
-            duration: 1000,
-            easing: 'out',
-        },
-        //colorAxis: {colors: ['blue', 'green']}
-    };
-
-    var chart = new google.visualization.GeoChart(document.getElementById("chartContentCountries"));
-
-    google.visualization.events.addListener(chart, 'ready', function () {
-        imageChartCountry = chart.getImageURI();
-    });
-
-    chart.draw(data, options);
-}
-
-//############## [Month Chart] #################
-function processDataMonths(position) {
-    /*$.each(dataSet, function(index, value) {
-        var month = parseInt(value[position].substr(5));
-        var downloads = parseInt(value[value.length -1]);
-        if(month == 1){
-            month = month - 1;
-        } else {
-            month = month - 1;
-        }
-
-        monthsObj[month].downloads = monthsObj[month].downloads + downloads;
-    });*/
-    //console.log(monthsObj);
-    google.charts.setOnLoadCallback(drawChartMonths);
-
-}
-
-function drawChartMonths(){
-    var d = [
-        ['Mes', globalTypeReport],
-    ];
-
-    var colors = [];
-
-
-    var count = 0;
-    $.each(monthsObj, function(index, v) {
-        colorHex = colorHexa();
-        var percent = Math.round((v.downloads / globalTotals) * 100);
-        var bar = [v.name, v.downloads];
-        var color = {color: colorHex};
-        colors.push(color);
-
-        var layer = '<h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(v.downloads)+'</h5>\n' +
-            '              <small style="color: #72777a">'+globalTypeReport+' en <span style="font-weight: bold; color: #000">'+v.name+'</span></small>\n' +
-            '              <span class="pull-right">'+percent+'%</span>\n' +
-            '              <div class="c-progress">\n' +
-            '                <div class="c-progress-bar" style="width: '+percent+'%; background: '+color.color+' !important;">\n' +
-            '                </div>\n' +
-            '              </div>';
-
-        d.push(bar);
-        $('#monthsList').append(layer);
-    });
-
-
-
-    if(globalTypeReport == 'Visitas') {
-        $('#itotalTypeMonth').addClass('fa-eye');
-    } else {
-        $('#itotalTypeMonth').addClass('fa-download');
-    }
-
-    $('#totalMonth').text(abbreviateNumber(globalTotals) + ' ' + globalTypeReport).next('span').text($.number(globalTotals));
-
-    var monthsObj_ = monthsObj.sort(dynamicSort("downloads"));
-
-    var mData = monthsObj_[0];
-    var maxName = mData.name;
-    var maxTotals = mData.downloads;
-    var percent = Math.round((maxTotals / globalTotals) * 100);
-
-    $('#monthUp').text(maxName + ' ' + abbreviateNumber(maxTotals) + ' ' + globalTypeReport).next('span').text(percent + '%');
-
-
-    var data = google.visualization.arrayToDataTable(d);
-
-    var view = new google.visualization.DataView(data);
-    /*view.setColumns([
-        0,
-        1,
-        {
-            calc: "stringify",
-            sourceColumn: 1,
-            type: "string",
-            role: "annotation"
-        },
-        2
-    ]);*/
-
-    var options = {
-        title: "",
-        /*bar: {groupWidth: "70%"},*/
-        legend: { position: "none" },
-        pieSliceText: 'label',
-        height: "500",
-        animation:{
-            duration: 1000,
-            easing: 'out',
-        },
-        is3D: true,
-        slices: colors
-
-    };
-
-
-
-    var chart = new google.visualization.PieChart(document.getElementById("chartContentMonths"));
-
-    google.visualization.events.addListener(chart, 'ready', function () {
-        imageChartMonth = chart.getImageURI();
-    });
-
-    chart.draw(view, options);
-}
-
-//############## [Type Total] #################
-function processDataTotal(position) {
     /*var countTotals = 0;
     $.each(dataSet, function(index, value) {
       var totals = parseInt(value[position]);
@@ -1322,33 +1710,84 @@ $(".export-action").click(function() {
 });
 
 
+var typeReportArray = [];
 $('#chartOptions').click(function () {
     //chartList
-    headers.forEach(function (values) {
-        values.forEach(function (value, index) {
-            var input = '<li class="list-group-item"><label for=""><input type="checkbox" name="checkChart" value="'+index+'"> '+value+'</label></li>';
-            $('#chartList').append(input);
-        });
+
+    var chartList = $('#chartList');
+    chartList.empty();
+    headers.forEach(function (value, index) {
+        if(value != 'Tipo' && value != 'Revista') {
+            var input = '<li class="list-group-item"><label for=""><input type="checkbox" name="checkChart" data-index="'+index+'" value="'+value+'"> '+value+'</label></li>';
+            chartList.append(input);
+        }
     });
 
     indexArray.forEach(function (values) {
         values.forEach(function (value) {
-            var bdvalue = value.i;
+            var indexBD = value.i;
             $('input[name="checkChart"]').each(function (index) {
-                var checkvalue = $(this).val();
-                console.log(checkvalue);
-                if(checkvalue == bdvalue){
+                var index = $(this).data('index');
+                var value = $(this).val();
+                if(index == indexBD){
                     if(!$(this).is(':checked')) {
                         $(this).prop('checked', true);
-                        console.log("checkar");
+                        var dataArrg = {"i": index, "v": value};
+                        typeReportArray.push(dataArrg);
                     }
                 }
             });
         });
     });
 
-    $('#configCharts').modal('show');
+    $('#configCharts').modal({
+        backdrop: 'static',
+        keyboard: true,
+        show: true
+    });
 
+});
+
+$(document).on("click", "input[name='checkChart']", function() {
+    var index = $(this).data("index");
+    var value = $(this).attr("value");
+
+    if($(this).is(":checked")){
+        var dataArrg = {"i": index, "v": value};
+        typeReportArray.push(dataArrg);
+    } else {
+        for(var i in typeReportArray){
+            if(typeReportArray[i].i == index){
+                typeReportArray.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    typeReportArray.sort();
+});
+
+$('#saveChangesChartList').click(function () {
+    if(typeReportArray.length > 0){
+        var data = {
+            '_token': CSRF_TOKEN,
+            'action': 'upload_report_index',
+            'csvId' : globalCSVID,
+            'indexArray': typeReportArray
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/uploadcsv",
+            data: data,
+            dataType: "JSON",
+            success: function(response){
+                location.reload();
+            }
+        });
+    } else {
+        alert("Debe seleccionar al menos una casilla de selección para generar gráficas");
+    }
 });
 
 /*######### FUNCIONES EXTRA ###########*/
@@ -1381,6 +1820,18 @@ function dynamicSort(property) {
     }
 }
 
+function dynamicSortMenor(property) {
+    var sortOrder = 1;
+    if(property[0] === "-") {
+        sortOrder = -1;
+        property = property.substr(1);
+    }
+    return function (b,a) {
+        var result = (a[property] > b[property]) ? -1 : (a[property] < b[property]) ? 1 : 0;
+        return result * sortOrder;
+    }
+}
+
 function abbreviateNumber(value) {
     var newValue = value;
     if (value >= 1000) {
@@ -1397,8 +1848,6 @@ function abbreviateNumber(value) {
     }
     return newValue;
 }
-
-
 
 
 $(".angle-panel-collapse").click(function(event) {

@@ -7,7 +7,7 @@ $(document).ready(function(){
 });
 
 function getList(){
-    var data = {'_token': CSRF_TOKEN}
+    var data = {'_token': CSRF_TOKEN};
     $.ajax({
         type: "POST",
         url: "listcsvfiles",
