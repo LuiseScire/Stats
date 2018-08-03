@@ -69,6 +69,12 @@ function validateExistFiles(){
           var typeReport = lastElement.csv_type_report_index;
           var getCsvFile = '/public'+lastElement.csv_path;
           var fileName = lastElement.csv_back_name;
+          var _fileName = lastElement.csv_front_name;
+          var csvTypeReport = lastElement.csv_type_report;
+
+          $('.fileNamePanels').text(_fileName);
+          $('.typeReportPanels').text(csvTypeReport);
+          $('.seeAgain').data('csvname', fileName);
 
           getCsv(getCsvFile, typeReport, fileName);
           $("#csvListContent").css('display', 'none');
@@ -250,6 +256,3 @@ function dynamicSort(property) {
         return result * sortOrder;
     }
 }
-
-
-

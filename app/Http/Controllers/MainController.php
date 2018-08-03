@@ -375,32 +375,19 @@ class MainController extends Controller
         return response()->json($response);
     }
 
-    public function createchartimage(Request $request)
-    {
+    public function createchartimage(Request $request){
         $image = $request->image;
-        $tipo_export = $request->tipoExport;
 
-        switch ($tipo_export) {
-            case ($tipo_export == 'jpg') || ($tipo_export == 'png'):
-                $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
-                $file_name = $this->codigoaleatorio() . '.' . $tipo_export;
-                $file_path = public_path() . '/chartimages/' . $file_name;
+        $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $image));
+        $file_name = $this->randCode() . '.png';
+        $file_path = public_path() . '/chartimages/' . $file_name;
 
-                if (file_put_contents($file_path, $data)) ;
-                break;
-            case 'pdf';
-
-            default:
-                // code...
-
-                break;
-        }
+        file_put_contents($file_path, $data);
 
         $response = array(
             'status' => 'success',
             'fileName' => $file_name
         );
-
         return response()->json($response);
     }
 

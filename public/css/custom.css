@@ -15,8 +15,8 @@
     top: 50%;
     left: 50%;
     width: 400px;
-    height: 270px;
-    margin: -170px 0 0 -200px;
+    height: 310px;
+    margin: -210px 0 0 -200px;
     background-image: url("../../public/images/preloader_chart.gif");
     background-repeat: no-repeat;
     background-position: center;
@@ -163,14 +163,14 @@ a.ir-arriba {
   margin-right: 5px;
 }
 
-.address-bar-content-header > .breadcrumb > li + li:before {
+.address-bar-content-header > .breadcrumb > li + li::before {
   padding: 0 0.5rem;
   content: '\2044';
   font-size: 16px;
   color: #333;
 }
 
-.address-bar-content-header > .breadcrumb > li.current-date:before {
+.address-bar-content-header > .breadcrumb > li.current-date::before {
   padding: 0 0.5rem;
   content: '';
   font-size: 16px;

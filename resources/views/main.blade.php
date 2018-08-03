@@ -20,34 +20,18 @@
 
 @section('content')
     <div class="row">
-
-        <div class="addres-bar-content-header">
-            <div class="col-md-8">
-                <h1 >Inicio</h1>
-            </div>
-            <div class="col-md-4 text-right">
+        <div class="col-lg-12">
+            <div class="address-bar-content-header">
                 <h1>
-                    <a>
-                        <button id="btnGlobalOpenFile" class="btn btn-danger" onclick="starInputFile()">
-                            <i class="fa fa-folder-open"></i> Explorar Archivos
-                        </button>
-                    </a>
+                  Inicio
+                  <span id="btnGlobalOpenFile" class="btn btn-danger pull-right" onclick="starInputFile()" role="button"><i class="fa fa-folder-open"></i> Subir Archivo</span>
                 </h1>
-
-            </div>
-
-            <div class="col-md-12">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><label><i class="fa fa-home"></i> Inicio</label></li>
-                    <li class="current-date pull-right"><span><i class="fa fa-calendar"></i> <span
-                                    id="current-date"></span></span></li>
+                    <li class="address-item"><label><i class="fa fa-home"></i> Inicio</label></li>
+                    <li class="current-date pull-right"><span><i class="fa fa-calendar"></i> <span id="current-date"></span></span></li>
                 </ol>
             </div>
-
-
-
         </div>
-
     </div>
 
     <div id="noFiles" style="display: none" class="alert alert-warning text-center" role="alert">
@@ -64,13 +48,19 @@
                                 <a id="tabHome" href="#home" data-toggle="tab"><i class="fa fa-home"></i> Inicio</a>
                             </li>
                             <li>
-                                <a id="tabHistory" href="#history" data-toggle="tab" style="display: none"><i class="fa fa-list"></i> Historial</a>
+                                <a id="tabHistory" href="#history" data-toggle="tab" style="display: none"><i class="fa fa-clock-o"></i> Historial</a>
                             </li>
                         </ul>
 
                         <div class="tab-content">
                             <div class="tab-pane active" id="home">
                                 <br>
+                                <h4>
+                                    Según la información de
+                                    <strong class="fileNamePanels" style="color:#A41C1E"></strong>
+                                    indica las siguientes
+                                    <strong class="typeReportPanels" style="color:#72777a"></strong>
+                                  </h4>
                                 <div id="panelsHeading" class="row" style="display: none">
                                     <div class="col-lg-4 col-md-4">
                                         <div class="panel panel-primary">
@@ -138,6 +128,23 @@
                                             </a>
                                         </div>
                                     </div>
+
+                                    <div class="col-md-12">
+                                        <h4>Graficar de nuevo</h4>
+                                        <div id="itemFile" class="media">
+                                           <div class="media-left">
+                                               <a href="javascript:void(0)" class="csv-file-item seeAgain" data-csvname="">
+                                                  <img class="media-object" src="{{ asset('images/csv-file-primary-color.svg') }}" alt="icon" width="64px" height="64px">
+                                              </a>
+                                           </div>
+                                           <div class="media-body" style="color: #E05740">
+                                             <h4 class="media-heading csv-file-item fileNamePanels seeAgain" style="color: #A41C1E; cursor: pointer" data-csvname=""></h4>
+                                             <span class="fa fa- fa-lg pull-right" style="cursor: pointer"></span><span class="pull-right"></span>
+                                             <span class="typeReportPanels"></span>
+                                             <br><small style="color: #72777a"></small>
+                                           </div>
+                                        </div>
+                                    </div>
                                     <!--<div class="col-lg-3 col-md-6">
                                       <div class="panel panel-red">
                                         <div class="panel-heading">
@@ -167,7 +174,7 @@
                                         <h2>Seleccione su archivo CSV para subirlo</h2>
                                         <p><i class="fa fa-upload upload" aria-hidden="true"></i></p>
                                         <p><a id="csvFileButton" class="btn btn-danger btn-lg" href="#" role="button" onclick="starInputFile()">
-                                                <i class="fa fa-folder-open"></i> Explorar Archivos</a></p>
+                                                <i class="fa fa-folder-open"></i> Subir Archivo</a></p>
                                     </div>
 
                                     <div id="progressBarContent" class="col-lg-12" style="display: none">

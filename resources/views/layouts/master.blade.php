@@ -25,6 +25,64 @@
             color: #000000;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        var messages = [
+            'Cargando...',
+            'Espere un momento, por favor...',
+            'Procesando datos...',
+            'Esto podría demorar un poco...',
+            'Su archivo excede los 3MB, espere, por favor...'
+
+        ];
+        var message = messages[0];
+        var secondsCount = 0;
+
+        var timer = null;
+        var interval = 1000;
+
+        $(function () {
+            setLoaderMessage();
+        });
+
+        function setLoaderMessage() {
+            if (timer !== null) return;
+            timer = setInterval(function () {
+                switch (secondsCount) {
+                    case 3:
+                        message = messages[1];
+                        break;
+                    case 6:
+                        message = messages[2];
+                        break;
+                    case 9:
+                        message = messages[3];
+                        break;
+                    case 12:
+                        message = messages[4]
+                    default:
+                        message = message;
+                        break;
+                }
+                secondsCount++;
+                $('.msg').text(message);
+            }, interval);
+            //clearInterval(stopIntervalSetMessage);
+        }
+        function fadeInLoader() {
+            $("#preloader").fadeIn("slow");
+            secondsCount = 0;
+            setLoaderMessage();
+            //$("wrapper").addClass("blur");
+        }
+
+        function fadeOutLoader() {
+            $("#preloader").fadeOut("slow");
+            clearInterval(timer);
+            timer = null;
+            //$("#wrapper").removeClass("blur");
+        }
+    </script>
 
 </head>
 <body>
@@ -136,8 +194,8 @@
                                         class="fa arrow"></span></a>
                             <ul class="nav nav-second-level nav-colors">
                                 <li id="liMenuChartTotal" style="display: none">
-                                    <a href="#chartPanelTotal" class="link-menu"> <i class="fa fa-window-maximize"
-                                                                                     style="color: #f0ad4e;"></i>
+                                    <a href="#chartPanelTotal" class="link-menu"> <i class="fa fa-trophy"
+                                                                                     style="color: gold;"></i>
                                         Total</a>
                                 </li>
                                 <li id="liMenuChartCountry" style="display: none">
@@ -190,7 +248,7 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+
 <!--<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" charset="utf-8"></script>
 -->
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
@@ -204,65 +262,10 @@
 <script src="{{ asset('js/pluggins/jQCloud/jqcloud.js') }}"></script>
 
 <script>
-    var messages = [
-        'Cargando...',
-        'Espere un momento, por favor...',
-        'Procesando datos...',
-        'Esto podría demorar un poco.'
-    ];
-    var message = messages[0];
-    var secondsCount = 0;
-
-    var timer = null;
-    var interval = 1000;
-
-    $(function () {
-        setLoaderMessage();
-    });
-
-    function setLoaderMessage() {
-        if (timer !== null) return;
-        timer = setInterval(function () {
-            secondsCount++;
-            switch (secondsCount) {
-                case 3:
-                    message = messages[1];
-                    break;
-                case 6:
-                    message = messages[2];
-                    break;
-                case 9:
-                    message = messages[3];
-                    break;
-                default:
-                    message = message;
-                    break;
-            }
-            $('.msg').text(message);
-
-        }, interval);
-        //clearInterval(stopIntervalSetMessage);
-    }
-
     var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-    $(window).on('load', function () {
-        //fadeOutLoader();
-    });
-
-    function fadeInLoader() {
-        $("#preloader").fadeIn("slow");
-        secondsCount = 0;
-        setLoaderMessage();
-        //$("wrapper").addClass("blur");
-    }
-
-    function fadeOutLoader() {
-        $("#preloader").fadeOut("slow");
-        clearInterval(timer);
-        timer = null;
-        //$("#wrapper").removeClass("blur");
-    }
-
+    /*$(window).on('load', function () {
+        fadeOutLoader();
+    });*/
     $(document).ready(function () {
         $('.ir-arriba').click(function () {
             $('body, html').animate({
@@ -315,7 +318,7 @@
         var monthNames = [
             "Enero", "Febrero", "Marzo",
             "Abril", "Mayo", "Junio", "Julio",
-            "Augosto", "Septimbre", "Octubre",
+            "Agosto", "Septimbre", "Octubre",
             "Noviembre", "Diciembre"
         ];
 

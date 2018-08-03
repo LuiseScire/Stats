@@ -107,21 +107,6 @@
             margin: 0 8px 0 -12px;
 
         }
-
-        #numberTable {
-            border: none;
-        }
-
-        #numberTable td {
-            border: #fff 1px solid;
-            background-color: #F5F5F5;
-            padding: 0px 5px 10px 5px;
-            /* vertical-align: middle; */
-            text-align: center;
-            white-space: nowrap;
-        }
-
-
     </style>
 @stop
 
@@ -135,7 +120,6 @@
         <h1 class="page-header">Dashboard</h1>
     </div>
 </div>-->
-
     <div class="row">
         <div class="col-lg-12">
             <div class="address-bar-content-header">
@@ -143,82 +127,103 @@
                 <ol class="breadcrumb">
                     <li class="address-item"><a href="{{ url('home') }}"><i class="fa fa-home"></i> Inicio</a></li>
                     <li class="address-item"><label><i class="fa fa-bar-chart"></i> Estadísticas</label></li>
-                    <li class="current-date pull-right"><span><i class="fa fa-calendar"></i><span id="current-date"></span></span></li>
+                    <li class="current-date pull-right"><span><i class="fa fa-calendar"></i> <span
+                                    id="current-date"></span></span></li>
                 </ol>
             </div>
         </div>
         <div class="col-md-12 col-xs-12">
-            <label id="chartOptions" class="pull-right" style="cursor: pointer"> Configuración <i class="fa fa-gear"></i></label>
+            <h4 id="chartOptions" class="pull-right" style="cursor: pointer; color:#A41C1E;"> Configuración <i
+                        class="fa fa-gear"></i></h4>
         </div>
     </div>
-
+    <br>
     <div id="chartsContent" style="display:none">
-        <div id="chartPanelTotal" class="row" style="display:none">
-            <div class="col-lg-4 col-md-6">
-                <div class="panel panel-yellow">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <i id="panelTotalIcon" class="fa fa-5x"></i>
-                            </div>
-                            <div class="col-xs-9 text-right">
-                                <div id="panelTotals" class="huge">0</div>
-                                <div id="panelTotalsTypeReport"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <i class="fa fa-calendar fa-5x"></i>
-                            </div>
-                            <div class="col-xs-9 text-right">
-                                <div id="panelMonths" class="huge">0</div>
-                                <div>Meses</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6">
-                <div class="panel panel-green">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <i class="fa fa-globe fa-5x"></i>
-                            </div>
-                            <div class="col-xs-9 text-right">
-                                <div id="panelCountries" class="huge">0</div>
-                                <div>Países</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!--<div class="col-lg-3 col-md-6">
-              <div class="panel panel-yellow">
-                <div class="panel-heading">
-                  <div class="row">
-                    <div class="col-xs-3">
-                      <i class="fa fa-trophy fa-5x"></i>
-                    </div>
-                    <div class="col-xs-9 text-right">
-                      <div id="panelMainCountry" class="huge">0</div>
-                      <div id="panelMainCountryText"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>-->
-        </div>
-
-
         <div class="row">
             <div class="col-lg-12">
+                <div id="chartPanelTotal" style="display:none">
+                    <div class="panel" style="border-top: 3px solid gold;">
+                        <div class="panel-heading">
+                            <h4 style="color: gold;">
+                                <i class="fa fa-trophy"></i>
+                                <span>Total</span>
+                                <!--<div class="dropdown pull-right">
+                                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-bars"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                        <li><a href="javascript:void(0)" class="export-action" data-charttype="total"
+                                               data-typeexport="png"><i class="fa fa-image"></i> Descargar Imagen PNG</a>
+                                        </li>
+                                    </ul>
+                                </div>-->
+                            </h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="col-lg-4 col-md-6">
+                                <div class="panel panel-yellow">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-xs-3">
+                                                <i id="panelTotalIcon" class="fa fa-5x"></i>
+                                            </div>
+                                            <div class="col-xs-9 text-right">
+                                                <div id="panelTotals" class="huge">0</div>
+                                                <div id="panelTotalsTypeReport"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-xs-3">
+                                                <i class="fa fa-calendar fa-5x"></i>
+                                            </div>
+                                            <div class="col-xs-9 text-right">
+                                                <div id="panelMonths" class="huge">0</div>
+                                                <div>Meses</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="panel panel-green">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-xs-3">
+                                                <i class="fa fa-globe fa-5x"></i>
+                                            </div>
+                                            <div class="col-xs-9 text-right">
+                                                <div id="panelCountries" class="huge">0</div>
+                                                <div>Países</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--<div class="col-lg-3 col-md-6">
+                            <div class="panel panel-yellow">
+                              <div class="panel-heading">
+                                <div class="row">
+                                  <div class="col-xs-3">
+                                    <i class="fa fa-trophy fa-5x"></i>
+                                  </div>
+                                  <div class="col-xs-9 text-right">
+                                    <div id="panelMainCountry" class="huge">0</div>
+                                    <div id="panelMainCountryText"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>-->
+                        </div>
+                    </div>
+                </div>
 
                 <!--  ######################## [CHART PAÍS] ############################## -->
                 <div id="chartPanelCountries" class="panel" style="display: none; border-top: 3px solid dodgerblue;">
@@ -226,7 +231,41 @@
                         <h4 style="color: dodgerblue;">
                             <i class="fa fa-globe"></i>
                             <span id="panelTitleCountries"></span>
-                            <div class="dropdown pull-right">
+                            <div class="pull-right">
+                                <!--<span class="btn btn-default export-action" title="Descargar Imagen PNG"
+                                      data-charttype="country" data-typeexport="png" role="button">
+                                    <i class="fa fa-download"></i>
+                                </span>
+                                <span class="btn btn-default export-action" title="Compartir en mi página web"
+                                      data-charttype="country" data-typeexport="embed" role="button">
+                                    <i class="fa fa-share-alt"></i>
+                                </span>-->
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-download"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png">
+                                                <i class="fa fa-image"></i> Descargar imagen PNG
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-share-alt"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="embed">
+                                                <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                            </div>
+                        <!--<div class="dropdown pull-right">
                                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                     <span class="fa fa-bars"></span>
@@ -236,18 +275,43 @@
                                                     class="fa fa-list"></i> Más detalles <i
                                                     class="fa fa-external-link"></i></a></li>
                                     <li class="divider"></li>
-                                    <li><a href="javascript:void(0)" class="export-action" data-charttype="country"
-                                           data-typeexport="png"><i class="fa fa-image"></i> Descargar Imagen PNG</a>
+                                    <li>
+                                        <a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png">
+                                          <i class="fa fa-image"></i> Descargar Imagen PNG
+                                        </a>
                                     </li>
-                                    <!--<li class="divider"></li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="embed">
+                                          <i class="fa fa-share-alt"></i>
+                                          Compartir en mi página web
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
                                     <li>
                                       <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
-                                    </li>-->
+                                    </li>
                                 </ul>
-                            </div>
+                            </div>-->
                         </h4>
                     </div>
                     <div class="panel-body collapse-up">
+                        <div class="col-md-12 text-center" style="z-index: 2;">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <button class="switchCountryChart btn btn-primary" data-chart="geo">
+                                    <i class="fa fa-map"></i>
+                                </button>
+                                <button class="switchCountryChart btn btn-default" data-chart="pie">
+                                    <i class="fa fa-pie-chart"></i>
+                                </button>
+                                <button class="switchCountryChart btn btn-default" data-chart="column">
+                                    <i class="fa fa-bar-chart"></i>
+                                </button>
+                                <button class="switchCountryChart btn btn-default" data-chart="line">
+                                    <i class="fa fa-line-chart"></i>
+                                </button>
+                            </div>
+                        </div>
                         <div class="col-md-9 col-xs-12">
                             <div id="chartContentCountries"></div>
                         </div>
@@ -305,25 +369,92 @@
                         <h4 style="color: cadetblue">
                             <i class="fa fa-building"></i>
                             <span id="panelTitleCity"></span>
-                            <div class="dropdown pull-right">
+
+
+                            <div class="pull-right">
+                                <!--<span class="btn btn-default export-action" title="Descargar Imagen PNG"
+                                      data-charttype="city" data-typeexport="png" role="button">
+                                    <i class="fa fa-download"></i>
+                                </span>
+                                <span class="btn btn-default export-action" title="Compartir en mi página web"
+                                      data-charttype="city" data-typeexport="embed" role="button">
+                                    <i class="fa fa-share-alt"></i>
+                                </span>-->
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-download"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="city" data-typeexport="png">
+                                                <i class="fa fa-image"></i> Descargar imagen PNG
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-share-alt"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="city" data-typeexport="embed">
+                                                <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                            </div>
+
+
+                            <!--<div class="dropdown pull-right">
                                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                     <span class="fa fa-bars"></span>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                    <li><a href="javascript:void(0)" class="export-action" data-charttype="city"
-                                           data-typeexport="png"><i class="fa fa-image"></i> Descargar Imagen PNG</a>
+                                    <li>
+                                      <a href="javascript:void(0)" class="export-action" data-charttype="city" data-typeexport="png">
+                                        <i class="fa fa-image"></i>
+                                        Descargar Imagen PNG
+                                      </a>
                                     </li>
-                                    <!--<li class="divider"></li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a href="javascript:void(0)" class="export-action" data-charttype="city" data-typeexport="embed">
+                                          <i class="fa fa-share-alt"></i>
+                                          Compartir en mi página web
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
                                     <li>
                                       <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
-                                    </li>-->
+                                    </li>
                                 </ul>
-                            </div>
+                            </div>-->
                         </h4>
                     </div>
                     <div class="panel-body collapse-up">
-                        <!--<div id="chartContentCities"></div>-->
+                        <div class="col-md-12 text-center" style="z-index: 2;">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <button class="switchCityChart btn btn-default" data-chart="pie"><i
+                                            class="fa fa-pie-chart"></i></button>
+                                <button class="switchCityChart btn btn-primary" data-chart="column"><i
+                                            class="fa fa-bar-chart"></i></button>
+                                <button class="switchCityChart btn btn-default" data-chart="line"><i
+                                            class="fa fa-line-chart"></i></button>
+                            </div>
+                        </div>
+                        <div class="col-md-8 col-xs-12">
+                            <div id="chartContentCities"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <input id="searchCity" type="text" class="form-control"
+                                   style="font-family: Arial, FontAwesome" placeholder="&#xF002; Buscar Ciudad">
+                            <div id="citiesList" style="overflow: auto; max-height: 400px;">
+
+                            </div>
+                        </div>
 
 
                         <div class="col-md-12 col-xs-12">
@@ -341,21 +472,66 @@
                         <h4 style="color: darkred">
                             <i class="fa fa-calendar"></i>
                             <span id="panelTitleMonths"></span>
-                            <div class="dropdown pull-right">
+
+                            <div class="pull-right">
+                               <!-- <span class="btn btn-default export-action" title="Descargar Imagen PNG"
+                                      data-charttype="month" data-typeexport="png" role="button">
+                                    <i class="fa fa-download"></i>
+                                </span>
+                                <span class="btn btn-default export-action" title="Compartir en mi página web"
+                                      data-charttype="month" data-typeexport="embed" role="button">
+                                    <i class="fa fa-share-alt"></i>
+                                </span>-->
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-download"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="month" data-typeexport="png">
+                                                <i class="fa fa-image"></i> Descargar imagen PNG
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-share-alt"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="month" data-typeexport="embed">
+                                                <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                            </div>
+                            <!--<div class="dropdown pull-right">
                                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                     <span class="fa fa-bars"></span>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                    <li><a href="javascript:void(0)" class="export-action" data-charttype="month"
-                                           data-typeexport="png"><i class="fa fa-image"></i> Descargar Imagen PNG</a>
+                                    <li>
+                                      <a href="javascript:void(0)" class="export-action" data-charttype="month" data-typeexport="png">
+                                         <i class="fa fa-image"></i>
+                                         Descargar Imagen PNG
+                                       </a>
                                     </li>
-                                    <!--<li class="divider"></li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a href="javascript:void(0)" class="export-action" data-charttype="month" data-typeexport="embed">
+                                          <i class="fa fa-share-alt"></i>
+                                          Compartir en mi página web
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
                                     <li>
                                       <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
-                                    </li>-->
+                                    </li>
                                 </ul>
-                            </div>
+                            </div>-->
                         </h4>
                     </div>
                     <div class="panel-body collapse-up">
@@ -370,7 +546,7 @@
                             </div>
                         </div>
                         <div class="col-md-8">
-                            <div id="chartContentMonths"></div>
+                            <div id="chartContentMonths" style="height: 500px;"></div>
                         </div>
                         <div class="col-md-4 col-xs-12" style="overflow: auto; max-height: 500px;">
                             <div id="monthsList" style="overflow: auto; max-height: 250px;"></div>
@@ -404,21 +580,65 @@
                         <h4 style="color: darkgreen">
                             <i class="fa fa-hashtag"></i>
                             <span id="panelTitleNumber"></span>
-                            <div class="dropdown pull-right">
+                            <div class="pull-right">
+                                <!--<span class="btn btn-default export-action" title="Descargar Imagen PNG"
+                                      data-charttype="number" data-typeexport="png" role="button">
+                                    <i class="fa fa-download"></i>
+                                </span>
+                                <span class="btn btn-default export-action" title="Compartir en mi página web"
+                                      data-charttype="number" data-typeexport="embed" role="button">
+                                    <i class="fa fa-share-alt"></i>
+                                </span>-->
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-download"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="number" data-typeexport="png">
+                                                <i class="fa fa-image"></i> Descargar imagen PNG
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-share-alt"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="number" data-typeexport="embed">
+                                                <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                            </div>
+                            <!--<div class="dropdown pull-right">
                                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                     <span class="fa fa-bars"></span>
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                    <li><a href="javascript:void(0)" class="export-action" data-charttype="number"
-                                           data-typeexport="png"><i class="fa fa-image"></i> Descargar Imagen PNG</a>
+                                    <li>
+                                      <a href="javascript:void(0)" class="export-action" data-charttype="number" data-typeexport="png">
+                                        <i class="fa fa-image"></i>
+                                        Descargar Imagen PNG
+                                      </a>
                                     </li>
-                                    <!--<li class="divider"></li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a href="javascript:void(0)" class="export-action" data-charttype="number" data-typeexport="embed">
+                                          <i class="fa fa-share-alt"></i>
+                                          Compartir en mi página web
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
                                     <li>
                                       <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
-                                    </li>-->
+                                    </li>
                                 </ul>
-                            </div>
+                            </div>-->
                         </h4>
                     </div>
                     <div class="panel-body collapse-up">
@@ -456,10 +676,11 @@
 
                         <div class="col-md-9">
                             <div class="md-chips" style="overflow: auto; max-height: 500px;"></div>
-                            <div id="chartContentNumber"></div>
+                            <div id="chartContentNumber" style="height: 500px;"></div>
                         </div>
                         <div class="col-md-3">
-                            <input id="searchNumber" type="text" class="form-control" style="font-family: Arial, FontAwesome;" placeholder="&#xF002; Buscar Número">
+                            <input id="searchNumber" type="text" class="form-control"
+                                   style="font-family: Arial, FontAwesome;" placeholder="&#xF002; Buscar Número">
                             <div id="numbersList" style="overflow: auto; max-height: 400px;">
                             </div>
                         </div>
@@ -473,8 +694,41 @@
                         <h4>
                             <i class="fa fa-font"></i>
                             <span id="panelTitleText"></span>
-
-                            <div class="dropdown pull-right">
+                            <div class="pull-right">
+                                <!--<span class="btn btn-default export-action" title="Descargar Imagen PNG"
+                                      data-charttype="text" data-typeexport="png" role="button">
+                                    <i class="fa fa-download"></i>
+                                </span>
+                                <span class="btn btn-default export-action" title="Compartir en mi página web"
+                                      data-charttype="text" data-typeexport="embed" role="button">
+                                    <i class="fa fa-share-alt"></i>
+                                </span>-->
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-download"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="text" data-typeexport="png">
+                                                <i class="fa fa-image"></i> Descargar imagen PNG
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-share-alt"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="text" data-typeexport="embed">
+                                                <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                            </div>
+                            <!--<div class="dropdown pull-right">
                                 <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
                                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                     <span class="fa fa-bars"></span>
@@ -483,21 +737,33 @@
                                     <li><a href="javascript:void(0)" class="export-action" data-charttype="text"
                                            data-typeexport="png"><i class="fa fa-image"></i> Descargar Imagen PNG</a>
                                     </li>
-                                    <!--<li class="divider"></li>
-                                    <li>
-                                      <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
-                                    </li>-->
                                 </ul>
-                            </div>
+                            </div>-->
 
                             <!--<span class="pull-right" title="Opciones" style="margin-left: 5px;"><i class="fa fa-bars"></i></span>
                             <span class="pull-right angle-panel-collapse" title="Ocultar"><i class="fa fa-angle-up fa-lg"></i></span>-->
                         </h4>
                     </div>
                     <div class="panel-body collapse-up">
-                        <div id="chartContentText"></div>
-                        <table id="tableContentText" class="table table-striped table-bordered"
-                               style="width:100%"></table>
+                        <div class="col-md-12 text-center" style="z-index: 2;">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <button class="switchTextChart btn btn-primary" data-chart="pie">
+                                    <i class="fa fa-pie-chart"></i>
+                                </button>
+                                <button class="switchTextChart btn btn-default" data-chart="column">
+                                    <i class="fa fa-bar-chart"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="parentChartContentText" class="col-md-8">
+                            <div id="chartContentText_"></div>
+                            <div id="chartContentText" style="height: 500px;"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <input id="searchText" type="text" class="form-control" style="font-family: Arial, FontAwesome;" placeholder="&#xF002; Buscar Texto">
+                            <div id="textList" style="overflow: auto; max-height: 400px;"></div>
+                        </div>
+                        <table id="tableContentText" class="table table-striped table-bordered" style="width:100%"></table>
                     </div>
                 </div>
 
@@ -724,6 +990,35 @@
                     </button>
                     <button id="saveChangesChartList" type="button" class="btn btn-primary"><i class="fa fa-save"></i>
                         Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="shareChartsModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    Compartir gráfica por <label id="shareChartsTypeReport"></label>
+                </div>
+                <div class="modal-body">
+                    <!-- &lt;iframe width="560" height="315" src="https://www.youtube.com/embed/owsfdh4gxyc" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt; -->
+                    <div id="shareChartsAlert" class="alert alert-success" style="display: none" role="alert">
+                        <strong>¡Código copiado satisfactoriamente!</strong>
+                    </div>
+                    <pre>
+                        <code id="shareChartsCodeTag" style="float: left"></code>
+                    </pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <i class="fa fa-times-circle"></i> Cerrar
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="copyToClipboard('shareChartsCodeTag')">
+                        <i class="fa fa-code"></i>
+                        Copiar Código
                     </button>
                 </div>
             </div>

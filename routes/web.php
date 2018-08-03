@@ -46,7 +46,7 @@ Route::group(['prefix' => 'estadisticas'], function () {
   Route::post('readcsv','MainController@readcsv');
   Route::post('archivo/getdatacsv', 'MainController@getdatacsv')->name('getdatacsv');
   Route::post('descargasporpais/getdatacsv2', 'MainController@getdatacsv2')->name('getdatacsv2');
-  Route::post('createchartimage','MainController@createchartimage');
+  Route::post('archivo/createchartimage','MainController@createchartimage')->name('createchartimage');
   Route::get('descargasporpais/{filename?}', 'MainController@downstatscountry');
   /*Route::get('descargasporpais/{filename?}', function($filename = "noData") {
     return view('downstatscountry', array('filename' => $filename));
