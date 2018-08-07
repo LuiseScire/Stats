@@ -344,35 +344,64 @@ function switchData() {
 }
 
 //############## [Countries Chart] #################
+var countryChartDraw = 'geo';
+$('.switchCountryChart').click(function () {
+    countryChartDraw = $(this).data('chart');
+    if(!$(this).hasClass('btn-primary')) {
+        $('.switchCountryChart').removeClass('btn-primary').addClass('btn-default');
+        $(this).addClass('btn-primary');
+    }
+    google.charts.setOnLoadCallback(drawChartCountries);
+});
+
 function processDataCountries() {
     google.charts.load('current', {
         'packages':['geochart'],
-        // Note: you will need to get a mapsApiKey for your project.
-        // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
         'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY'
     });
     google.charts.setOnLoadCallback(drawChartCountries);
 }
 
 function drawChartCountries() {
-    var title;
-
     var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
 
-    var d = [
+    /*var d = [
         ['País', globalTypeReport, 'Porcentaje'],
-    ];
+    ];*/
 
+    var d;
+    switch (countryChartDraw) {
+        case 'geo':
+            d = [
+                ['País', globalTypeReport, 'Porcentaje'],
+            ];
+            break;
+        case 'pie':
+            d = [
+                ['País', globalTypeReport],
+            ];
+            break;
+        case 'column':
+        case 'line':
+            d = [
+                ['País', 'Totals', { role: 'style' }],
+            ];
+            break;
+    }
+
+    var colors = [];
+
+    $('#countriesList').empty();
+
+    var previewLimit = 10;
     var countPreview = 0;
     var countCountries = 0;
     var unknowTotals = 0;
     $.each(_countriesObj, function(index, v) {
-        color = colorHexa();
+        colorHex = colorHexa();
         var totals = parseInt(v.downloads);
         var country = v.name;
         if(totals > 0){
-            countPreview++;
-
             if(country != 'Desconocido'){
                 countCountries++;
                 var per = (totals / globalTotals) * 100;
@@ -383,19 +412,48 @@ function drawChartCountries() {
                     per = Math.round(per);
                 }
 
-                var bar = [country, totals, per];
-                d.push(bar);
+                switch (countryChartDraw){
+                    case 'geo':
+                        var bar = [country, totals, per];
+                        d.push(bar);
+                        colorHex = '#A41C1E';
+                        break;
+                    case 'pie':
+                        if(countPreview < previewLimit) {
+                            var text = country + ' ' + abbreviateNumber(totals) + ' ' + globalTypeReport;
+                            var bar = [text, totals];
+                            d.push(bar);
+                            var color = {color: colorHex};
+                            colors.push(color);
+                        }
+                        break;
+                    case 'column':
+                        if(countPreview < previewLimit) {
+                            var bar = [country, totals, 'color: '+colorHex];
+                            d.push(bar);
+                            break;
+                        }
+                    case 'line':
+                        if(countPreview < previewLimit) {
+                            colorHex = '#A41C1E';
+                            var bar = [country, totals, 'color: '+colorHex];
+                            d.push(bar);
+                        }
+                        break;
+                }
+                countPreview++;
+
+
 
                 var layer = '<div data-country="'+country+'"><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
                     '              <small style="color: #72777a">'+ globalTypeReport+' de <span style="font-weight: bold; color: #000">'+country+'</span></small>\n' +
                     '              <span class="pull-right">'+per+'%</span>\n' +
                     '              <div class="c-progress">\n' +
-                    '                <div class="c-progress-bar" style="width: '+per+'%;">\n' +
+                    '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;">\n' +
                     '                </div>\n' +
                     '              </div></div>';
 
                 $("#countriesList").append(layer);
-
 
                 var word = {text: country, weight: totals};
                 wordsCountry.push(word);
@@ -446,30 +504,71 @@ function drawChartCountries() {
 
     var data = google.visualization.arrayToDataTable(d);
 
-    title = '';
-    var options = {
-        title: title,
-        bar: {groupWidth: "70%"},
-        legend: { position: "none" },
-        height: "400",
-        vAxis: {
-            gridlines: {count: gridlinesCount},
-            format: 'short',
-        },
-        colorAxis: {colors: ['#E05740', '#A41C1E']},
-        animation:{
-            duration: 1000,
-            easing: 'out',
-        },
-    };
+    var view = new google.visualization.DataView(data);
 
-    var chart = new google.visualization.GeoChart(document.getElementById("chartContentCountries"));
+    var title = 'Rating ' + previewLimit + ' de países con mayores ' + globalTypeReport;
+
+    switch (countryChartDraw){
+        case 'geo':
+            //title = 'Todos los países que realizan ' + globalTypeReport;
+            var options = {
+                height: "400",
+                colorAxis: {colors: ['#E05740', '#A41C1E']},
+            };
+            var chart = new google.visualization.GeoChart(document.getElementById("chartContentCountries"));
+            break;
+        case 'pie':
+            var options = {
+                title: title,
+                is3D: true,
+                chartArea:{left:10, top:20, width:"100%", height:"90%"},
+                slices: colors
+            };
+            var chart = new google.visualization.PieChart(document.getElementById("chartContentCountries"));
+            break;
+        case 'column':
+        case 'line':
+            view.setColumns([
+                0,
+                1,
+                {
+                    calc: "stringify",
+                    sourceColumn: 1,
+                    type: "string",
+                    role: "annotation"
+                },
+                2
+            ]);
+
+            var options = {
+                title: title,
+                bar: {groupWidth: "70%"},
+                legend: { position: "none" },
+                height: "500",
+                vAxis: {
+                    title: globalTypeReport,
+                    gridlines: {count: gridlinesCount},
+                    format: 'short',
+                },
+                hAxis: {
+                    title: 'Ciudades',
+                }
+
+            };
+            if(countryChartDraw == 'column'){
+                var chart = new google.visualization.ColumnChart(document.getElementById("chartContentCountries"));
+            } else {
+                var chart = new google.visualization.AreaChart(document.getElementById("chartContentCountries"));
+            }
+            break;
+    }
 
     google.visualization.events.addListener(chart, 'ready', function () {
         imageChartCountry = chart.getImageURI();
     });
 
-    chart.draw(data, options);
+    //chart.draw(data, options);
+    chart.draw(view, options);
     $('#cloudWordsCountry').jQCloud(wordsCountry);
 }
 
@@ -501,189 +600,6 @@ function processDataCities() {
     google.charts.setOnLoadCallback(drawChartCities);
 }
 
-/*function drawChartCitiesFull() {
-    var dataSet = [];
-
-    $.each(citiesArrg, function(index, v) {
-        var totals = parseInt(v.totals);
-        var city = v.city;
-        var country = v.country;
-        if(totals > 0) {
-            var data = [city, country,  $.number(totals)];
-            dataSet.push(data);
-        }
-    });
-
-    var x = $("#tableContentCities").DataTable({
-        data : dataSet,
-        columns: [
-            { title: 'Ciudad' },
-            { title: 'País'},
-            { title: globalTypeReport }
-        ],
-        "order": [[ 2, "desc" ]],
-        "language": {
-            "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
-        }
-    });
-}*/
-
-function drawChartCities_() {
-    var title;
-    //console.log();
-    /*var _citiesArrg = citiesArrg.sort(dynamicSort("totals"));*/
-
-    /*var d = [
-        ['País', 'Totals', { role: 'style' }],
-    ];*/
-
-    var d = [
-        ['Location', 'Parent', 'Market trade volume (size)', 'Market increase/decrease (color)'],
-        ['Global',    null,                 0,                               0],
-    ];
-
-    var continents = 0;
-    $.each(continentsObj, function (index, v) {
-        var theyreThere = Boolean(v.totals);
-        if(theyreThere){
-            var data = [v.name, 'Global', 0, 0];
-            d.push(data);
-        }
-    });
-
-    var totalCountries = countriesObj.length;
-    var size = Math.round(totalCountries / 100);
-    $.each(countriesObj, function(index, v) {
-        color = colorHexa();
-        var totals = parseInt(v.downloads);
-        var country = v.name;
-        var continent = v.continent;
-        if (totals > 0) {
-            //countPreview++;
-            //if(countPreview < previewLimit) {
-            if (country != 'Desconocido') {
-                var data = [country, continent, size, size];
-                d.push(data);
-            }
-        }
-    });
-
-    countPreview = 0;
-    previewLimit = 100;
-
-    var totalCities = citiesArrg.length;
-    var size = Math.round(totalCities / 100);
-    $.each(citiesArrg, function(index, v) {
-        var totals = parseInt(v.totals);
-        var city = v.city;
-        var country = v.country;
-        if(totals > 0) {
-            //if(countPreview < previewLimit) {
-            var data = [city, country, size, size];
-            //console.log(data);
-            d.push(data);
-            //}
-            countPreview++
-        }
-        console.log(city);
-    });
-
-    var previewLimit = 200;
-    var countPreview = 0;
-    /*$.each(_citiesArrg, function(index, v) {
-        color = colorHexa();
-        var downloads = parseInt(v.totals);
-        var city = v.city;
-        if(downloads > 0){
-            countPreview++;
-            if(countPreview < previewLimit) {
-                var bar = [city, downloads, 'color: '+color];
-                d.push(bar);
-            }
-        }
-    });*/
-
-    //console.log(_citiesArrg);
-
-    /*var datax = google.visualization.arrayToDataTable([
-        ['Location', 'Parent', 'Market trade volume (size)', 'Market increase/decrease (color)'],
-        ['Global',    null,                 0,                               0],
-        ['America',   'Global',             0,                               0],
-        ['Europe',    'Global',             0,                               0],
-        ['Asia',      'Global',             0,                               0],
-        ['Australia', 'Global',             0,                               0],
-        ['Africa',    'Global',             0,                               0],
-        ['Brazil',    'America',            11,                              10],
-        ['USA',       'America',            52,                              31],
-        ['Mexico',    'America',            24,                              12],
-        ['Canada',    'America',            16,                              -23],
-        ['France',    'Europe',             42,                              -11],
-        ['Germany',   'Europe',             31,                              -2],
-        ['Sweden',    'Europe',             22,                              -13],
-        ['Italy',     'Europe',             17,                              4],
-        ['UK',        'Europe',             21,                              -5],
-        ['China',     'Asia',               36,                              4],
-        ['Japan',     'Asia',               20,                              -12],
-        ['India',     'Asia',               40,                              63],
-        ['Laos',      'Asia',               4,                               34],
-        ['Mongolia',  'Asia',               1,                               -5],
-        ['Israel',    'Asia',               12,                              24],
-        ['Iran',      'Asia',               18,                              13],
-        ['Pakistan',  'Asia',               11,                              -52],
-        ['Egypt',     'Africa',             21,                              0],
-        ['S. Africa', 'Africa',             30,                              43],
-        ['Sudan',     'Africa',             12,                              2],
-        ['Congo',     'Africa',             10,                              12],
-        ['Zaire',     'Africa',             8,                               10]
-    ]);*/
-
-    var data = google.visualization.arrayToDataTable(d);
-
-    tree = new google.visualization.TreeMap(document.getElementById('chartContentCities'));
-
-    tree.draw(data, {
-        midColor: '#E05740',
-        maxColor: '#A41C1E',
-        headerHeight: 15,
-        fontColor: 'white',
-        showScale: true
-    });
-    //['#E05740', '#A41C1E']
-
-    /*var data = google.visualization.arrayToDataTable(d);
-
-    var view = new google.visualization.DataView(data);
-    view.setColumns([0, 1,
-        { calc: "stringify",
-            sourceColumn: 1,
-            type: "string",
-            role: "annotation" },
-        2]);
-
-    var options = {
-        //title: "Descargas por país. Total " + $.number(descargas),
-        bar: {groupWidth: "60%"},
-        legend: { position: "none" },
-        fontSize: 14,
-        hAxis: {
-            title: 'Total de ' + globalTypeReport + ': ' + $.number(descargas),
-            minValue: 0,
-            format: 'short'
-        },
-        vAxis: {
-            title: 'Ciudad',
-
-        },
-        chartArea: {width: '90%', height: '95%', left: 100},
-    };
-
-    var chart = new google.visualization.BarChart(document.getElementById("chartContentCities"));
-    google.visualization.events.addListener(chart, 'ready', function () {
-        countriesWithDownloadsImageChart = chart.getImageURI();
-    });
-    chart.draw(view, options);*/
-}
-
 function drawChartCities() {
     var _citiesArrg = citiesArrg.sort(dynamicSort("totals"));
 
@@ -691,13 +607,13 @@ function drawChartCities() {
     switch (cityChartDraw) {
         case 'pie':
             d = [
-                ['Mes', globalTypeReport],
+                ['Ciudad', globalTypeReport],
             ];
             break;
         case 'column':
         case 'line':
             d = [
-                ['País', 'Totals', { role: 'style' }],
+                ['Ciudad', 'Totals', { role: 'style' }],
             ];
             break;
     }

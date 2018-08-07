@@ -55,12 +55,12 @@
                         <div class="tab-content">
                             <div class="tab-pane active" id="home">
                                 <br>
-                                <h4>
+                                <h4 id="segunInfo" style="display: none">
                                     Según la información de
                                     <strong class="fileNamePanels" style="color:#A41C1E"></strong>
                                     indica las siguientes
                                     <strong class="typeReportPanels" style="color:#72777a"></strong>
-                                  </h4>
+                                </h4>
                                 <div id="panelsHeading" class="row" style="display: none">
                                     <div class="col-lg-4 col-md-4">
                                         <div class="panel panel-primary">

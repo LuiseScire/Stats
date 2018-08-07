@@ -11,47 +11,50 @@
 |
 */
 Auth::routes();
-//Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/home', 'MainController@home')->name('home');
-
-// Generating URLs...
-//$url = route('home');
 
 Route::get('/', function () {
-    // Generating Redirects...
     return redirect()->route('home');
 });
+/********************* [ADMIN] ++++++++++++++++++++++++++++*/
+Route::group(['middleware' => 'journal'], function() {
+  Route::get('/home', 'MainController@home')->name('home');
 
-Route::get('/historial', 'MainController@historial')->name('historial');
+  Route::get('/historial', 'MainController@historial')->name('historial');
+
+  Route::get('/subircsv', 'MainController@subircsv')->name('subircsv');
+
+  Route::get('/testpath', 'MainController@test');
 
 
-/*Route::get('home', function () {
-    return view('main');
-});*/
+  Route::group(['prefix' => 'estadisticas'], function () {
+    Route::get('archivo/{filename?}/{target?}', 'MainController@stats');
 
-Route::get('/subircsv', 'MainController@subircsv')->name('subircsv');
-/*Route::get('subircsv', function () {
-    return view('uploadcsv');
-});*/
-Route::get('/testpath', 'MainController@test');
-
-//Route::get('estadisticas/{filename}', 'MainController@estadisticas');
-Route::group(['prefix' => 'estadisticas'], function () {
-  Route::get('archivo/{filename?}/{target?}', 'MainController@stats');
-    /*Route::get('archivo/{filename?}', function ($filename = "noData"){
-        // Matches The "/admin/users" URL
-        return view('estadisticas', array('filename' => $filename));
+    Route::post('readcsv','MainController@readcsv');
+    Route::post('archivo/getdatacsv', 'MainController@getdatacsv')->name('getdatacsv');
+    Route::post('descargasporpais/getdatacsv2', 'MainController@getdatacsv2')->name('getdatacsv2');
+    Route::post('archivo/createchartimage','MainController@createchartimage')->name('createchartimage');
+    Route::get('descargasporpais/{filename?}', 'MainController@downstatscountry');
+    /*Route::get('descargasporpais/{filename?}', function($filename = "noData") {
+      return view('downstatscountry', array('filename' => $filename));
     });*/
+  });
 
-  Route::post('readcsv','MainController@readcsv');
-  Route::post('archivo/getdatacsv', 'MainController@getdatacsv')->name('getdatacsv');
-  Route::post('descargasporpais/getdatacsv2', 'MainController@getdatacsv2')->name('getdatacsv2');
-  Route::post('archivo/createchartimage','MainController@createchartimage')->name('createchartimage');
-  Route::get('descargasporpais/{filename?}', 'MainController@downstatscountry');
-  /*Route::get('descargasporpais/{filename?}', function($filename = "noData") {
-    return view('downstatscountry', array('filename' => $filename));
-  });*/
+  Route::post('uploadcsv','MainController@uploadcsv');
+  Route::post('listcsvfiles','MainController@listcsvfiles');
 });
 
-Route::post('uploadcsv','MainController@uploadcsv');
-Route::post('listcsvfiles','MainController@listcsvfiles');
+/********************* [PANEL] ++++++++++++++++++++++++++++*/
+/*Route::group([
+    'middleware' => 'admin',
+    'prefix' => 'admin',
+    'namespace' => 'Admin'
+], function () {
+    Route::get('/panel', 'AdminController@panel');
+    Route::get('/series', 'SeriesController@index');
+    Route::get('/series/{id}', 'SeriesController@edit');
+});*/
+
+Route::group(['middleware' => 'admin', 'prefix' => 'admin'], function () {
+    Route::get('/panel', 'AdminController@panel');
+
+});

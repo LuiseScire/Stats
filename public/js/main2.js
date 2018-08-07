@@ -79,9 +79,11 @@ function validateExistFiles(){
           getCsv(getCsvFile, typeReport, fileName);
           $("#csvListContent").css('display', 'none');
           $('#tabHistory').show();
+          $('#segunInfo').css('display', 'block');
         //$("#noFiles").css('display', 'block');
       } else {
         $("#noFiles, #uploadFilesContent").css('display', 'block');
+
         fadeOutLoader();
       }
     }

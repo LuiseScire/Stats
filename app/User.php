@@ -15,7 +15,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'user_type'
     ];
 
     /**
@@ -26,4 +26,37 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+
+    //this method used in LoginController
+    public function userType() {
+        $user_type = '';
+        //dd($this->user_type);
+        if($this->user_type == 'Admin'){
+            $user_type = 'Admin';
+        } else {
+            $user_type = 'Journal';
+        }
+
+        return $this->user_type;
+    }
+
+    public function validateTypeUser() {
+
+    }
+
+    /*public function isAdmin() {
+        if($this->user_type == 'Admin'){
+          return true;
+        }
+        return false;
+        //return $this->user_type; // Here you return the name without the dot, instead of the name
+    }
+
+    public function isJournal(){
+        if($this->user_type == 'Journal'){
+          return true;
+        }
+        return false;
+    }*/
 }

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Authenticatable;
 use App\Csvfile;
+use App\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
 //use App\Http\Controllers\Controller;
 
 class MainController extends Controller
