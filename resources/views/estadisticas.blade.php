@@ -1028,14 +1028,14 @@
 @stop
 
 @section('javascript')
-
     <script type="text/javascript">
         var fileName = '{{ $filename }}';
         var target = "{{ $target }}";
         var getCsvFile = "{{ asset('/csvfiles/'.$filename) }}";
     </script>
-    <script type="text/javascript" src="{{ asset('js/pluggins/download.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/statsarrays.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/stats.js') }}"></script>
+    <script src="{{ asset('js/pluggins/download.js') }}"></script>
+    <script src="{{ asset('js/statsarrays.js') }}"></script>
+    <script src="{{ asset('js/stats/translate.objects.js') }}" charset="utf-8"></script>
+    <script src="{{ asset('js/stats/stats.js') }}"></script>
 
 @stop

@@ -1,0 +1,4 @@
+titulo-web=>Stats
+page-title=>
+bienvenidos=>Bienvenidos a mi sitio
+hola=>hola mundo

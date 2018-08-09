@@ -1,0 +1,32 @@
+menu-opt-logout=>Salir
+menu-opt-home=>Inicio
+menu-opt-charts=>Estadísticas
+page-title=>Inicio
+address-bar-current-page=>Inicio
+tab-opt-home=>Inicio
+tab-opt-historical=>Historial
+btn-upload-file=>Subir Archivo
+graphic-again=>Graficar de nuevo
+panel-heading-first-title=>Según la información de
+panel-heading-last-title=>indica las siguientes
+panel-view-details=>Ver Detalles
+panel-heading-historical-title=>Historial de Archivos
+no-file-yet-alert=>Aún no has subido ningún archivo.
+
+modal-title-type-report=>Seleccionar Informe
+modal-cancel-btn=>Cancelar
+modal-continue-btn=>Continuar
+
+show-graph-legend=>Generar gráficas por:
+file-exceeds-legend=>Su archivo excede los 3MB, este proceso podría demorar un poco
+
+
+main-file-upload-legend=>Seleccione su archivo CSV para subirlo
+file-uploaded-alert-first=>Archivo
+file-uploaded-alert-last=>subido correctamente
+change-file-btn=>Cambiar Archivo
+loading-preview-legend=>Cargando vista previa del archivo
+
+dfUploaded=>Subido el
+dfOf=> de
+dfOf2=> de

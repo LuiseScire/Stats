@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Authenticatable;
 use App\Csvfile;
+use App\Lastcsv;
 use App\User;
 
 use Illuminate\Http\Request;
@@ -28,12 +29,6 @@ class MainController extends Controller
         return view('uploadcsv');
     }
 
-    /*
-     * public function downstatscountry($filename = "noData") {
-      return view('downstatscountry', array('filename' => $filename));
-    }
-     * */
-
     public function home()
     {
         return view('main');
@@ -48,8 +43,7 @@ class MainController extends Controller
     {
         #Model
         $csv_file_db = new Csvfile;
-        #
-
+        $last_csv_db = new Lastcsv();
         $auth_id = Auth::id();
 
         $case = $request->case;
@@ -67,11 +61,11 @@ class MainController extends Controller
                 break;
             default:
                 $csv_list = $csv_file_db->where([['csv_user_id', $auth_id], ['csv_status', 'active']])->orderBy('csv_timestamp', 'desc')->get();
+                $last_csv_file_data =  $last_csv_db->select()->where('last_user_id', $auth_id)->first();
 
-                $file_list = [];
 
-                $response = array(
-                    'fileList' => $file_list,
+                $response = array(                    
+                    'lastCsvFileData' => $last_csv_file_data,
                     'csvList' => $csv_list
                 );
                 break;
@@ -80,8 +74,7 @@ class MainController extends Controller
         return response()->json($response);
     }
 
-    public function uploadcsv(Request $request)
-    {
+    public function uploadcsv(Request $request){
         #Models
         $csv_file_db = new Csvfile;
 
@@ -195,8 +188,7 @@ class MainController extends Controller
         return response()->json($response);
     }
 
-    public function uploadcsv_(Request $request)
-    {
+    public function uploadcsv_(Request $request){
         #Models
         $csv_file_db = new Csvfile;
 
@@ -330,28 +322,44 @@ class MainController extends Controller
         return response()->json($response);
     }
 
-    public function stats($filename = "noData", $target = "noTarget")
-    {
+    /*########################## [Stats Functions] #######################*/
+    public function stats($filename = "noData", $target = "noTarget") {
         return view('estadisticas', array('filename' => $filename, 'target' => $target));
     }
 
-    public function downstatscountry($filename = "noData")
-    {
+    public function downstatscountry($filename = "noData") {
         return view('downstatscountry', array('filename' => $filename));
     }
 
-    public function getdatacsv(Request $request)
-    {
+    public function getdatacsv(Request $request) {
         #Models
         $csv_file_db = new Csvfile;
+
+
         $auth_id = Auth::id();
 
         $csv_back_name = $request->filename;
-
         $csv_file_data = $csv_file_db->select()->where([['csv_back_name', $csv_back_name], ['csv_user_id', $auth_id]])->first();
         $type_report = $csv_file_data->csv_type_report;
 
+
         return response()->json(array('csvFileData' => $csv_file_data));
+    }
+
+    public function lastcsv(Request $request) {
+        $lastcsv_db = new Lastcsv();
+        $user_id = Auth::id();
+
+        $data_set = [
+            'last_type'         =>  $request->type,
+            'last_block_one'    =>  $request->block_one,
+            'last_block_two'    =>  $request->block_two,
+            'last_block_three'  =>  $request->block_three,
+        ];
+
+        $lastcsv_db->where('last_user_id', $user_id)->update($data_set);
+
+        return response()->json( array('stats' => 'success') );
     }
 
     public function getdatacsv2(Request $request)
@@ -392,6 +400,23 @@ class MainController extends Controller
         return response()->json($response);
     }
 
+    /*########################## [User Functions] #######################*/
+    public function updateLang(Request $request){
+        $user_db = new User();
+
+        $user_id = Auth::id();
+        $lang = $request->lang;
+
+        $affected = $user_db->where('id', $user_id)->update(['lang' => $lang]);
+
+        $status = ($affected == 1) ? 'success' : 'error';
+
+        return response()->json(array('status' => $status));
+    }
+
+
+
+    /*########################## [Extra Functions] #######################*/
     private function randCode()
     {
         $key = '';

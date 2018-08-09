@@ -32,90 +32,43 @@
     font-style: italic;
     color: #72777a;
 }
-
-#loaderContent {
-    /*width: 200px;
-    height: 200px;
-    position: absolute;
-    left: 50%;
-    top: 50%;*/
-    /*background-image: url("../../public/images/preloader_chart.gif");
-    background-repeat: no-repeat;
-    background-position: center;*/
-    /*margin: -100px 0 0 -100px;*/
-    font-size: 30px;
-    color: #72777a;
-    font-style: italic;
-    position: absolute;
-    top: 25%;
-    left: 35%;
-    z-index: 999999;
-
-}
-/*.blur{
-  -webkit-filter: blur(3px);
-  -moz-filter: blur(3px);
-  -ms-filter: blur(3px);
-  -o-filter: blur(3px);
-  filter: blur(3px);
-}
-
-.preloader {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.1);
-  z-index: 9999;
-}
-
-.loader {
-  position: absolute;
-  top: 50%;
-  left: 48%;
-  z-index: 999999;
-}
-
-.line {
-  animation: expand 1s ease-in-out infinite;
-  border-radius: 10px;
-  display: inline-block;
-  transform-origin: center center;
-  margin: 0 3px;
-  width: 1px;
-  height: 25px;
-}
-
-.line:nth-child(1) {
-  background: #27ae60;
-}
-
-.line:nth-child(2) {
-  animation-delay: 180ms;
-  background: #f1c40f;
-}
-
-.line:nth-child(3) {
-  animation-delay: 360ms;
-  background: #e67e22;
-}
-
-.line:nth-child(4) {
-  animation-delay: 540ms;
-  background: #2980b9;
-}
-
-@keyframes expand {
-  0% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(2);
-  }
-}*/
-
 /*end preloader*/
+
+/*language preloader*/
+#langPreloader{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    /*background-color: #DFE3E9;*/
+    z-index: 9999;
+    /*display: none;*/
+}
+
+
+#langPreloader .lmsg{
+    position:fixed;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    font-size: 40px;
+    font-style: italic;
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.3);
+    /*background: rgba(164, 28, 30, 0.3);*/
+}
+
+.blur{
+    -webkit-filter: blur(5px);
+    -moz-filter: blur(5px);
+    -ms-filter: blur(5px);
+    -o-filter: blur(5px);
+    filter: blur(5px);
+}
+
+/*end language preloader*/
 
 /*btn go to top*/
 a.ir-arriba {
@@ -176,8 +129,6 @@ a.ir-arriba {
   font-size: 16px;
   color: #333;
 }
-
-
 /*END NAVEGACIÓN*/
 
 /*BLUE NAVBAR*/

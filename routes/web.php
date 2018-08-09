@@ -12,9 +12,13 @@
 */
 Auth::routes();
 
+
+/********************* [GLOBAL] ++++++++++++++++++++++++++++*/
 Route::get('/', function () {
     return redirect()->route('home');
 });
+
+Route::post('updateLang', 'MainController@updateLang');
 /********************* [ADMIN] ++++++++++++++++++++++++++++*/
 Route::group(['middleware' => 'journal'], function() {
   Route::get('/home', 'MainController@home')->name('home');
@@ -40,6 +44,7 @@ Route::group(['middleware' => 'journal'], function() {
   });
 
   Route::post('uploadcsv','MainController@uploadcsv');
+  Route::post('lastcsv', 'MainController@lastcsv')->name('lastcsv');
   Route::post('listcsvfiles','MainController@listcsvfiles');
 });
 

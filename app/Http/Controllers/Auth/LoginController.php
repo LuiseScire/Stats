@@ -40,6 +40,7 @@ class LoginController extends Controller
             return '/admin-panel';
         }
     }
+
     /**
      * Create a new controller instance.
      *

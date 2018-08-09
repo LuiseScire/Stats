@@ -10,8 +10,8 @@
     <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
 
     <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">-->
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome-animation/0.2.1/font-awesome-animation.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ asset('css/metisMenu.css') }}">
@@ -26,15 +26,45 @@
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="{{ asset('js/translate/translate.js') }}"></script>
     <script type="text/javascript">
-        var messages = [
-            'Cargando...',
-            'Espere un momento, por favor...',
-            'Procesando datos...',
-            'Esto podría demorar un poco...',
-            'Su archivo excede los 3MB, espere, por favor...'
+        var public_path = "{{ asset('/') }}";
+        var currentLang = '{{ Auth::user()->lang }}';
 
-        ];
+        //currentLang = 'en';
+        //default's Spanish
+        let stateCheck = setInterval(() => {
+          if (document.readyState === 'complete') {
+            clearInterval(stateCheck);
+            // document ready
+            if(currentLang == 'en'){
+                $('#translate').click();
+            } else {
+                $('#langPreloader').fadeOut('slow');
+                $('#wrapper').removeClass('blur');
+            }
+            fadeOutLoader();
+          }
+        }, 100);
+
+        var messages;
+        if(currentLang == 'en'){
+            messages = [
+                'Loading...',
+                'Wait a moment, please...',
+                'Processing data...',
+                'This could take a while...',
+                'Your file exceeds 3 MB, wait a moment, please...'
+            ];
+        } else {
+            messages = [
+                'Cargando...',
+                'Espere un momento, por favor...',
+                'Procesando datos...',
+                'Esto podría demorar un poco...',
+                'Su archivo excede los 3MB, espere, por favor...'
+            ];
+        }
         var message = messages[0];
         var secondsCount = 0;
 
@@ -73,38 +103,42 @@
             $("#preloader").fadeIn("slow");
             secondsCount = 0;
             setLoaderMessage();
-            //$("wrapper").addClass("blur");
         }
 
         function fadeOutLoader() {
             $("#preloader").fadeOut("slow");
             clearInterval(timer);
             timer = null;
-            //$("#wrapper").removeClass("blur");
+
         }
     </script>
-
 </head>
 <body>
-<!--<div id="preloader">
-        <div id="loaderContent" class="text-center">
-            <img src="{{ asset('images/preloader_chart.gif') }}" alt="Preloader" height="300px">
-            <p>Cargando...</p>
-        </div>
-      </div>-->
+
+<div id="langPreloader">
+    <div class="lmsg">
+        <i class="fa fa-language faa-flash animated"></i>
+        <span id="preLoaderLangMSG">Procesando traducción / Process the translation</span>
+    </div>
+</div>
+
 <div id="preloader">
     <div class="loader"></div>
-    <div class="msg">Cargando...</div>
+    @if(Auth::user()->lang == 'en')
+        <div class="msg">Loading...</div>
+    @else
+        <div class="msg">Cargando...</div>
+    @endif
 </div>
 
 <a class="ir-arriba" title="Volver arriba">
-        <span class="fa-stack">
-            <i class="fa fa-circle fa-stack-2x"></i>
-            <i class="fa fa-arrow-up fa-stack-1x fa-inverse"></i>
-        </span>
+    <span class="fa-stack">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-arrow-up fa-stack-1x fa-inverse"></i>
+    </span>
 </a>
 
-<div id="wrapper">
+<div id="wrapper" class="blur">
     @section('sidebar')
         <nav id="navBar" class="navbar navbar-default navbar-custom navbar-fixed-top" role="navigation"
              style="margin-bottom: 0">
@@ -145,7 +179,7 @@
                                onclick="event.preventDefault();
                                          document.getElementById('logout-form').submit();">
                                 <i class="fa fa-sign-out fa-fw"></i>
-                                {{ __('Salir') }}
+                                <span data-lang="menu-opt-logout">{{ __('Salir') }}</span>
                             </a>
 
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -155,8 +189,12 @@
                     </ul>
                     <!-- /.dropdown-user -->
                 </li>
+                <li>
+                    <a href="javascript:void(0)" id="translate" data-text="EN,ES" data-file="es,en" data-index="1" data-page="home">EN</a>
+                </li>
                 <!-- /.dropdown -->
             </ul>
+
             <!-- /.navbar-top-links -->
 
             <div id="sidebar" class="navbar-default sidebar" role="navigation"
@@ -166,8 +204,10 @@
                         <!--MENU INICIO-->
 
                         <li class="home-item-menu">
-                            <a href="#home" class="link-menu"><i class="fa fa-home fa-fw" style="color: #337ab7;"></i>
-                                Inicio</a>
+                            <a href="#home" class="link-menu">
+                                <i class="fa fa-home fa-fw" style="color: #337ab7;"></i>
+                                <span data-lang="menu-opt-home">Inicio</span>
+                            </a>
                         </li>
                         <!--<li class="home-item-menu">
                             <a href="#history" class="link-menu"><i class="fa fa-list" style="color: #A41C1E"></i> Historial</a>
@@ -190,7 +230,7 @@
 
 
                         <li id="menuOptionCharts" style="display: none">
-                            <a href="#"><i class="fa fa-bar-chart" style="color: #D800FC;"></i> Estadísticas<span
+                            <a href="#"><i class="fa fa-bar-chart" style="color: #D800FC;"></i> <span data-lang="menu-opt-charts">Gráficas</span><span
                                         class="fa arrow"></span></a>
                             <ul class="nav nav-second-level nav-colors">
                                 <li id="liMenuChartTotal" style="display: none">
@@ -263,9 +303,6 @@
 
 <script>
     var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
-    /*$(window).on('load', function () {
-        fadeOutLoader();
-    });*/
     $(document).ready(function () {
         $('.ir-arriba').click(function () {
             $('body, html').animate({
@@ -284,66 +321,31 @@
                 //$("#navBar").removeClass("navbar-static-top").addClass("navbar-fixed-top");
             }
         });
-        /*hacia abajo*/
-        /*$('.ir-abajo').click(function(){
-            $('body, html').animate({
-                  scrollTop: '1000px'
-              }, 1000);
-        });*/
 
         $(document).on('click', 'a.link-menu[href^="#"]', function () {
             var target = $(this.hash);
-
             var scroll = target.offset().top - 55;
-
             $('html, body').animate({scrollTop: scroll}, 500);
             return false;
         });
 
-        $("#current-date").text(formatDate());
-
-        //$("#side-menu > li > a > i").css('color', colorHexa());
-
-        /*setTimeout(function () {
-            $(".nav-colors li").each(function(n) {
-                $(this).find('a').find('i').css('color', colorHexa());
-            });
-        }, 500);*/
-
-
+        $('#currentDateES').text(currentDateFormat('es'));
+        $('#currentDateEN').text(currentDateFormat('en'));
     });
 
-    function formatDate() {
-        var date = new Date();
-        var monthNames = [
-            "Enero", "Febrero", "Marzo",
-            "Abril", "Mayo", "Junio", "Julio",
-            "Agosto", "Septimbre", "Octubre",
-            "Noviembre", "Diciembre"
-        ];
-
-        var day = date.getDate();
-        var monthIndex = date.getMonth();
-        var year = date.getFullYear();
-
-        return day + ' de ' + monthNames[monthIndex] + ' de ' + year;
-    }
-
-    function colorHexa() {
-        hexadecimal = new Array("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F")
-        color_aleatorio = "#";
-        for (i = 0; i < 6; i++) {
-            posarray = aleatorio(0, hexadecimal.length);
-            color_aleatorio += hexadecimal[posarray];
+    function currentDateFormat(lang) {
+        var dateFormat, date = new Date();
+        switch (lang) {
+            case 'es':
+                var months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septimbre", "Octube", "Nomviembre", "Diciembre"];
+                dateFormat = date.getDate() + ' de ' + months[date.getMonth()] + ' de ' + date.getFullYear();
+                break;
+            case 'en':
+                var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                dateFormat =  months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+                break;
         }
-        return color_aleatorio;
-    }
-
-    function aleatorio(inferior, superior) {
-        numPosibilidades = superior - inferior;
-        aleat = Math.random() * numPosibilidades;
-        aleat = Math.floor(aleat);
-        return parseInt(inferior) + aleat;
+        return dateFormat;
     }
 </script>
 

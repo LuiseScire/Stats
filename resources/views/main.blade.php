@@ -23,12 +23,12 @@
         <div class="col-lg-12">
             <div class="address-bar-content-header">
                 <h1>
-                  Inicio
-                  <span id="btnGlobalOpenFile" class="btn btn-danger pull-right" onclick="starInputFile()" role="button"><i class="fa fa-folder-open"></i> Subir Archivo</span>
+                  <span data-lang="page-title">Inicio</span>
+                  <span id="btnGlobalOpenFile" class="btn btn-danger pull-right" onclick="starInputFile()" role="button"><i class="fa fa-folder-open"></i> <span data-lang="btn-upload-file">Subir Archivo</span></span>
                 </h1>
                 <ol class="breadcrumb">
-                    <li class="address-item"><label><i class="fa fa-home"></i> Inicio</label></li>
-                    <li class="current-date pull-right"><span><i class="fa fa-calendar"></i> <span id="current-date"></span></span></li>
+                    <li class="address-item"><label><i class="fa fa-home"></i> <span data-lang="address-bar-current-page">Inicio</span></label></li>
+                    <li class="current-date pull-right"><span><i class="fa fa-calendar"></i> <span id="currentDateEN" class="date-format-en" style="display:none"></span><span id="currentDateES" class="date-format-es" style="display:none"></span></span></li>
                 </ol>
             </div>
         </div>
@@ -45,10 +45,10 @@
                     <div id="exTab2">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a id="tabHome" href="#home" data-toggle="tab"><i class="fa fa-home"></i> Inicio</a>
+                                <a id="tabHome" href="#home" data-toggle="tab"><i class="fa fa-home"></i> <span data-lang="tab-opt-home">Inicio</span></a>
                             </li>
                             <li>
-                                <a id="tabHistory" href="#history" data-toggle="tab" style="display: none"><i class="fa fa-clock-o"></i> Historial</a>
+                                <a id="tabHistory" href="#history" data-toggle="tab" style="display: none"><i class="fa fa-clock-o"></i> <span data-lang="tab-opt-historical">Historial</span></a>
                             </li>
                         </ul>
 
@@ -56,9 +56,9 @@
                             <div class="tab-pane active" id="home">
                                 <br>
                                 <h4 id="segunInfo" style="display: none">
-                                    Según la información de
+                                    <span data-lang="panel-heading-first-title">Según la información de</span>
                                     <strong class="fileNamePanels" style="color:#A41C1E"></strong>
-                                    indica las siguientes
+                                    <span data-lang="panel-heading-last-title">indica las siguientes</span>
                                     <strong class="typeReportPanels" style="color:#72777a"></strong>
                                 </h4>
                                 <div id="panelsHeading" class="row" style="display: none">
@@ -77,7 +77,7 @@
                                             </div>
                                             <a id="panelTotalsDetails">
                                                 <div class="panel-footer">
-                                                    <span class="pull-left">Ver Detalles</span>
+                                                    <span class="pull-left" data-lang="panel-view-details">Ver Detalles</span>
                                                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                                     <div class="clearfix"></div>
                                                 </div>
@@ -99,7 +99,7 @@
                                             </div>
                                             <a id="panelCountriesDetails">
                                                 <div class="panel-footer">
-                                                    <span class="pull-left">Ver Detalles</span>
+                                                    <span class="pull-left" data-lang="panel-view-details">Ver Detalles</span>
                                                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                                     <div class="clearfix"></div>
                                                 </div>
@@ -121,7 +121,7 @@
                                             </div>
                                             <a id="panelMainCountryDetails">
                                                 <div class="panel-footer">
-                                                    <span class="pull-left">Ver Detalles</span>
+                                                    <span class="pull-left" data-lang="panel-view-details">Ver Detalles</span>
                                                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
                                                     <div class="clearfix"></div>
                                                 </div>
@@ -130,7 +130,7 @@
                                     </div>
 
                                     <div class="col-md-12">
-                                        <h4>Graficar de nuevo</h4>
+                                        <h4 data-lang="graphic-again">Graficar de nuevo</h4>
                                         <div id="itemFile" class="media">
                                            <div class="media-left">
                                                <a href="javascript:void(0)" class="csv-file-item seeAgain" data-csvname="">
@@ -168,13 +168,15 @@
                                 <!--<div id="cloudWords" style="width:100%; height: 50%;"></div>-->
 
                                 <div id="uploadFilesContentParent">
-                                    <div id="uploadFilesContent" class="jumbotron"
-                                         style="text-align: center; border-style: dashed; background-color: white; border-color: #eee; display: none">
+                                    <div id="uploadFilesContent" class="jumbotron" style="text-align: center; border-style: dashed; background-color: white; border-color: #eee; display: none">
                                         <input type="file" id="csvFile" name="csvFile" style="display: none">
-                                        <h2>Seleccione su archivo CSV para subirlo</h2>
+                                        <h2 data-lang="main-file-upload-legend">Seleccione su archivo CSV para subirlo</h2>
                                         <p><i class="fa fa-upload upload" aria-hidden="true"></i></p>
-                                        <p><a id="csvFileButton" class="btn btn-danger btn-lg" href="#" role="button" onclick="starInputFile()">
-                                                <i class="fa fa-folder-open"></i> Subir Archivo</a></p>
+                                        <p>
+                                            <a id="csvFileButton" class="btn btn-danger btn-lg" href="#" role="button" onclick="starInputFile()">
+                                                <i class="fa fa-folder-open"></i> <span data-lang="btn-upload-file">Subir Archivo</span>
+                                            </a>
+                                        </p>
                                     </div>
 
                                     <div id="progressBarContent" class="col-lg-12" style="display: none">
@@ -188,15 +190,10 @@
                                     <div id="confirmFileContent" class="col-lg-12" style="display:none">
                                         <div id="loadInfoText" class="alert alert-success" role="alert">
                                             <p>
-                                                Archivo <strong id="strongFileName"></strong> subido correctamente
+                                                <span data-lang="file-uploaded-alert-first">Archivo</span> <strong id="strongFileName"></strong> <span data-lang="file-uploaded-alert-last">subido correctamente</span>
                                                 <button id="cambiarArchivo" class="btn btn-primary btn-xs"><i class="fa fa-folder-open"></i>
-                                                    Cambiar archivo
+                                                    <span data-lang="change-file-btn">Cambiar archivo</span>
                                                 </button>
-                                                <!--¿Deseas
-                                                <a href="javascript:void(0)" id="cambiarArchivo"><strong>cambiar el archivo</strong></a>
-                                                o
-                                                <a href="javascript:void(0)" id="uploadFileConfirmed"><strong>continuar</strong></a>
-                                                ?-->
                                             </p>
                                         </div>
                                         <hr>
@@ -205,7 +202,7 @@
                                     <div class="col-lg-12">
                                         <div id="loadPreviewText" class="alert alert-warning" style="text-align: center; display:none"
                                              role="alert">
-                                            <strong>Cargando vista previa del archivo</strong>
+                                            <strong data-lang="loading-preview-legend">Cargando vista previa del archivo</strong>
                                         </div>
                                     </div>
 
@@ -223,10 +220,10 @@
                             <!--end tab-->
 
                             <div class="tab-pane" id="history">
-                                <h3>Historial de Archivos</h3>
+                                <h3 data-lang="panel-heading-historical-title">Historial de Archivos</h3>
                                 <div id="noFiles" style="display: none">
                                     <div class="alert alert-warning text-center" role="alert">
-                                        Aún no has subido ningún archivo.
+                                        <span>Aún no has subido ningún archivo.</span>
                                         <a href="javascript:void(0)">
                                             <button class="btn btn-danger btn-xs" onclick="starInputFile()"><i
                                                         class="fa fa-folder-open"></i> Explorar Archivos
@@ -259,7 +256,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title">Seleccionar Informe/Reporte</h4>
+                    <h4 class="modal-title" data-lang="modal-title-type-report">Seleccionar Informe</h4>
                 </div>
                 <div class="modal-body">
                     <select id="selectReportType" class="form-control">
@@ -272,8 +269,8 @@
                     </select>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times-circle"></i> Cancelar</button>
-                    <button id="continueSelectFile" type="button" class="btn btn-primary">Continuar <i class="fa fa-arrow-right"></i></button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times-circle"></i> <span data-lang="modal-cancel-btn">Cancelar</span></button>
+                    <button id="continueSelectFile" type="button" class="btn btn-primary"><span data-lang="modal-continue-btn">Continuar</span> <i class="fa fa-arrow-right"></i></button>
                 </div>
             </div>
         </div>
@@ -282,12 +279,8 @@
 @stop
 
 @section('javascript')
-    <script>
-
-    </script>
     <script type="text/javascript" src="{{ asset('js/statsarrays.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/main2.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/uploadcsv.js') }}"></script>
-
-
+    <script id="translateScript" type="text/javascript" src="{{ asset('js/main/translate.objects.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/main/main.js') }}"></script>
+    <!--<script type="text/javascript" src="{{ asset('js/main/uploadcsv.js') }}"></script>-->
 @stop
