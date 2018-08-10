@@ -19,20 +19,16 @@ Route::get('/', function () {
 });
 
 Route::post('updateLang', 'MainController@updateLang');
-/********************* [ADMIN] ++++++++++++++++++++++++++++*/
+/********************* [JOURNAL PANEL] ++++++++++++++++++++++++++++*/
 Route::group(['middleware' => 'journal'], function() {
   Route::get('/home', 'MainController@home')->name('home');
 
   Route::get('/historial', 'MainController@historial')->name('historial');
-
   Route::get('/subircsv', 'MainController@subircsv')->name('subircsv');
-
   Route::get('/testpath', 'MainController@test');
-
 
   Route::group(['prefix' => 'estadisticas'], function () {
     Route::get('archivo/{filename?}/{target?}', 'MainController@stats');
-
     Route::post('readcsv','MainController@readcsv');
     Route::post('archivo/getdatacsv', 'MainController@getdatacsv')->name('getdatacsv');
     Route::post('descargasporpais/getdatacsv2', 'MainController@getdatacsv2')->name('getdatacsv2');
@@ -46,9 +42,14 @@ Route::group(['middleware' => 'journal'], function() {
   Route::post('uploadcsv','MainController@uploadcsv');
   Route::post('lastcsv', 'MainController@lastcsv')->name('lastcsv');
   Route::post('listcsvfiles','MainController@listcsvfiles');
+
+  /********************* [JOURNAL ADMIN PANEL] ++++++++++++++++++++++++++++*/
+  Route::group(['middleware' => 'jadmin'], function () {
+      Route::get('users', 'JadminController@users')->name('users');
+  });
 });
 
-/********************* [PANEL] ++++++++++++++++++++++++++++*/
+/********************* [ADMIN PANEL] ++++++++++++++++++++++++++++*/
 /*Route::group([
     'middleware' => 'admin',
     'prefix' => 'admin',

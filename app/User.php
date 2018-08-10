@@ -15,7 +15,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'user_type', 'lang'
+        'name', 'email', 'password', 'user_type', 'journal_type', 'lang'
     ];
 
     /**
@@ -40,23 +40,4 @@ class User extends Authenticatable
 
         return $this->user_type;
     }
-
-    /*public function validateTypeUser() {
-
-    }*/
-
-    /*public function isAdmin() {
-        if($this->user_type == 'Admin'){
-          return true;
-        }
-        return false;
-        //return $this->user_type; // Here you return the name without the dot, instead of the name
-    }
-
-    public function isJournal(){
-        if($this->user_type == 'Journal'){
-          return true;
-        }
-        return false;
-    }*/
 }

@@ -45,10 +45,10 @@ var words = [];
 $(document).ready(function(){
     $('.global-item-menu').css('display', 'none');
     $('.home-item-menu').css('display', 'block');
-    setTimeout(function () {
+    /*setTimeout(function () {
         var urlHASH = window.location.hash;
         $('a.link-menu[href="'+urlHASH+'"]').click();
-    }, 500);
+    }, 500);*/
     validateExistFiles();
 });
 

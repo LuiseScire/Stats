@@ -190,7 +190,10 @@
                     <!-- /.dropdown-user -->
                 </li>
                 <li>
-                    <a href="javascript:void(0)" id="translate" data-text="EN,ES" data-file="es,en" data-index="1" data-page="home">EN</a>
+                    <a href="javascript:void(0)">
+                        <i class="fa fa-language"></i>
+                        <span id="translate" data-text="EN,ES" data-file="es,en" data-index="1" data-page="home">EN</span>
+                    </a>
                 </li>
                 <!-- /.dropdown -->
             </ul>
@@ -204,7 +207,7 @@
                         <!--MENU INICIO-->
 
                         <li class="home-item-menu">
-                            <a href="#home" class="link-menu">
+                            <a href="{{ url('home') }}" class="link-menu">
                                 <i class="fa fa-home fa-fw" style="color: #337ab7;"></i>
                                 <span data-lang="menu-opt-home">Inicio</span>
                             </a>
@@ -276,6 +279,14 @@
                             <a href="#"><i class="fa fa-bar-chart"></i> Estadísticas<span class="fa arrow"></span></a>
                             <ul id="menuOptionChartsContent" class="nav nav-second-level"></ul>
                         </li>
+                        @if(Auth::user()->journal_type == 'Admin')
+                        <li>
+                            <a href="{{ url('users') }}">
+                                <i class="fa fa-users" style="color: #A41C1E;"></i>
+                                <span data-lang="menu-opt-users">Usuarios</span>
+                            </a>
+                        </li>
+                        @endif
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
