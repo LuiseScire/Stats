@@ -64,7 +64,7 @@ class MainController extends Controller
                 $last_csv_file_data =  $last_csv_db->select()->where('last_user_id', $auth_id)->first();
 
 
-                $response = array(                    
+                $response = array(
                     'lastCsvFileData' => $last_csv_file_data,
                     'csvList' => $csv_list
                 );

@@ -46,6 +46,7 @@ Route::group(['middleware' => 'journal'], function() {
   /********************* [JOURNAL ADMIN PANEL] ++++++++++++++++++++++++++++*/
   Route::group(['middleware' => 'jadmin'], function () {
       Route::get('users', 'JadminController@users')->name('users');
+      Route::post('/userregister', 'JadminController@registerUser')->name('userregister');
   });
 });
 

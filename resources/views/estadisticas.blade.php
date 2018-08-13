@@ -971,8 +971,6 @@
 
 
 
-
-
     <!--MODALS-->
     <div id="configCharts" class="modal fade">
         <div class="modal-dialog modal-sm">
