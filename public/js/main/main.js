@@ -157,7 +157,7 @@ function validateExistFiles(){
           $('#tabHistory').show();
           $('#segunInfo').css('display', 'block');
         //$("#noFiles").css('display', 'block');
-		//fadeOutLoader();
+		fadeOutLoader();
       } else {
         $("#noFiles, #uploadFilesContent").css('display', 'block');
         fadeOutLoader();

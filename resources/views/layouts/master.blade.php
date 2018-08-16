@@ -14,16 +14,43 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome-animation/0.2.1/font-awesome-animation.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ asset('pluggins/bootstrap-select-picker/dist/css/bootstrap-select.css') }}">
     <link rel="stylesheet" href="{{ asset('css/metisMenu.css') }}">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
     <link rel="stylesheet" href="{{ asset('css/jQCloud/jqcloud.css') }}">
+
     @yield('css')
     <style>
         #sidebar > .sidebar-nav > .nav > li > a,
         #sidebar > .sidebar-nav > .nav > li > .nav-second-level > li > a {
             color: #000000;
         }
+
+        .swal2-popup {
+          font-size: 1.6rem !important;
+        }
+
+        footer{
+            margin-left: 250px;
+            min-height:50px;
+            padding-top:20px;
+            border: 1px solid #e7e7e7;
+            /* position: fixed; */
+            bottom: 0;
+            width: 82%;
+            background: #FFFFFF;
+            z-index: 3;
+        }
+
+        @media (max-width: 768px) {
+            /* For mobile phones: */
+            footer{
+                margin: 0 !important;
+                width: 100% !important;
+            }
+        }
+
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script src="{{ asset('js/translate/translate.js') }}"></script>
@@ -43,7 +70,6 @@
                 $('#langPreloader').fadeOut('slow');
                 $('#wrapper').removeClass('blur');
             }
-            fadeOutLoader();
           }
         }, 100);
 
@@ -294,9 +320,21 @@
             <!-- /.navbar-static-side -->
         </nav>
     @show
-    <div id="page-wrapper">
+    <div id="page-wrapper" style="/*margin-bottom: 58px;*/">
         @yield('content')
     </div>
+
+     @if(auth::id() == 1)
+     <footer class="main-footer text-center" style="">
+         <strong>Copyright © 2018 <a href="javascript:void(0)" style="text-decoration: none; color: #A41C1E">stats.escire.net</a></strong> Todos los derechos reservados.
+     </footer>
+    <!-- <div class="page-footer">
+        <div class="page-footer-text text-center">
+                © Copyright 2018 stats.escire.net - Todos los derechos reservados
+        </div>
+    </div> -->
+
+    @endif
 </div>
 
 
@@ -305,13 +343,14 @@
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
 <script src="{{ asset('js/bootstrap.js') }}"></script>
+<script src="{{ asset('pluggins/bootstrap-select-picker/dist/js/bootstrap-select.js') }}"></script>
 <script src="{{ asset('js/metisMenu.js') }}"></script>
 <script src="{{ asset('js/main.js') }}"></script>
 <script src="{{ asset('js/pluggins/jquery.number.js') }}"></script>
 <script src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="{{ asset('js/pluggins/jQCloud/jqcloud.js') }}"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@7.25.0/dist/sweetalert2.all.min.js"></script>
 <script>
     var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
     $(document).ready(function () {

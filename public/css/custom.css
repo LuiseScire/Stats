@@ -80,7 +80,7 @@ a.ir-arriba {
     position: fixed;
     bottom:20px;
     right:20px;
-    z-index: 2;
+    z-index: 4;
     color: #A41C1E;
 }
 /*btn go to top*/

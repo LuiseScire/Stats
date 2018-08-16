@@ -105,7 +105,6 @@
             text-align: center;
             color: white;
             margin: 0 8px 0 -12px;
-
         }
     </style>
 @stop
