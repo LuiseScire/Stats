@@ -37,7 +37,7 @@ class LoginController extends Controller
         }
 
         if($user->userType() == 'Admin') {
-            return '/admin-panel';
+            return '/admin/panel';
         }
     }
 

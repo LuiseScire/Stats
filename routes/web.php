@@ -45,14 +45,8 @@ Route::group(['middleware' => 'journal'], function() {
 
   /********************* [JOURNAL ADMIN PANEL] ++++++++++++++++++++++++++++*/
   Route::group(['middleware' => 'jadmin'], function () {
-
-      Route::match(['get', 'post'], 'users', 'JadminController@users');
-
-      //Route::get('users', 'JadminController@usersView')->name('users');
-      //Route::post('/user', 'JadminController@user')->name('user');
-      // Route::post('/getAllUsers', 'JadminController@getAllUsers')->name('getAllUsers');
-      Route::post('/userregister', 'JadminController@registerUser')->name('userregister');
-      // Route::post('/deleteuser', 'JadminController@deleteUser')->name('deleteuser');
+    Route::match(['get', 'post'], 'users', 'JadminController@users');
+    Route::post('/userregister', 'JadminController@registerUser')->name('userregister');
   });
 });
 
@@ -69,5 +63,6 @@ Route::group(['middleware' => 'journal'], function() {
 
 Route::group(['middleware' => 'admin', 'prefix' => 'admin'], function () {
     Route::get('/panel', 'AdminController@panel');
-
+    Route::post('/users', 'AdminController@users');
+    Route::post('/userregister', 'AdminController@registerUser');
 });

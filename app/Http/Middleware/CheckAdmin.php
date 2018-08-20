@@ -15,7 +15,7 @@ class CheckAdmin
      */
     public function handle($request, Closure $next)
     {
-      if (auth()->user()->user_type == 'Admin') {
+      if (auth()->user()->userType() == 'Admin') {
           return $next($request);
       }
 

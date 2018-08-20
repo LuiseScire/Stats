@@ -1,25 +1,28 @@
 /*$(window).on('load', function(){
     fadeOutLoader();
 });*/
+
+//config required for each views
 var displayDateES, displayDateEN, translate = [];
 switch (currentLang) {
 	case 'es':
 		for(var i in esObject) {
 			translate[i] = esObject[i];
 		}
+        //show date in historical
 		displayDateES = 'display: block';
 		displayDateEN = 'display: none';
-		$('#currentDateES').show();
 		break;
 	case 'en':
 		for(var i in enObject) {
 			translate[i] = enObject[i];
 		}
+        //show date in historical
 		displayDateES = 'display: none';
 		displayDateEN = 'display: block';
-		$('#currentDateEN').show();
 		break;
 }
+// end config required for each views
 
 /*uploadcsv*/
 var fileNameConfirmed;

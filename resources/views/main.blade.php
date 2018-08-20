@@ -23,8 +23,8 @@
         <div class="col-lg-12">
             <div class="address-bar-content-header">
                 <h1>
-                  <span data-lang="page-title">Inicio</span>
-                  <span id="btnGlobalOpenFile" class="btn btn-danger pull-right" onclick="starInputFile()" role="button"><i class="fa fa-folder-open"></i> <span data-lang="btn-upload-file">Subir Archivo</span></span>
+                    <span data-lang="page-title">Inicio</span>
+                    <span id="btnGlobalOpenFile" class="btn btn-danger pull-right" onclick="starInputFile()" role="button"><i class="fa fa-folder-open"></i> <span data-lang="btn-upload-file">Subir Archivo</span></span>
                 </h1>
                 <ol class="breadcrumb">
                     <li class="address-item"><label><i class="fa fa-home"></i> <span data-lang="address-bar-current-page">Inicio</span></label></li>

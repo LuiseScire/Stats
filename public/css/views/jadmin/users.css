@@ -1,0 +1,255 @@
+#NoUserJumbotron i.users {
+    transform: scale(0.8);
+    opacity: 0.3;
+    font-size: 50px;
+    margin-bottom: 1rem;
+}
+
+.register-form h2{
+    color: #636363;
+    margin: 0 0 15px;
+    position: relative;
+    text-align: center;
+}
+
+.register-form h2:before, .register-form h2:after{
+    content: "";
+    height: 2px;
+    width: 26%;
+    background: #d4d4d4;
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+}
+
+.register-form h2:before{
+    left: 0;
+}
+
+.register-form h2:after{
+    right: 0;
+}
+
+.register-form .hint-text{
+    color: #999;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.profile-card-background{
+    /*background-image: url('https://i.pinimg.com/736x/10/02/e2/1002e25d3a2b4f21dd42015b08646e5f--magdalena-pretty-face.jpg');*/
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.profile-card-container{
+    background-position: center top;
+    overflow: hidden;
+    /*padding: 0px;*/
+    /* width: 325px; */
+    border-radius: 5px;
+    display: inline-block;
+    /*margin: 10px;*/
+    border: 1px solid #eee;
+    margin-bottom: 25px;
+}
+
+.profile-card-content{
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-card-background {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  z-index: 1;
+  background-position: center -70px;
+  -webkit-filter: blur(7px);
+  filter: blur(7px);
+}
+
+.profile-card-image{
+    position: relative;
+    z-index: 2;
+    padding: 20px;
+    background: rgb(34,34,34);
+    background: rgba(34,34,34,0.75);
+}
+
+.profile-card-image img{
+    margin: 25px 25% 0px;
+}
+
+.profile-card-image h4 { text-align: center; color: #fefefe; font-weight: normal; }
+
+.profile-card-caption, .profile-card-footer{
+    padding: 15px;
+}
+
+.profile-card-caption-item{
+    margin-bottom: 20px;
+}
+
+.profile-card-caption-item span{
+    color: #72777A;
+}
+
+.profile-card-caption-item h5{
+    color: #72777A;
+    font-weight: bold;
+    margin-top: 0;
+    margin-left: 15px;
+}
+
+.profile-card-caption-options{
+    margin: 0;
+}
+
+.cover-card-background{
+    background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.cover-card-container{
+    background-position: center top;
+    overflow: hidden;
+    padding: 0px;
+    border-radius: 5px;
+    display: inline-block;
+    /* margin: 10px; */
+    width: 100%;
+}
+
+.cover-card-content{
+    position: relative;
+    overflow: hidden;
+}
+
+.cover-card-background{
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  z-index: 1;
+  background-position: center -70px;
+  -webkit-filter: blur(7px);
+  filter: blur(7px);
+}
+
+.cover-card-image{
+  position: relative;
+  z-index: 2;
+  padding: 20px;
+  background: rgb(34,34,34);
+  background: rgba(34,34,34,0.75);
+}
+
+.cover-card-image img{
+    margin: 25px 25% 0px;
+    padding:1px;
+    border:1px solid #ccc;
+    /*height: 200px;*/
+    min-height: 200px;
+    max-height: 200px;
+    border-radius: 5px;
+    width: 50%;
+}
+
+.cover-card-image h2 {
+    text-align: center;
+    color: #fefefe;
+    font-weight: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/*
+  ##Device = Tablets, Ipads (portrait)
+  ##Screen = B/w 768px to 1024px
+*/
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    .cover-card-background{
+        background-size: 1080px auto;
+    }
+
+    .cover-card-image img{
+        margin: 25px 5%;
+        width: 90%;
+    }
+
+    .cover-card-image h2{
+        margin-top: 0;
+    }
+}
+
+/*
+  ##Device = Tablets, Ipads (landscape)
+  ##Screen = B/w 768px to 1024px
+*/
+
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+    .cover-card-background{
+        background-size: 1080px auto;
+    }
+
+}
+
+/*
+  ##Device = Most of the Smartphones Mobiles (Portrait)
+  ##Screen = B/w 320px to 479px
+*/
+
+@media (min-width: 320px) and (max-width: 480px) {
+    .cover-card-background{
+        background-size: 1080px auto;
+    }
+
+    .cover-card-image img{
+        margin: 25px 5%;
+        width: 90%;
+        min-height: 100px;
+        max-height: 100px;
+    }
+
+    .cover-card-image h2{
+        margin-top: 0;
+    }
+}
+
+/*
+  ##Device = Low Resolution Tablets, Mobiles (Landscape)
+  ##Screen = B/w 481px to 767px
+*/
+
+@media (min-width: 481px) and (max-width: 767px) {
+    .register-form h2:before, .register-form h2:after{
+        content: "";
+        height: 2px;
+        width: 13%;
+        background: #d4d4d4;
+        position: absolute;
+        top: 50%;
+        z-index: 2;
+    }
+
+    .cover-card-background{
+        background-size: 1080px auto;
+    }
+
+    .cover-card-image img{
+        margin: 25px 5%;
+        width: 90%;
+        min-height: 200px;
+        max-height: 200px;
+    }
+
+    .cover-card-image h2{
+        margin-top: 0;
+    }
+}

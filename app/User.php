@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\JournalUser;
+
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -22,11 +24,13 @@ class User extends Authenticatable
         'password',
         'user_type',
         'journal_type',
+        'pack',
         'journal',
         'lang',
         'avatar',
         'status'
     ];
+
 
     /**
      * The attributes that should be hidden for arrays.
@@ -49,5 +53,10 @@ class User extends Authenticatable
         }
 
         return $this->user_type;
+    }
+
+    public function journalType(){
+        $j_user_type = JournalUser::where('jnals_user_id', $this->id)->select('jnals_user_type')->first();
+        return 'Admin';
     }
 }

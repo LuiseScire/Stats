@@ -45,7 +45,9 @@ class JadminController extends Controller
         switch ($s_case) {
             case 'getAll':
                 $response['allUsers'] = $user_db
-                                        ->join('journals_users', 'id', '=', 'jnals_user_id')
+                                        ->join('journals_users as J', 'id', '=', 'J.jnals_user_id')
+                                        ->join('academic_degree as D', 'J.jnals_academic_degree', '=', 'D.degree_id')
+                                        ->join('countries as C', 'J.jnals_country', '=', 'C.country_id')
                                         ->where('journal', $journal)->get();
 
                 return response()->json($response);
@@ -74,59 +76,11 @@ class JadminController extends Controller
         }//end swith
     }
 
-    // public function usersView(){
-    //     #Models
-    //     $degree_db = new AcademicDegree();
-    //     $country_db = new Country();
-    //
-    //     $response['degrees'] = $degree_db->where('degree_status', 'Activo')->get();
-    //     $response['countries'] = $country_db->get();
-    //
-    //     return view('jadmin.users', $response);
-    // }
-    //
-    // public function user(Request $request){
-    //     #Models
-    //     //global
-    //     $user_db =  new User();
-    //
-    //     //getAll
-    //     $auth_id = Auth::id();
-    //     $journal = Auth::user()->journal;
-    //
-    //
-    //
-    //     $switch_case = $request->swithCase;
-    //     switch ($switch_case) {
-    //         case 'getAll':
-    //             $response['allUsers'] = $user_db
-    //                                     ->join('journals_users', 'id', '=', 'jnals_user_id')
-    //                                     ->where('journal', $journal)->get();
-    //
-    //             break;
-    //         case 'delete':
-    //             $deleted = $user_db->where('id', $user_id)->update(['status' => 'deleted']);
-    //             if($deleted){
-    //                 $response = array(
-    //                     'status' => 'success',
-    //                     'message' => 'Usuario eliminado satisfactoriamente',
-    //                 );
-    //             } else {
-    //                 $response = array(
-    //                     'status' => 'error',
-    //                     'message' => 'Error al eliminar usuario',
-    //                 );
-    //             }
-    //             break;
-    //     }
-    //
-    //     return response()->json($response);
-    // }
-
     public function registerUser(Request $request){
         #Models
         $user_db =  new User();
         $journal_db = new JournalUser();
+        $auth_id = Auth::id();
 
         #Request
         $email = $request->userEmail;
@@ -141,9 +95,15 @@ class JadminController extends Controller
         $state = $request->userState;
         $city = $request->userCity;
 
-        //$lang = ($country == 143) ? 'es' : 'en';
+        $lang = ($this->spanishSpeaker($country)) ? 'es' : 'en';
 
         $journal = Auth::user()->journal;
+
+        $journal_name = $journal_db->getJName($auth_id);
+        $journal_logo = $journal_db->getLogo($auth_id);
+        if(!$journal_logo){
+            $journal_logo = Null;
+        }
 
         $validator = Validator::make($data, [
             'email' => 'required|string|email|max:255|unique:users',
@@ -158,19 +118,21 @@ class JadminController extends Controller
                 'password' => Hash::make($password),
                 'user_type' => 'Journal',
                 'journal_type' => 'User',
-                'journal' => $journal
+                'journal' => $journal,
+                'lang' => $lang
             ]);
 
             if($newUser) {
                 $setDataJournal = $journal_db->create([
                     'jnals_academic_degree' => $academic_d,
-                    'jnals_adscripción' => '',
-                    'jnals_journal_name' => '',
+                    'jnals_adscripcion' => '',
+                    'jnals_journal_name' => $journal_name,
                     'jnals_phone' => $phone,
                     'jnals_country' => $country,
                     'jnals_state' => $state,
                     'jnals_city' => $city,
-                    'jnals_user_id' => $newUser->id
+                    'jnals_user_id' => $newUser->id,
+                    'jnals_logo' => $journal_logo
                 ]);
 
                 if($setDataJournal){
@@ -201,6 +163,17 @@ class JadminController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    private function spanishSpeaker($country_){
+        $countries = [9, 32, 14, 50, 53, 54, 66, 201, 70, 93, 89, 99, 143, 165, 174, 184, 176, 64, 234, 234];
+
+        foreach ($countries as $country) {
+            if($country == $country_)
+            return true;
+        }
+
+        return false;
     }
 
 }

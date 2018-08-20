@@ -15,7 +15,12 @@ class CheckJadmin
      */
     public function handle($request, Closure $next)
     {
-        if(auth()->user()->journal_type == 'Admin'){
+        // if(auth()->user()->journal_type == 'Admin'){
+        //     return $next($request);
+        // }
+
+        $user_type = auth()->user()->journalType();
+        if($user_type == 'Admin'){
             return $next($request);
         }
 

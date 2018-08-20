@@ -15,7 +15,7 @@ class CheckJournal
      */
     public function handle($request, Closure $next)
     {
-      if (auth()->user()->user_type == 'Journal') {
+      if (auth()->user()->userType() == 'Journal') {
           return $next($request);
       }
 

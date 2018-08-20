@@ -17,6 +17,7 @@ function getAllUsers(){
 
         var countUsers = 0;
         $.each(response.allUsers, function(index, v) {
+
             var id =  v.id;
 
             if(id != auth_id){
@@ -35,19 +36,30 @@ function getAllUsers(){
                     'avatar': v.avatar,
                     'status': v.status,
                     'phone': v.jnals_phone,
+                    'degree_id': v.degree_id,
+                    'degree': v.degree_name,
+                    'country_es': v.country_es,
+                    'country_en': v.country_en,
+                    'logo': v.jnals_logo,
+                    'journalName': v.jnals_journal_name
                 };
 
                 var user = usersDataSet[id];
 
                 user['fullName'] = user.name + ' ' +user.lastName;
 
-                user['location'] = user.city + ', ' + user.state + ', ' + user.country;
+                user['location'] = user.city + ', ' + user.state + ', ' + user.country_es;
 
                 var avatar = (user.avatar == null) ? 'default-user-avatar.png' : 'useravatar/' + user.avatar;
                 user['urlAvatar'] = public_path + '/images/' + avatar;
 
+                if(user.degree == null || user.degree == ''){
+                    user['degree'] = 'No definido';
+                }
 
-
+                if(user.phone == null || user.phone == ''){
+                    user['phone'] = 'No definido';
+                }
 
                 var profileCard = '<div class="col-md-4" id="profileCard'+id+'"><div class="profile-card-container">'+
                 '                    <div class="profile-card-content">'+
@@ -68,7 +80,7 @@ function getAllUsers(){
                 '                        </div>'+
                 '                        <div class="profile-card-caption-item">'+
                 '                            <span><i class="fa fa-graduation-cap"></i> Grado Académico</span>'+
-                '                            <h5>'+user.academicDegree+'</h5>'+
+                '                            <h5>'+user.degree+'</h5>'+
                 '                        </div>'+
                 '                        <div class="profile-card-caption-item">'+
                 '                            <span><i class="fa fa-phone"></i> Teléfono</span>'+
@@ -96,6 +108,15 @@ function getAllUsers(){
         });//end each()
 
         if(countUsers > 0){
+            /*var user = usersDataSet[usersDataSet.length -1];
+
+            if(user.logo != null && user.logo.trim() != ''){
+                var url = public_path + 'images/journalslogo/' + user.logo;
+                $('.cover-card-background').css('background-image', url);
+                $('.cover-card-image').next('img').attr('src', url);
+            }
+            $('.cover-card-image h2').text(user.journalName);*/
+
             $('#btnGlobalOpenModalRegister, #userList').show();
         } else {
             $('#NoUserJumbotron').show();
@@ -107,8 +128,8 @@ function userRegister(){
     var data = {'_token': CSRF_TOKEN};
     var form = $('#userRegisterForm');
     try {
-        if($('input[name="userFirstName"]').val().trim().length < 1) throw 'Nombre de usuario no puede estar vacío';
-        if($('input[name="userLastName"]').val().trim().length < 1) throw 'Apellido de usuario no puede estar vacío';
+        if($('input[name="userFirstName"]').val().trim().length < 1) throw 'Nombre(s) no puede estar vacío';
+        if($('input[name="userLastName"]').val().trim().length < 1) throw 'Apellidos no puede estar vacío';
         if($('input[name="userEmail"]').val().trim().length < 1) throw 'Correo electrónico no puede estás vacío';
         if($('input[name="userPassword"]').val().trim().length < 1) throw 'Contraseña no puede estar vacía';
         if($('input[name="userPassword"]').val().trim().length < 8) throw 'La contraseña no puede ser menor a 8 caracteres';
@@ -124,6 +145,11 @@ function userRegister(){
                 if(response.status == 'error-mail'){
                     $('#registerFormAlert').fadeOut('fast').fadeIn('slow');
                     $('#registerFormAlertMessage').text(response.message);
+                    swal(
+                        '!Error!',
+                        response.message,
+                        'error'
+                    );
                 }
 
                 if(response.status == 'success'){
@@ -134,6 +160,7 @@ function userRegister(){
                         'success'
                     );
                     getAllUsers();
+                    form.get(0).reset();
                 }
 
                 if(response.status == 'error'){
@@ -148,6 +175,11 @@ function userRegister(){
             },
         });
     } catch (e) {
+        swal(
+            '¡Error!',
+            e,
+            'error'
+        );
         $('#registerFormAlert').fadeOut('fast').fadeIn('slow');
         $('#registerFormAlertMessage').text(e);
     }
@@ -156,7 +188,7 @@ function userRegister(){
 function deleteUser(user_id ){
     var user = usersDataSet[user_id];
     swal({
-        title: '¿Seguro que desea eliminar a '+user.name+'?',
+        title: '¿Desea eliminar a '+user.name+'?',
         text: 'Los datos asociados a este usuario serán eliminados',
         imageUrl: user.urlAvatar,
         imageWidth: 150,

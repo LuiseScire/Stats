@@ -3,169 +3,10 @@
 @section('title', 'Users')
 
 @section('css')
-@section('css')
-    <style media="screen">
-        #NoUserJumbotron i.users {
-            transform: scale(0.8);
-            opacity: 0.3;
-            font-size: 50px;
-            margin-bottom: 1rem;
-        }
+    <link rel="stylesheet" href="{{ asset('css/views/jadmin/users.css') }}">
+    <style>
 
-        .register-form h2{
-    		color: #636363;
-            margin: 0 0 15px;
-    		position: relative;
-    		text-align: center;
-        }
-    	.register-form h2:before, .register-form h2:after{
-    		content: "";
-    		height: 2px;
-    		width: 26%;
-    		background: #d4d4d4;
-    		position: absolute;
-    		top: 50%;
-    		z-index: 2;
-    	}
-    	.register-form h2:before{
-    		left: 0;
-    	}
-    	.register-form h2:after{
-    		right: 0;
-    	}
-
-        .register-form .hint-text{
-		color: #999;
-		margin-bottom: 30px;
-		text-align: center;
-	}
     </style>
-    <style media="screen">
-        .profile-card-background{
-            /*background-image: url('https://i.pinimg.com/736x/10/02/e2/1002e25d3a2b4f21dd42015b08646e5f--magdalena-pretty-face.jpg');*/
-  		    background-repeat: no-repeat;
-  		    background-size: cover;
-        }
-
-        .profile-card-container{
-            background-position: center top;
-            overflow: hidden;
-            /*padding: 0px;*/
-            /* width: 325px; */
-            border-radius: 5px;
-            display: inline-block;
-            /*margin: 10px;*/
-            border: 1px solid #eee;
-            margin-bottom: 25px;
-        }
-
-        .profile-card-content{
-            position: relative;
-  		    overflow: hidden;
-        }
-
-        .profile-card-background {
-		  position: absolute;
-		  top: 0px;
-		  right: 0px;
-		  bottom: 0px;
-		  left: 0px;
-		  z-index: 1;
-		  background-position: center -70px;
-		  -webkit-filter: blur(7px);
-		  filter: blur(7px);
-		}
-
-        .profile-card-image{
-            position: relative;
-  		    z-index: 2;
-  		    padding: 20px;
-  		    background: rgb(34,34,34);
-  		    background: rgba(34,34,34,0.75);
-        }
-
-        .profile-card-image img{
-			margin: 25px 25% 0px;
-		}
-
-		.profile-card-image h4 { text-align: center; color: #fefefe; font-weight: normal; }
-
-        .profile-card-caption, .profile-card-footer{
-			padding: 15px;
-		}
-
-        .profile-card-caption-item{
-            margin-bottom: 20px;
-        }
-
-        .profile-card-caption-item span{
-            color: #72777A;
-        }
-
-        .profile-card-caption-item h5{
-            color: #72777A;
-            font-weight: bold;
-            margin-top: 0;
-            margin-left: 15px;
-        }
-
-        .profile-card-caption-options{
-            margin: 0;
-        }
-
-        .cover-card-background{
-        	background-repeat: no-repeat;
-		  background-size: cover;
-        }
-
-        .cover-card-container{
-            background-position: center top;
-			overflow: hidden;
-			padding: 0px;
-			border-radius: 5px;
-			display: inline-block;
-			/* margin: 10px; */
-            width: 100%;
-        }
-
-        .cover-card-content{
-        	position: relative;
-		    overflow: hidden;
-        }
-
-        .cover-card-background{
-		  position: absolute;
-		  top: 0px;
-		  right: 0px;
-		  bottom: 0px;
-		  left: 0px;
-		  z-index: 1;
-		  background-position: center -70px;
-		  -webkit-filter: blur(7px);
-		  filter: blur(7px);
-        }
-
-        .cover-card-image{
-           position: relative;
-		  z-index: 2;
-		  padding: 20px;
-		  background: rgb(34,34,34); /* for IE */
-		  background: rgba(34,34,34,0.75);
-        }
-
-        .cover-card-image img{
-			margin: 25px 25% 0px;
-            padding:1px;
-            border:1px solid #ccc;
-            height: 200px;
-            min-height: 200px;
-            max-height: 200px;
-            border-radius: 5px;
-		}
-
-		.cover-card-image h2 { text-align: center; color: #fefefe; font-weight: normal; }
-    </style>
-@stop
 @endsection
 
 @section('content')
@@ -195,20 +36,31 @@
     </div>
     @else
     <div class="col-md-12">
-        <!-- <div id="journalCover">
+        <div id="journalCover">
             <div class="cover-card-container">
         		<div class="cover-card-content">
-        			<div class="cover-card-background"
-        			style="background-image: url({{ asset('images/your-logo.png') }})"></div>
+                    @php
+                        $logo = App\JournalUser::getLogo(Auth::id());
+                    @endphp
+                    @if(!$logo)
+                    <div class="cover-card-background" style="background-image: url({{ asset('images/your-logo.png') }})"></div>
+                    @else
+                    <div class="cover-card-background" style="background-image: url({{ $logo }})"></div>
+                    @endif
                     <div class="cover-card-image">
-                        <img src="{{ asset('images/your-logo.png') }}" width="50%">
-                        <h2>facebook</h2>
+                        @if(!$logo)
+                        <img src="{{ asset('images/your-logo.png') }}" height="10px">
+                        @else
+                        <img src="{{ $logo }}">
+                        @endif
+                        <h2>{{ App\JournalUser::getJName(Auth::id()) }}</h2>
                     </div>
+
         		</div>
         	</div>
-        </div> -->
+        </div>
 
-        <div class="cover-card-container" id="journalCover">
+        <!-- <div class="cover-card-container" id="journalCover">
     		<div class="cover-card-content">
     			<div class="cover-card-background"
     			style="background-image: url('http://escire.mx/assets/website/images/logo.png')"></div>
@@ -217,7 +69,7 @@
                     <h2>facebook</h2>
                 </div>
     		</div>
-    	</div>
+    	</div> -->
     </div>
 
     <div class="col-lg-12">
@@ -230,11 +82,11 @@
                 </a>
             </p>
         </div>
-        <br>
     </div>
 
 
-    <div class="col-md-6 col-md-offset-3">
+    <div class="col-lg-6 col-md-6 col-md-offset-3">
+        <br>
         <input type="text" class="form-control" id="serchUsers" style="font-family: Arial, FontAwesome" placeholder="&#xF002; buscar usuario">
         <br>
     </div>
@@ -307,13 +159,13 @@
             			<div class="row">
             				<div class="col-xs-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-user"></i> </span>
+                                    <span class="input-group-addon"><i class="fa fa-user"></i> *</span>
                                     <input type="text" class="form-control" name="userFirstName" placeholder="Nombre(s) *">
                                 </div>
                             </div>
             				<div class="col-xs-6">
                                 <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-user"></i> </span>
+                                    <span class="input-group-addon"><i class="fa fa-user"></i> *</span>
                                     <input type="text" class="form-control" name="userLastName" placeholder="Apellidos *">
                                 </div>
                             </div>
@@ -321,13 +173,13 @@
                     </div>
                     <div class="form-group">
                         <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-at"></i></span>
+                            <span class="input-group-addon"><i class="fa fa-at"></i> *</span>
                         	<input type="email" class="form-control" name="userEmail" placeholder="Correo Electrónico *">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                            <span class="input-group-addon"><i class="fa fa-lock"></i> *</span>
                             <input type="text" class="form-control" name="userPassword" placeholder="Contraseña *">
                             <span class="input-group-btn">
                                 <button type="button" class="btn btn-default" name="button"onclick="randomPassword()"><i class="fa fa-random"></i> Crear contraseña</button>
@@ -363,7 +215,7 @@
                     </div>
                     <div class="form-group">
                         <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-globe"></i> </span>
+                            <span class="input-group-addon"><i class="fa fa-globe"></i> *</span>
                             <select class="form-control selectpicker" name="userCountry" data-live-search="true">
                                 @if(!$countries->isEmpty())
                                     @if(Auth::user()->lang == 'en')
@@ -418,7 +270,5 @@
 <script src="{{ asset('js/users/users.js') }}" charset="utf-8"></script>
 <script type="text/javascript">
     var auth_id = '{{ Auth::id() }}';
-    console.log(auth_id);
-
 </script>
 @endsection

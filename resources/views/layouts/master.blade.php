@@ -19,8 +19,8 @@
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
     <link rel="stylesheet" href="{{ asset('css/jQCloud/jqcloud.css') }}">
-
     @yield('css')
+
     <style>
         #sidebar > .sidebar-nav > .nav > li > a,
         #sidebar > .sidebar-nav > .nav > li > .nav-second-level > li > a {
@@ -43,13 +43,78 @@
             z-index: 3;
         }
 
-        @media (max-width: 768px) {
-            /* For mobile phones: */
+        /*
+          ##Device = Tablets, Ipads (portrait)
+          ##Screen = B/w 768px to 1024px
+        */
+
+        /* @media (min-width: 768px) and (max-width: 1024px) {
+            .navbar-brand{
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 55%;
+            }
+        } */
+
+        /*
+          ##Device = Tablets, Ipads (landscape)
+          ##Screen = B/w 768px to 1024px
+        */
+
+        /* @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+
+        } */
+
+        /* @media (max-width: 768px) {
+
+            footer{
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+              .navbar-brand{
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 85%;
+            }
+        } */
+
+        /*
+          ##Device = Most of the Smartphones Mobiles (Portrait)
+          ##Screen = B/w 320px to 479px
+        */
+
+        @media (min-width: 320px) and (max-width: 480px) {
+            .navbar-brand{
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              width: 85%;
+            }
+
             footer{
                 margin: 0 !important;
                 width: 100% !important;
             }
         }
+
+        /*
+          ##Device = Low Resolution Tablets, Mobiles (Landscape)
+          ##Screen = B/w 481px to 767px
+        */
+
+        @media (min-width: 481px) and (max-width: 767px) {
+
+
+            footer{
+                margin: 0 !important;
+                width: 100% !important;
+            }
+        }
+
+
 
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
@@ -82,6 +147,7 @@
                 'This could take a while...',
                 'Your file exceeds 3 MB, wait a moment, please...'
             ];
+
         } else {
             messages = [
                 'Cargando...',
@@ -90,6 +156,7 @@
                 'Esto podría demorar un poco...',
                 'Su archivo excede los 3MB, espere, por favor...'
             ];
+
         }
         var message = messages[0];
         var secondsCount = 0;
@@ -175,7 +242,27 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a id="navLinkHome" class="navbar-brand" href="{{ url('home') }}">Stats</a>
+                <!-- {{ url('home') }} -->
+
+                @if(Auth::user()->user_type == 'Admin')
+                <a class="navbar-brand" href="javascript:void(0)" style="padding:0">
+                    <img alt="Brand" src="{{ asset('images/escire_logo.png') }}" style="min-height: 50px; max-height: 50px">
+                </a>
+                @else
+                    @php
+                        $logo = App\JournalUser::getLogo(Auth::user()->journal);
+                    @endphp
+                    @if(!$logo)
+                    <a class="navbar-brand" href="javascript:void(0)">{{ App\JournalUser::getJName(Auth::user()->journal) }} </a>
+                    @else
+                    <a class="navbar-brand" href="javascript:void(0)" style="padding:0">
+                        <img alt="Brand" src="http://escire.mx/assets/website/images/logo.png" style="min-height: 50px; max-height: 50px">
+                    </a>
+                    @endif
+                    <!-- /if getLogo -->
+                @endif
+                <!-- /if user_type -->
+
                 <!-- show in downstatscountry view -->
                 <a id="navLinkBack" class="navbar-brand opc-nav-downstatscountry-view" href="javascript:void(0)"
                    style="display:none">
@@ -324,7 +411,7 @@
         @yield('content')
     </div>
 
-     @if(auth::id() == 1)
+
      <footer class="main-footer text-center" style="">
          <strong>Copyright © 2018 <a href="javascript:void(0)" style="text-decoration: none; color: #A41C1E">stats.escire.net</a></strong> Todos los derechos reservados.
      </footer>
@@ -333,8 +420,6 @@
                 © Copyright 2018 stats.escire.net - Todos los derechos reservados
         </div>
     </div> -->
-
-    @endif
 </div>
 
 
@@ -381,6 +466,15 @@
 
         $('#currentDateES').text(currentDateFormat('es'));
         $('#currentDateEN').text(currentDateFormat('en'));
+
+        switch (currentLang){
+            case 'es':
+                $('#currentDateES').show();
+                break;
+            case 'en':
+                $('#currentDateEN').show();
+                break;
+        }
     });
 
     function currentDateFormat(lang) {
@@ -389,10 +483,12 @@
             case 'es':
                 var months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septimbre", "Octube", "Nomviembre", "Diciembre"];
                 dateFormat = date.getDate() + ' de ' + months[date.getMonth()] + ' de ' + date.getFullYear();
+
                 break;
             case 'en':
                 var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
                 dateFormat =  months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+
                 break;
         }
         return dateFormat;
