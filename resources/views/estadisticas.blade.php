@@ -766,6 +766,110 @@
                     </div>
                 </div>
 
+                <!--  ########################[CHART ROLES] ######################## -->
+                <div class="panel" id="chartPanelRoles" style="display: none; border-top: 3px solid #555e81;">
+                    <div class="panel-heading">
+                        <h4 style="color: #555e81">
+                            <i class="fa fa-users"></i>
+                            <span>Roles</span>
+                            <div class="pull-right">
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-download"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="role" data-typeexport="png">
+                                                <i class="fa fa-image"></i> Descargar imagen PNG
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-share-alt"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="role" data-typeexport="embed">
+                                                <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                            </div>
+                        </h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-12 text-center" style="z-index: 2;">
+                            <div class="btn-group" role="group">
+                                <button class="switchUserChart btn btn-default" data-chart="pie"><i class="fa fa-pie-chart"></i></button>
+                                <button class="switchUserChart btn btn-primary" data-chart="column"><i class="fa fa-bar-chart"></i></button>
+                                <!-- <button class="switchCityChart btn btn-default" data-chart="line"><i class="fa fa-line-chart"></i></button> -->
+                            </div>
+                        </div>
+                        <div class="col-md-9 col-xs-12">
+                            <div id="chartContentUsers"></div>
+                        </div>
+                        <div class="col-md-3 col-xs-12">
+                            <div id="usersList" style="overflow: auto; max-height: 250px;"></div>
+                            <div id="cloudWordsRoles" style="width:100%; height: 50%;"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!--  ########################[CHART GENDERS] ######################## -->
+                <div class="panel" id="chartPanelGenders" style="display: none; border-top: 3px solid #00adc1;">
+                    <div class="panel-heading">
+                        <h4 style="color: #00adc1">
+                            <i class="fa fa-transgender"></i>
+                            <span>Géneros</span>
+                            <div class="pull-right">
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-download"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="gender" data-typeexport="png">
+                                                <i class="fa fa-image"></i> Descargar imagen PNG
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                                <span class="dropdown" style="margin-left: 5px;">
+                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-share-alt"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li>
+                                            <a href="javascript:void(0)" class="export-action" data-charttype="gender" data-typeexport="embed">
+                                                <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+                            </div>
+                        </h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="col-md-12 text-center" style="z-index: 2;">
+                            <div class="btn-group" role="group">
+                                <button class="switchGenderChart btn btn-default" data-chart="pie"><i class="fa fa-pie-chart"></i></button>
+                                <button class="switchGenderChart btn btn-primary" data-chart="column"><i class="fa fa-bar-chart"></i></button>
+                                <!-- <button class="switchCityChart btn btn-default" data-chart="line"><i class="fa fa-line-chart"></i></button> -->
+                            </div>
+                        </div>
+                        <div class="col-md-9 col-xs-12">
+                            <div id="chartContentGenders"></div>
+                        </div>
+                        <div class="col-md-3 col-xs-12">
+                            <div id="gendersList"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- [CHART TOTAL] -->
                 <div id="chartPanelTotal_" class="panel" style="display: none">
                     <div class="panel-heading">
@@ -1028,7 +1132,7 @@
     <script type="text/javascript">
         var fileName = '{{ $filename }}';
         var target = "{{ $target }}";
-        var getCsvFile = "{{ asset('/csvfiles/'.$filename) }}";
+        var getCsvFile = "{{ asset('/files/'.$filename) }}";
     </script>
     <script src="{{ asset('js/pluggins/download.js') }}"></script>
     <script src="{{ asset('js/statsarrays.js') }}"></script>

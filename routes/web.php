@@ -30,7 +30,8 @@ Route::group(['middleware' => 'journal'], function() {
   Route::group(['prefix' => 'estadisticas'], function () {
     Route::get('archivo/{filename?}/{target?}', 'MainController@stats');
     Route::post('readcsv','MainController@readcsv');
-    Route::post('archivo/getdatacsv', 'MainController@getdatacsv')->name('getdatacsv');
+    // Route::post('archivo/getdatacsv', 'MainController@getdatacsv')->name('getdatacsv');
+    Route::post('archivo/getdatafiles', 'MainController@getDataFiles')->name('getdatafiles');
     Route::post('descargasporpais/getdatacsv2', 'MainController@getdatacsv2')->name('getdatacsv2');
     Route::post('archivo/createchartimage','MainController@createchartimage')->name('createchartimage');
     Route::get('descargasporpais/{filename?}', 'MainController@downstatscountry');
@@ -40,6 +41,8 @@ Route::group(['middleware' => 'journal'], function() {
   });
 
   Route::post('uploadcsv','MainController@uploadcsv');
+  Route::post('files','MainController@files');
+  Route::post('readxml', 'MainController@readxml');
   Route::post('lastcsv', 'MainController@lastcsv')->name('lastcsv');
   Route::post('listcsvfiles','MainController@listcsvfiles');
 

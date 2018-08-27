@@ -41,7 +41,6 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-
     //this method used in LoginController
     public function userType() {
         $user_type = '';
@@ -55,8 +54,8 @@ class User extends Authenticatable
         return $this->user_type;
     }
 
-    public function journalType(){
-        $j_user_type = JournalUser::where('jnals_user_id', $this->id)->select('jnals_user_type')->first();
-        return 'Admin';
+    public static function journalType($user_id){
+        $j_user_type = JournalUser::where('jnals_user_id', $user_id)->select('jnals_user_type')->first();
+        return $j_user_type->jnals_user_type;
     }
 }

@@ -18,8 +18,8 @@ class CheckJadmin
         // if(auth()->user()->journal_type == 'Admin'){
         //     return $next($request);
         // }
-
-        $user_type = auth()->user()->journalType();
+        $user_id = auth()->user()->id;
+        $user_type = auth()->user()->journalType($user_id);
         if($user_type == 'Admin'){
             return $next($request);
         }

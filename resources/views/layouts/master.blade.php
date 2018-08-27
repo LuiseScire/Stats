@@ -277,7 +277,7 @@
             <ul class="nav navbar-nav navbar-top-links navbar-right">
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="fa fa-user fa-fw"></i>{{ Auth::user()->name }} <i class="fa fa-caret-down"></i>
+                        <i class="fa fa-user fa-fw"></i>{{ Auth::user()->name }} {{ Auth::user()->last_name }}<i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
                         <!--<li>
@@ -376,6 +376,15 @@
                                     <a href="#chartPanelText" class="link-menu"><i class="fa fa-font"></i>
                                         Texto</a>
                                 </li>
+                                <li id="liMenuChartRole" style="display: none">
+                                    <a href="#chartPanelRoles" class="link-menu"><i class="fa fa-users"
+                                                                                     style="color: #555e81"></i>
+                                        Roles</a>
+                                </li>
+                                <li id="liMenuChartGender" style="display: none">
+                                    <a href="#chartPanelGenders" class="link-menu"><i class="fa fa-transgender" style="color: #00adc1"></i>
+                                        Géneros</a>
+                                </li>
                                 <!--<li>
                                   <a href="#totalDownloadsPanel" class="link-menu"><i class="fa fa-bar-chart"></i> Descargas Totales</a>
                                 </li>
@@ -392,13 +401,15 @@
                             <a href="#"><i class="fa fa-bar-chart"></i> Estadísticas<span class="fa arrow"></span></a>
                             <ul id="menuOptionChartsContent" class="nav nav-second-level"></ul>
                         </li>
-                        @if(Auth::user()->journal_type == 'Admin')
-                        <li>
-                            <a href="{{ url('users') }}">
-                                <i class="fa fa-users" style="color: #A41C1E;"></i>
-                                <span data-lang="menu-opt-users">Usuarios</span>
-                            </a>
-                        </li>
+                        @if(Auth::user()->user_type != 'Admin')
+                            @if(Auth::user()->journalType(Auth::id()) == 'Admin')
+                            <!-- <li>
+                                <a href="{{ url('users') }}">
+                                    <i class="fa fa-users" style="color: #A41C1E;"></i>
+                                    <span data-lang="menu-opt-users">Usuarios</span>
+                                </a>
+                            </li> -->
+                            @endif
                         @endif
                     </ul>
                 </div>

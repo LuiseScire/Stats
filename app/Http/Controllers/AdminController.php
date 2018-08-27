@@ -53,6 +53,29 @@ class AdminController extends Controller
                     ['journal', $journal]
                 ])->get();
                 break;
+            case 'delete':
+                $user_journal = $request->userJournal;
+                $id = $request->id;
+
+                switch ($user_journal) {
+                    case 'user':
+                        $user = $user_db->where('id', $id)->update(['status' => 'Deleted']);
+                        if($user){
+                            $response = array('status' => 'success');
+                        } else {
+                            $response = array('status' => 'error');
+                        }
+                        break;
+                    case 'journal':
+                        $journal = $journal_db->where('jnal_id', $id)->update(['jnal_status' => 'Deleted']);
+                        if($journal){
+                            $response = array('status' => 'success');
+                        } else {
+                            $response = array('status' => 'error');
+                        }
+                        break;
+                }
+                break;
         }
 
         return response()->json($response);
@@ -66,6 +89,9 @@ class AdminController extends Controller
         $journal_users_db = new JournalUser();
 
         #Request
+
+        $register_type = $request->registerType;
+
         $email = $request->userEmail;
         $data = array('email' => $email);
 
@@ -73,7 +99,7 @@ class AdminController extends Controller
         $username_l = $request->userLastName;
         $password = $request->userPassword;
 
-        $academic_d = $request->userAcademicDegree;
+        $academic_d = ($request->userAcademicDegree != '---') ? $request->userAcademicDegree : 8;
 
         $ascription = $request->userAscription;
         $journal_name = $request->userJournalName;
@@ -93,12 +119,23 @@ class AdminController extends Controller
 
         if (!$validator->fails()){
             //All OK
-            $newJournal = $journal_db->create([
-                'jnal_name' => $journal_name,
-                'jnal_phone' => $journal_phone,
-                'jnal_pack_plan'  => 1,
-                'jnal_total_users' => 1,
-            ]);
+            if($register_type == 'journal') {
+                $newJournal = $journal_db->create([
+                    'jnal_name' => $journal_name,
+                    'jnal_phone' => $journal_phone,
+                    'jnal_pack_plan'  => 1,
+                    'jnal_total_users' => 1,
+                ]);
+                $jounal_id = $newJournal->id;
+                $user_type = 'Journal';
+            } else {
+                $newJournal = true;
+                $jounal_id = $request->journalId;
+                $user_type = 'User';
+                $jnal_data = $journal_db->where('jnal_id', $jounal_id)->select('jnal_total_users')->first();
+                $jnal_total_users = $jnal_data->jnal_total_users;
+
+            }
 
             if($newJournal){
                 $newUser = $user_db->create([
@@ -107,12 +144,26 @@ class AdminController extends Controller
                     'email' => $email,
                     'password' => Hash::make($password),
                     'user_type' => 'Journal',
-                    'journal' => $newJournal->id,
+                    'journal' => $jounal_id,
                     'lang' => $lang
                 ]);
 
                 if($newUser) {
-                    $setDataJournal = $journal_users_db->create([
+                    if($register_type == 'journal') {
+                        $journal_db->where([
+                            ['jnal_id', $jounal_id],
+                        ])->update([
+                            'jnal_user_admin' => $jounal_id,
+                        ]);
+                    } else {
+                        $journal_db->where([
+                            ['jnal_id', $jounal_id],
+                        ])->update([
+                            'jnal_total_users' => $jnal_total_users + 1,
+                        ]);
+                    }
+
+                    $setDataJournalUsers = $journal_users_db->create([
                         'jnals_academic_degree' => $academic_d,
                         'jnals_adscripcion' => $ascription,
                         'jnals_phone' => $phone,
@@ -122,7 +173,7 @@ class AdminController extends Controller
                         'jnals_user_id' => $newUser->id
                     ]);
 
-                    if($setDataJournal){
+                    if($setDataJournalUsers){
                         $response = array(
                             'status' => 'success',
                             'message' => 'Usuario registrado satisfactoriamente',

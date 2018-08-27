@@ -17,7 +17,6 @@ function getAllUsers(){
 
         var countUsers = 0;
         $.each(response.allUsers, function(index, v) {
-
             var id =  v.id;
 
             if(id != auth_id){
@@ -29,7 +28,7 @@ function getAllUsers(){
                     'academicDegree' : v.jnals_academic_degree,
                     'userType' : v.user_type,
                     'city': v.city,
-                    'journalType': v.journal_type,
+                    'journalType': v.jnals_user_type,
                     'country': v.jnals_country,
                     'state': v.jnals_state,
                     'city': v.jnals_city,

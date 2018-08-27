@@ -35,7 +35,7 @@
     </div>
 
     <div id="noFiles" style="display: none" class="alert alert-warning text-center" role="alert">
-        Aún no has subido ningún archivo.
+        Aún no ha subido ningún archivo.
     </div>
 
     <div class="row">
@@ -61,13 +61,13 @@
                                     <span data-lang="panel-heading-last-title">indica las siguientes</span>
                                     <strong class="typeReportPanels" style="color:#72777a"></strong>
                                 </h4>
-                                <div id="panelsHeading" class="row" style="display: none">
-                                    <div class="col-lg-4 col-md-4">
+                                <div id="panelsHeading" class="row">
+                                    <!-- <div class="col-lg-4 col-md-4">
                                         <div class="panel panel-primary">
                                             <div class="panel-heading">
                                                 <div class="row">
                                                     <div id="panelTotalIcon" class="col-xs-4">
-                                                        <!--<i class="fa fa-circle fa-5x"></i>-->
+
                                                     </div>
                                                     <div class="col-xs-8 text-right">
                                                         <div id="panelTotals" class="huge"></div>
@@ -127,24 +127,9 @@
                                                 </div>
                                             </a>
                                         </div>
-                                    </div>
+                                    </div> -->
 
-                                    <div class="col-md-12">
-                                        <h4 data-lang="graphic-again">Graficar de nuevo</h4>
-                                        <div id="itemFile" class="media">
-                                           <div class="media-left">
-                                               <a href="javascript:void(0)" class="csv-file-item seeAgain" data-csvname="">
-                                                  <img class="media-object" src="{{ asset('images/csv-file-primary-color.svg') }}" alt="icon" width="64px" height="64px">
-                                              </a>
-                                           </div>
-                                           <div class="media-body" style="color: #E05740">
-                                             <h4 class="media-heading csv-file-item fileNamePanels seeAgain" style="color: #A41C1E; cursor: pointer" data-csvname=""></h4>
-                                             <span class="fa fa- fa-lg pull-right" style="cursor: pointer"></span><span class="pull-right"></span>
-                                             <span class="typeReportPanels"></span>
-                                             <br><small style="color: #72777a"></small>
-                                           </div>
-                                        </div>
-                                    </div>
+
                                     <!--<div class="col-lg-3 col-md-6">
                                       <div class="panel panel-red">
                                         <div class="panel-heading">
@@ -164,6 +149,23 @@
 
                                 </div>
                                 <!--end panel heading-->
+
+                                <div class="col-md-12" id="graphicAgainPanel" style="display:none">
+                                    <h4 data-lang="graphic-again">Graficar de nuevo</h4>
+                                    <div id="itemFile" class="media">
+                                       <div class="media-left">
+                                           <a href="javascript:void(0)" class="csv-file-item seeAgain" data-csvname="">
+                                              <img class="media-object" src="{{ asset('images/csv-file-primary-color.svg') }}" alt="icon" width="64px" height="64px">
+                                          </a>
+                                       </div>
+                                       <div class="media-body" style="color: #E05740">
+                                         <h4 class="media-heading csv-file-item fileNamePanels seeAgain" style="color: #A41C1E; cursor: pointer" data-csvname=""></h4>
+                                         <span class="fa fa- fa-lg pull-right" style="cursor: pointer"></span><span class="pull-right"></span>
+                                         <span class="typeReportPanels"></span>
+                                         <br><small style="color: #72777a"></small>
+                                       </div>
+                                    </div>
+                                </div>
 
                                 <!--<div id="cloudWords" style="width:100%; height: 50%;"></div>-->
 
@@ -223,7 +225,6 @@
                                 <h3 data-lang="panel-heading-historical-title">Historial de Archivos</h3>
                                 <div id="noFiles" style="display: none">
                                     <div class="alert alert-warning text-center" role="alert">
-                                        <span>Aún no has subido ningún archivo.</span>
                                         <a href="javascript:void(0)">
                                             <button class="btn btn-danger btn-xs" onclick="starInputFile()"><i
                                                         class="fa fa-folder-open"></i> Explorar Archivos
@@ -266,6 +267,9 @@
                         <option value="2">Descargas de Archivo del número</option>
                         <option value="3">Visitas a la página de la tabla de contenidos del número</option>
                         <option value="4">Visitas a la página principal de la revista</option>
+                        @if(Auth::id() == 1)
+                        <option value="5">Módulo para usuarios/as XML</option>
+                        @endif
                     </select>
                 </div>
                 <div class="modal-footer">

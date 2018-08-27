@@ -1,6 +1,4 @@
-/*$(window).on('load', function(){
-    fadeOutLoader();
-});*/
+
 
 //config required for each views
 var displayDateES, displayDateEN, translate = [];
@@ -38,7 +36,12 @@ var globalTypeReport, globalTypeReportAllowed;
 
 var preViewTable;
 
+// guarda los indices del tipo de gráfica que se mostrará
 var indexArray = [];
+// guarda los indices extra del tipo de gráfica que se mostrará
+//por ejemplo 'usuarios' del tipo de gráfica 'Roles'
+var indexArrayRole = [];
+
 /*end uploadcsv*/
 
 var totalFiles = 0;
@@ -54,7 +57,13 @@ $(document).ready(function(){
     }, 500);*/
     validateExistFiles();
 });
+/*=============================================================
+==================== [ H I S T O R I A L ] ====================
+=============================================================*/
 
+/*========================================
+Validar si el usuario ha subido documentos
+========================================*/
 function validateExistFiles(){
   var data = {'_token': CSRF_TOKEN};
   $.ajax({
@@ -63,18 +72,17 @@ function validateExistFiles(){
     data: data,
     dataType: "JSON",
     success: function(response){
-      //console.log(response.csvDBList);
       var count = 0;
 
-      $.each(response.csvList, function(index, v) {
-          var csvId = v.csv_id;
-          var csvName = v.csv_front_name;
-          var csvDBName = v.csv_back_name;
-          var csvPath = v.csv_path;
-          var csvStatus = v.csv_status;
-          var csvVersion = v.csv_version;
-          var csvTimestamp = v.csv_timestamp;
-          var csvTypeReport = v.csv_type_report;
+      $.each(response.filesList, function(index, v) {
+          var csvId = v.file_id;
+          var csvName = v.file_front_name;
+          var csvDBName = v.file_back_name;
+          var csvPath = v.file_path;
+          var csvStatus = v.file_status;
+          var csvVersion = v.file_version;
+          var csvTimestamp = v.file_timestamp;
+          var csvTypeReport = v.file_report_name;
 
           var fileName;
 
@@ -107,89 +115,236 @@ function validateExistFiles(){
 
       if(count > 0){
           totalFiles = count;
-          var lastElement = response.csvList[0];
-          var typeReport = lastElement.csv_type_report_index;
-          var getCsvFile = '/public'+lastElement.csv_path;
-          var fileName = lastElement.csv_back_name;
-          var _fileName = lastElement.csv_front_name;
-          var csvTypeReport = lastElement.csv_type_report;
+          var lastElement = response.filesList[0];
+          var typeReport = lastElement.file_report_index;
+          var getCsvFile = '/public'+lastElement.file_path;
+          var fileName = lastElement.file_back_name;
+          var _fileName = lastElement.file_front_name;
+          var csvTypeReport = lastElement.file_report_name;
 
           $('.fileNamePanels').text(_fileName);
           $('.typeReportPanels').text(csvTypeReport);
           $('.seeAgain').data('csvname', fileName);
+
 
           //getCsv(getCsvFile, typeReport, fileName);
 		  var typeReport = 0,
 		  	  totals = 0,
 			  countCountries = 0,
 			  mainCountry = '';
-		  var v = response.lastCsvFileData;
 
-		  typeReport = v.last_type;
-		  totals = v.last_block_one;
-		  countCountries = v.last_block_two;
-		  mainCountry = v.last_block_three
+		  var v = response.lastFileData;
 
-		  switch (typeReport){
-              case 'Descargas':
-                  totalsIcon = '<i class="fa fa-download fa-5x"></i>';
-                  break;
-              case 'Visitas':
-                  totalsIcon = '<i class="fa fa-eye fa-5x"></i>';
-                  break;
-          }
+          createHeaderBlocks(v, fileName);
 
-          $('#panelTotalIcon').html(totalsIcon);
-          $('#panelTotals').text(abbreviateNumber(totals));
-          $('#panelTotalsText').text(typeReport);
-
-		  $('#panelCountries').html(' En ' + countCountries);
-
-		  var mcountry = mainCountry.split(',');
-		  nameCountry = mcountry[0];
-		  totalsCountry = mcountry[1];
-          //nameCountry = (mainCountry.name.length > 8) ? mainCountry.code : nameCountry;
-          var totls = $.number(totalsCountry);
-
-          $('#panelMainCountry').text(nameCountry);
-          $('#panelMainCountryText').text('Con '+totls+' '+typeReport);
-		  $("#panelsHeading").css('display', 'block');
-          $('#panelTotalsDetails, #panelCountriesDetails, #panelMainCountryDetails').attr('href', 'estadisticas/archivo/'+fileName);
-
-          $("#csvListContent").css('display', 'none');
-          $('#tabHistory').show();
-          $('#segunInfo').css('display', 'block');
-        //$("#noFiles").css('display', 'block');
-		fadeOutLoader();
+          $('#tabHistory, #graphicAgainPanel').show();
+          fadeOutLoader();
       } else {
-        $("#noFiles, #uploadFilesContent").css('display', 'block');
-        fadeOutLoader();
+          $("#noFiles, #uploadFilesContent").css('display', 'block');
+          $('#btnGlobalOpenFile').hide();
+          fadeOutLoader();
       }
     }
   });
 }
 
+function isThereFiles(){
+
+}
+
+/*========================================
+En el caso de que existan documentos verifica
+qué tipo de reporte es para general la información
+de los bloques de colores
+========================================*/
+function createHeaderBlocks(v, fileName) {
+    var showBlockOne = 0,
+        showBlockTwo = 0,
+        showBlockThree = 0;
+
+    var blocks = '';
+
+    var typeReport = v.last_type,
+        block_one = v.last_block_one,
+        block_two = v.last_block_two,
+        block_three = v.last_block_three;
+
+
+    var totalsIcon = '',
+        blockTwoIcon = '',
+        dataBlockTwo,
+        dataTextBlockTwo,
+        dataBlockThree,
+        dataTextBlockThree;
+
+    switch (typeReport){
+        case 'Descargas':
+            totalsIcon = '<i class="fa fa-download fa-5x"></i>';
+            showBlockOne = 1;
+
+            blockTwoIcon = '<i class="fa fa-globe fa-5x"></i>';
+            dataBlockTwo = 'En ' + block_two;
+            dataTextBlockTwo = 'Países';
+            showBlockTwo = 1;
+
+
+            var mcountry = block_three.split(',');
+            nameCountry = mcountry[0];
+            totalsCountry = mcountry[1];
+
+            var totls = $.number(totalsCountry);
+
+            dataBlockThree = nameCountry;
+            dataTextBlockThree = 'Con '+totls+' '+typeReport;
+            showBlockThree = 1;
+
+            break;
+        case 'Visitas':
+            totalsIcon = '<i class="fa fa-eye fa-5x"></i>';
+            showBlockOne = 1;
+
+            blockTwoIcon = '<i class="fa fa-globe fa-5x"></i>';
+            dataBlockTwo = 'En ' + block_two;
+            dataTextBlockTwo = 'Países';
+            showBlockTwo = 1;
+
+            var mcountry = block_three.split(',');
+            nameCountry = mcountry[0];
+            totalsCountry = mcountry[1];
+
+            var totls = $.number(totalsCountry);
+
+            dataBlockThree = nameCountry;
+            dataTextBlockThree = 'Con '+totls+' '+typeReport;
+            showBlockThree = 1;
+
+            break;
+        case 'Usuarios':
+            showBlockOne = 1;
+            totalsIcon = '<i class="fa fa-users fa-5x"></i>';
+
+            blockTwoIcon = '<i class="fa fa-user fa-5x"></i>';
+            dataBlockTwo = block_two;
+            dataTextBlockTwo = 'Tipos de usuarios';
+            showBlockTwo = 1;
+            break;
+    }
+
+
+    if(showBlockOne){
+        blocks = '<div class="col-lg-4 col-md-4">'+
+                    '<div class="panel panel-primary">'+
+                        '<div class="panel-heading">'+
+                            '<div class="row">'+
+                                '<div id="panelTotalIcon" class="col-xs-4">'+
+                                     totalsIcon +
+                                '</div>'+
+                                '<div class="col-xs-8 text-right">'+
+                                    '<div id="panelTotals" class="huge">'+abbreviateNumber(block_one)+'</div>'+
+                                    '<div id="panelTotalsText">'+typeReport+'</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                        '<a id="panelTotalsDetails" href="estadisticas/archivo/'+fileName+'">'+
+                            '<div class="panel-footer">'+
+                                '<span class="pull-left" data-lang="panel-view-details">Ver Detalles</span>'+
+                                '<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>'+
+                                '<div class="clearfix"></div>'+
+                            '</div>'+
+                        '</a>'+
+                    '</div>'+
+                '</div>';
+    }
+
+    if(showBlockTwo) {
+        blocks += '<div class="col-lg-4 col-md-4">'+
+                    '<div class="panel panel-green">'+
+                        '<div class="panel-heading">'+
+                            '<div class="row">'+
+                                '<div class="col-xs-4">'+
+                                    blockTwoIcon +
+                                '</div>'+
+                                '<div class="col-xs-8 text-right">'+
+                                    '<div id="panelCountries" class="huge">'+dataBlockTwo+'</div>'+
+                                    '<div>'+dataTextBlockTwo+'</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                        '<a id="panelCountriesDetails" href="estadisticas/archivo/'+fileName+'">'+
+                            '<div class="panel-footer">'+
+                                '<span class="pull-left" data-lang="panel-view-details">Ver Detalles</span>'+
+                                '<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>'+
+                                '<div class="clearfix"></div>'+
+                            '</div>'+
+                        '</a>'+
+                    '</div>'+
+                '</div>';
+    }
+
+    if(showBlockThree){
+        blocks += '<div class="col-lg-4 col-md-4">'+
+                    '<div class="panel panel-yellow">'+
+                        '<div class="panel-heading">'+
+                            '<div class="row">'+
+                                '<div class="col-xs-4">'+
+                                    '<i class="fa fa-line-chart fa-5x"></i>'+
+                                '</div>'+
+                                '<div class="col-xs-8 text-right">'+
+                                    '<div id="panelMainCountry" class="huge">'+dataBlockThree+'</div>'+
+                                    '<div id="panelMainCountryText">'+dataTextBlockThree+'</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'+
+                        '<a id="panelMainCountryDetails" href="estadisticas/archivo/'+fileName+'">'+
+                            '<div class="panel-footer">'+
+                                '<span class="pull-left" data-lang="panel-view-details">Ver Detalles</span>'+
+                                '<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>'+
+                                '<div class="clearfix"></div>'+
+                            '</div>'+
+                        '</a>'+
+                    '</div>'+
+                '</div>';
+    }
+
+    $('#segunInfo').css('display', 'block');
+    $('#panelsHeading').append(blocks);
+    $('#tabHistory, #graphicAgainPanel').show();
+}
+
+/*========================================
+Direcciona a la página
+"http://stats.escire.net/estadisticas/archivo/<nombre del archivo del servidor>"
+para generar gráficas
+========================================*/
 $(document).on('click', '.csv-file-item', function() {
     var fileName = $(this).data('csvname');
     location.href = 'estadisticas/archivo/' + fileName;
 });
 
-function deleteItem(csvId, fileName) {
-    var data = {'_token': CSRF_TOKEN, 'case':'delete', 'csv_id': csvId};
+
+/*========================================
+Elimina un documento
+(solamente cambia el status del registro a "deleted" en la bd)
+========================================*/
+function deleteItem(fileId, fileName) {
+    var data = {'_token': CSRF_TOKEN, 'switchCase':'delete', 'fileId': fileId};
 
     var _confirm = confirm("¿Está seguro que desea eliminar '"+fileName+"'?");
     if(_confirm) {
-        $.post('listcsvfiles', data, function(response) {
+        $.post('files', data, function(response) {
             var status = response.status;
             var message = response.message;
 
             if(status == "success") {
-                $("#itemFile"+csvId).slideUp("slow");
+                $("#itemFile"+fileId).slideUp("slow");
                 totalFiles = totalFiles - 1;
                 if(totalFiles == 0) {
                     $("#noFiles").css('display', 'block');
+                    $("#noFiles, #uploadFilesContent").css('display', 'block');
+                    $('#tabHome').click();
+                    $('#segunInfo, #panelsHeading, #tabHistory, #graphicAgainPanel, #btnGlobalOpenFile').css('display', 'none');
+                    fadeOutLoader();
                 }
-
             }
 
             if(status == "error") {
@@ -198,6 +353,9 @@ function deleteItem(csvId, fileName) {
         });
     }
 }
+
+
+
 
 function getCsv(getCsvFile, typeReport, fileName) {
     var headers = [];
@@ -246,6 +404,7 @@ function getCsv(getCsvFile, typeReport, fileName) {
         });
 
         // **************************************/
+        totalsIcon = '';
         switch (typeReport){
             case 0:
             case 2:
@@ -257,10 +416,13 @@ function getCsv(getCsvFile, typeReport, fileName) {
             case 4:
                 typeReport = "Visitas";
                 totalsIcon = '<i class="fa fa-eye fa-5x"></i>';
+            case 5:
+                typeReport = '';
+                totalsIcon = '';
                 break;
         }
 
-        $('#panelTotalIcon').html(totalsIcon);
+        $('#panelTotalIcon').html();
         $('#panelTotals').text(abbreviateNumber(totals));
         $('#panelTotalsText').text(typeReport);
 
@@ -296,13 +458,17 @@ function getCsv(getCsvFile, typeReport, fileName) {
     });//end d3.text()
 }
 
-/*uploadcsv*/
+/*=============================================================
+============== [ S U B I R    A R C H I V O S ] ===============
+=============================================================*/
 $('#btnGlobalOpenFile').click(function () {
     $('#tabHome').click();
 	starInputFile();
-
 });
 
+/*========================================
+solicita seleccione el tipo de reporte
+========================================*/
 function starInputFile(){
 	if(changeFile == 0){
         $('#typeReportModal').modal({
@@ -316,57 +482,89 @@ function starInputFile(){
 
 }
 
+/*========================================
+valida el tipo de reporte seleccionado
+========================================*/
 $('#continueSelectFile').click(function () {
-    globalTypeReportAllowed = $("#selectReportType").val();
+    globalTypeReportAllowed = parseInt($("#selectReportType").val());
     globalTypeReport = $("#selectReportType :selected").text();
 
     if(!isNaN(globalTypeReportAllowed)){
+        switch (globalTypeReportAllowed) {
+            case 5:
+                $('#csvFile').attr("accept", "").attr("accept", "text/xml");
+                break;
+            default:
+                $('#csvFile').attr("accept", "").attr("accept", "text/csv");
+                break;
+        }
     	$('#csvFile').click();
     } else {
     	alert(translate.continueSelectFile);
 	}
 });
 
+/*========================================
+valida el tipo de archivo seleccionado
+========================================*/
 $("#csvFile").change(function() {
 	$('#typeReportModal').find('button.close').click();
 	var _this = $(this),
 		file = this.files[0],
-		match = ['text/csv'],
-		fileSize, messageError;
+		match = ['text/csv', 'text/xml'],
+		fileSize,
+        fileType,
+        messageError;
 
-		var size = (1024 * 1024) * 3;
+	var size = (1024 * 1024) * 3;
 
-		if(_this.val() != ''){
-			if(file.type == match[0]){
-                fileName = file.name;
-                csvFile = file;
-				if(file.size > size){
-                    fileSizeExceeded = 1;
-					var _confirm = confirm(translate.fileExceedsLegend);
-					if(_confirm) {
-                        subirCsv();
-					}
-				} else {
-                    subirCsv();
+	if(_this.val() != ''){
+		if(file.type == match[0] || file.type == match[1]){
+            fileName = file.name;
+            csvFile = file;
+
+            switch (file.type) {
+                case match[0]:
+                    fileType = 'csv';
+                    break;
+                case match[1]:
+                    fileType = 'xml';
+                    break;
+                default:
+            }
+
+			if(file.size > size){
+                fileSizeExceeded = 1;
+				var _confirm = confirm(translate.fileExceedsLegend);
+				if(_confirm) {
+                    subirCsv(fileType);
 				}
-
 			} else {
-			  alert(translate.fileNotAllowed);
-			  _this.val('');
+                subirCsv(fileType);
 			}
+
+		} else {
+		  alert(translate.fileNotAllowed);
+		  _this.val('');
 		}
+	}
 });
 
-function subirCsv() {
+
+/*========================================
+Procesa la subida del archivo a una carpeta temporal
+========================================*/
+function subirCsv(fileType) {
 	var formData = new FormData();
 
 	formData.append('_token', CSRF_TOKEN);
-	formData.append('csvFile', csvFile);
-	formData.append('action', 'uploadPreview');
+	formData.append('file', csvFile);
+	formData.append('switchCase', 'upload');
 	formData.append('message', 'hello');
 	formData.append('deleteExist', deleteExist);
+    formData.append('fileType', fileType);
 
-	$('#history, #noFiles, #panelsHeading, #segunInfo').css('display', 'none');
+	$('#history, #noFiles, #panelsHeading, #segunInfo, #graphicAgainPanel').css('display', 'none');
 
     if(changeFile == 1){
         $("#uploadProgressBar").css("width","0%");
@@ -374,7 +572,7 @@ function subirCsv() {
 	}
 
 	$.ajax({
-		url: 'uploadcsv',
+		url: 'files',
 		method: 'POST',
 		enctype: 'multipart/form-data',
 		data: formData,
@@ -416,7 +614,17 @@ function subirCsv() {
 
 				setTimeout(function() {
                     $("#progressBarContent").css('display', 'none');
-					processPreview();
+                    switch (fileType) {
+                        case 'csv':
+                            processPreview();
+                            break;
+                        case 'xml':
+                            processPreviewXML();
+                            break;
+                        default:
+
+                    }
+
 				}, 2000);
 
 			}
@@ -425,6 +633,86 @@ function subirCsv() {
 
 	});
 }
+
+// function subirCsv(fileType) {
+// 	var formData = new FormData();
+//
+// 	formData.append('_token', CSRF_TOKEN);
+// 	formData.append('csvile', csvFile);
+// 	formData.append('action', 'uploadPreview');
+// 	formData.append('message', 'hello');
+// 	formData.append('deleteExist', deleteExist);
+//     formData.append('fileType', fileType);
+//
+// 	$('#history, #noFiles, #panelsHeading, #segunInfo').css('display', 'none');
+//
+//     if(changeFile == 1){
+//         $("#uploadProgressBar").css("width","0%");
+//         $('#preView, #loadPreviewText, #confirmFileContent').css('display', 'none');
+// 	}
+//
+// 	$.ajax({
+// 		url: 'uploadcsv',
+// 		method: 'POST',
+// 		enctype: 'multipart/form-data',
+// 		data: formData,
+// 		cache: false,
+// 		contentType: false,
+// 		processData: false,
+// 		xhr: function() {
+// 			var xhr = new window.XMLHttpRequest();
+// 			xhr.upload.addEventListener('progress',
+// 				uploadProgressHandler,
+// 				false
+// 			);
+//
+// 			xhr.addEventListener('load', loadHandler, false);
+// 			xhr.addEventListener('error', errorHandler, false);
+// 			xhr.addEventListener('abort', abortHandler, false);
+//
+// 			return xhr;
+// 		},
+// 		success: function(response){
+// 			if(response.status == 'success'){
+// 				fileNameConfirmed = fileName;
+// 				storageFileName = response.storageFileName;
+//
+// 				fadeInLoader();
+//
+// 				if($("#loadPreviewText").hasClass('alert-info')){
+// 					$("#loadPreviewText").removeClass('alert-info').addClass('alert-warning').html("Cargando vista previa del archivo");
+// 				}
+//
+// 				if(changeFile == 1) {
+// 					$("#cambiarArchivo").attr('disabled', 'disabled');
+// 					$("#uploadFileConfirmed").attr('disabled', 'disabled');
+// 					preViewTable.destroy();
+// 					$('#preViewTable').empty();
+// 				}
+//
+// 				$("#loadPreviewText").show();
+//
+// 				setTimeout(function() {
+//                     $("#progressBarContent").css('display', 'none');
+//                     switch (fileType) {
+//                         case 'csv':
+//                             processPreview();
+//                             break;
+//                         case 'xml':
+//                             processPreviewXML();
+//                             break;
+//                         default:
+//
+//                     }
+//
+// 				}, 2000);
+//
+// 			}
+// 			if(response.status == "error") alert(response.message);
+// 		}
+//
+// 	});
+// }
 
 function uploadProgressHandler(event) {
   var percent = (event.loaded / event.total) * 100;
@@ -456,12 +744,123 @@ function abortHandler(event) {
 	location.reload();
 }
 
+/*========================================
+una vez subido el archivo lo recupera del
+servidor para leer la información
+========================================*/
+
 var globalTotals = 0;
 var globalNameCountry = '';
 var globalTotalsMainCountry = 0;
 var globalCountCountries = 0;
+var globalBlockTwo = 0;
+
+function processPreviewXML(){
+    var url = "/public/files/tmp/" + storageFileName;
+	var dataSet = [];
+	var indices = 0;
+    var extraIndices = 0;
+
+    var data = {'_token': CSRF_TOKEN, 'fileName': storageFileName};
+    var headers = ['País','Géneros','Roles'];
+    var rolesArray = [];
+
+    $.post('readxml', data, function(response){
+        $.each(response, function(index, v){
+            var data = [];
+            data[0] = v.username;
+            data[1] = v.email;
+            data[2] = v.country;
+            data[3] = v.gender;
+
+            var roles = '';
+
+            $.each(v.roles, function(index, v){
+                var existValue = 0;
+                for (i in rolesArray){
+                    if(rolesArray[i] == v){
+                        existValue = 1;
+                    }
+                }
+                if(existValue == 0){
+                    rolesArray.push(v);
+                }
+                roles += v + ', ';
+                globalTotals = globalTotals + 1;
+            });
+
+            roles = roles.slice(0,-2);
+            data[4] = roles;
+
+            dataSet.push(data);
+        });
+
+        var checkboxTitles = "";
+        for(var i in headers){
+            var title = headers[i];
+            checkboxTitles += '<label class="checkbox-inline"><input type="checkbox" name="indices[]" data-index="'+indices+'" data-typegraph="'+title+'" value="'+title+'">'+title+'</label>';
+            indices++;
+		}
+        globalBlockTwo = indices;
+
+        var alertContent = '<p><strong data-lang="show-graph-legend">'+translate.showGraphLegend+'</strong></p>';
+        alertContent += checkboxTitles;
+
+        alertContent += '<div style="display:none" id="showRoles"><p><strong>Tipos de usuarios</strong></p>';
+
+        var checkboxRoles = "";
+        for(var i in rolesArray){
+            var title = rolesArray[i];
+            checkboxRoles += '<label class="checkbox-inline"><input type="checkbox" name="extraIndices[]" data-index="'+extraIndices+'" value="'+title+'">'+title+'</label>';
+            extraIndices++;
+		}
+        alertContent += checkboxRoles;
+        alertContent += '</div>';
+
+        if(fileSizeExceeded){
+            alertContent += '<p style="color: darkred" data-lang="file-exceeds-legend">'+translate.fileExceedsLegend+'</p>';
+		}
+
+        alertContent += '<p><button id="uploadFileConfirmed" class="btn btn-primary btn-xs" data-lang="modal-continue-btn" data-filetype="xml">Continuar <i class="fa fa-arrow-right"></i> </button></p>';
+
+        $("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html(alertContent);
+
+		dataTableLangeURL = (currentLang == 'es')
+		? "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+		: '//cdn.datatables.net/plug-ins/1.10.19/i18n/English.json';
+
+        preViewTable = $('#preViewTable').DataTable({
+            columns: [
+                {'title': 'Nombre de usuario'},
+                {'title': 'Correo electrónico'},
+                {'title': 'País'},
+                {'title': 'Género'},
+                {'title': 'Rol(es)'}
+            ],
+            data : dataSet,
+            responsive: true,
+            "ordering": false,
+            "language": {
+                "url": dataTableLangeURL
+            },
+            "lengthMenu": [[50, 25], [50, 25]]
+        });
+
+        $("#confirmFileContent").show();
+        $("#strongFileName").text(fileNameConfirmed);
+
+        if(changeFile == 1) {
+            $("#cambiarArchivo").removeAttr('disabled');
+            $("#uploadFileConfirmed").removeAttr('disabled');
+        }
+
+        $("#preView").show();
+        fadeOutLoader();
+    });
+}
+
 function processPreview(){
-	var url = "/public/csvfiles/tmp/" + storageFileName;
+	var url = "/public/files/tmp/" + storageFileName;
 	var dataSet = [];
 	var indices = 0;
 
@@ -504,7 +903,6 @@ function processPreview(){
                         } else {
                             if(country == v.code) {
                                 v.downloads = v.downloads + totals;
-
                             }
                         }
                     });
@@ -536,12 +934,11 @@ function processPreview(){
         for(var i in headers){
             var title = headers[i];
             if(title != 'Tipo' && title != 'Revista') {
-                checkboxTitles += '<label class="checkbox-inline"><input type="checkbox" name="indices[]" data-index="'+indices+'" value="'+title+'">'+title+'</label>';
+                checkboxTitles += '<label class="checkbox-inline"><input type="checkbox" name="indices[]" data-index="'+indices+'"  data-typegraph="'+title+'" value="'+title+'">'+title+'</label>';
 			}
             indices++;
             var column = {"title": title};
             columns.push(column);
-
 		}
 
         var alertContent = '<p><strong data-lang="show-graph-legend">'+translate.showGraphLegend+'</strong></p>';
@@ -551,7 +948,7 @@ function processPreview(){
             alertContent += '<p style="color: darkred" data-lang="file-exceeds-legend">'+translate.fileExceedsLegend+'</p>';
 		}
 
-        alertContent += '<p><button id="uploadFileConfirmed" class="btn btn-primary btn-xs" data-lang="modal-continue-btn">Continuar <i class="fa fa-arrow-right"></i> </button></p>';
+        alertContent += '<p><button id="uploadFileConfirmed" class="btn btn-primary btn-xs" data-lang="modal-continue-btn" data-filetype="csv">Continuar <i class="fa fa-arrow-right"></i> </button></p>';
         $("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html(alertContent);
 
         dataSet.shift();
@@ -584,57 +981,161 @@ function processPreview(){
     });
 }
 
+
+
+/*========================================
+Mueve el archivo de la carpet temporal
+y redirecciona a la vista para general las gráficas
+========================================*/
 $(document).on('click', '#uploadFileConfirmed', function (event) {
+    var foundValue = 0;
 	if(indexArray.length > 0){
-		var data = {
-			'_token': CSRF_TOKEN,
-			'action': 'moveFromTemp',
-			'fileName': fileNameConfirmed,
-			'storageFileName': storageFileName,
-			'typeReport': globalTypeReport,
-			'typeReportIndex': globalTypeReportAllowed,
-			'indexArray': indexArray
-		};
+        for(i in indexArray){
+            if(indexArray[i].v == 'Roles'){
+                foundValue = 1;
+            }
+        }
 
-		$.ajax({
-			type: "POST",
-			url: "uploadcsv",
-			data: data,
-			dataType: "JSON",
-			success: function(response){
-				if(response.status == 'success'){
+        var passes = 0;
+        if(foundValue){
+            if(indexArrayRole.length > 0){
+                passes = 1
+            } else {
+                swal(
+                    '¡Error!',
+                    'Debe seleccionar al menos un tipo de usuario',
+                    'error'
+                );
+            }
+        } else {
+            passes = 1;
+        }
 
-					var report = '';
-					switch (parseInt(globalTypeReportAllowed)){
-			            case 0:
-			            case 2:
-			                report = "Descargas";
-			                break;
-			            case 1:
-			            case 3:
-			            case 4:
-			                report = "Visitas";
-			                break;
-			        }
+        if(passes){
+            var fileType = $(this).data('filetype');
 
-					var data = {
-						'_token'	: CSRF_TOKEN,
-						'type'		: report,
-						'block_one'	: globalTotals,
-						'block_two' : globalCountCountries,
-						'block_three': globalNameCountry + ','+globalTotalsMainCountry
-					};
-					$.post('lastcsv', data, function(response) {
-						location.href = 'estadisticas/archivo/' + storageFileName;
-					});
-				}
-			}
-		});
+            var data = {
+    			'_token': CSRF_TOKEN,
+    			'switchCase': 'moveFromTemp',
+    			'fileName': fileNameConfirmed,
+    			'storageFileName': storageFileName,
+    			'typeReport': globalTypeReport,
+    			'typeReportIndex': globalTypeReportAllowed,
+    			'indexArray': indexArray,
+                'indexArrayRole': indexArrayRole,
+                'fileType': fileType,
+                'simpleTypeReport': '',
+                'block_one':'',
+                'block_two':'',
+                'block_three':'',
+    		};
+
+            var simpleTypeReport = '';
+            switch (globalTypeReportAllowed){
+                case 0:
+                case 2:
+                    data.simpleTypeReport = 'Descargas';
+                    data.block_one = globalTotals;
+                    data.block_two = globalCountCountries;
+                    data.block_three = globalNameCountry + ','+globalTotalsMainCountry;
+                    break;
+                case 1:
+                case 3:
+                case 4:
+                    data.simpleTypeReport = 'Visitas';
+                    data.block_one = globalTotals;
+                    data.block_two = globalCountCountries;
+                    data.block_three = globalNameCountry + ','+globalTotalsMainCountry;
+                    break;
+                case 5:
+                    data.simpleTypeReport = 'Usuarios';
+                    data.block_one = globalTotals;
+                    data.block_two = globalBlockTwo;
+                    data.block_three = null;
+                    break;
+            }
+
+    		$.ajax({
+    			type: "POST",
+    			url: "files",
+    			data: data,
+    			dataType: "JSON",
+    			success: function(response){
+    				if(response.status == 'success'){
+
+                        location.href = 'estadisticas/archivo/' + storageFileName;
+
+    				}
+    			}
+    		});
+        }// end pases
+
+
 
 	} else {
 		alert(translate.checkboxUnchecked);
 	}
 });
+
+
+// $(document).on('click', '#uploadFileConfirmed', function (event) {
+// 	if(indexArray.length > 0){
+//
+//         var fileType = $(this).data('filetype');
+//
+// 		var data = {
+// 			'_token': CSRF_TOKEN,
+// 			'action': 'moveFromTemp',
+// 			'fileName': fileNameConfirmed,
+// 			'storageFileName': storageFileName,
+// 			'typeReport': globalTypeReport,
+// 			'typeReportIndex': globalTypeReportAllowed,
+// 			'indexArray': indexArray,
+//             'fileType': fileType
+// 		};
+//
+// 		$.ajax({
+// 			type: "POST",
+// 			url: "files",
+// 			data: data,
+// 			dataType: "JSON",
+// 			success: function(response){
+// 				if(response.status == 'success'){
+//
+// 					var report = '';
+// 					switch (parseInt(globalTypeReportAllowed)){
+// 			            case 0:
+// 			            case 2:
+// 			                report = 'Descargas';
+// 			                break;
+// 			            case 1:
+// 			            case 3:
+// 			            case 4:
+// 			                report = 'Visitas';
+// 			                break;
+//                         case 5:
+//                             report = 'Usuarios';
+//                             break;
+// 			        }
+//
+// 					var data = {
+// 						'_token'	: CSRF_TOKEN,
+// 						'type'		: report,
+// 						'block_one'	: globalTotals,
+// 						'block_two' : globalCountCountries,
+// 						'block_three': globalNameCountry + ','+globalTotalsMainCountry
+// 					};
+// 					$.post('lastcsv', data, function(response) {
+// 						location.href = 'estadisticas/archivo/' + storageFileName;
+// 					});
+// 				}
+// 			}
+// 		});
+//
+// 	} else {
+// 		alert(translate.checkboxUnchecked);
+// 	}
+// });
 
 /*function lastcsv(){
 
@@ -646,16 +1147,25 @@ $("#cambiarArchivo").click(function(event) {
 });
 
 $(document).on("click", "input[name='indices[]']", function() {
-	var index = $(this).data("index");
-	var value = $(this).attr("value");
+	var index = $(this).data('index');
+	var value = $(this).attr('value');
+    var typeGraph = $(this).data('typegraph');
 
-	if($(this).is(":checked")){
-		var dataArrg = {"i": index, "v": value};
+	if($(this).is(':checked')){
+		var dataArrg = {'i': index, 'v': value};
 		indexArray.push(dataArrg);
+
+        if(typeGraph == 'Roles'){
+            $('#showRoles').slideDown('slow');
+        }
 	} else {
 		for(var i in indexArray){
 	      if(indexArray[i].i == index){
-	        indexArray.splice(i, 1);
+            if(indexArray[i].v == 'Roles'){
+                $('#showRoles').slideUp('slow');
+                indexArrayRole = [];
+            }
+            indexArray.splice(i, 1);
 	        break;
 	      }
 	    }
@@ -664,6 +1174,27 @@ $(document).on("click", "input[name='indices[]']", function() {
 	indexArray.sort();
 	//console.log(indexArray);
 });
+
+$(document).on('click', 'input[name="extraIndices[]"]', function(){
+    var index = $(this).data('index');
+	var value = $(this).attr('value');
+
+    if($(this).is(':checked')){
+		var dataArrg = {'i': index, 'v': value};
+		indexArrayRole.push(dataArrg);
+	} else {
+		for(var i in indexArrayRole){
+	      if(indexArrayRole[i].i == index){
+	        indexArrayRole.splice(i, 1);
+	        break;
+	      }
+	    }
+	}
+
+    indexArrayRole.sort();
+    console.log(indexArrayRole);
+});
+
 /*end uploadcsv*/
 
 /*---------------EXTRA FUNCTIONS------------------*/

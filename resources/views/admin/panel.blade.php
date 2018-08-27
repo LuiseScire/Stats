@@ -4,6 +4,12 @@
 
 @section('css')
 <link rel="stylesheet" href="{{ asset('css/views/jadmin/users.css') }}">
+<style media="screen">
+    .row-selected{
+        background-color: #A41C1E !important;
+        color: #ffffff;
+    }
+</style>
 @stop
 
 @section('sidebar')
@@ -15,8 +21,8 @@
         <div class="col-lg-12">
             <div class="address-bar-content-header">
                 <h1>
-                    <span data-lang="page-title">Inicio</span>
-                    <span id="btnGlobalOpenFile" class="btn btn-danger pull-right" data-toggle="modal" data-target="#journalRegisterModal" role="button"><i class="fa fa-user-plus"></i> <span data-lang="btn-new-journal">Registrar Revista</span></span>
+                    <span data-lang="page-title">Revistas registradas en Stats</span>
+                    <span id="btnGlobalOpenModalRegister" class="btn btn-danger pull-right" data-toggle="modal" data-target="#journalRegisterModal" role="button"><i class="fa fa-user-plus"></i> <span data-lang="btn-new-journal">Registrar Revista</span></span>
                 </h1>
                 <ol class="breadcrumb">
                     <li class="address-item"><label><i class="fa fa-home"></i> Inicio</label></li>
@@ -25,12 +31,9 @@
             </div>
         </div>
         <div class="col-md-12 col-xs-12">
-            <table class="table table-striped" id="journalsTable" style="width: 100%"></table>
+            <table class="table table-striped table-bordered" id="journalsTable" style="width: 100%"></table>
         </div>
     </div>
-
-
-
 
     <div class="modal fade" id="journalRegisterModal">
         <div class="modal-dialog ">
@@ -40,7 +43,7 @@
                     <i class="fa fa-user-plus"></i> <span data-lang='user-register-header'>Registrar Nuevo Usuario</span>
                 </div>-->
                 <div class="modal-body register-form">
-                    <h2> <i class="fa fa-user-plus"></i> Nueva Revista </h2>
+                    <h2> <i class="fa fa-user-plus"></i> <span id="modalRegisterTitle">Nueva Revista</span> </h2>
                     <p class="hint-text"><span>Campos con</span> ( <span style="font-size: 18px">*</span> ) <span>son requeridos</span></p>
                     <div class="alert alert-danger" id="registerFormAlert" style="display: none">
                         <strong>!Error¡ </strong><span id="registerFormAlertMessage"></span>
@@ -56,7 +59,7 @@
                         <div class="form-group">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-phone"></i></span>
-                                <input type="text" class="form-control" name="userJurnalPhone" placeholder="Teléfono">
+                                <input type="text" class="form-control" name="userJournalPhone" placeholder="Teléfono">
                             </div>
                         </div>
                         <br>
@@ -160,7 +163,7 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">
                         <i class="fa fa-times-circle"></i> Cerrar
                     </button>
-                    <button type="button" class="btn btn-danger" onclick="userRegister()">
+                    <button type="button" class="btn btn-danger" id="btnRegisterUserJournal" onclick="userJournalRegister(event)" data-register="journal" data-journalid="">
                         <i class="fa fa-save"></i>
                         Registrar
                     </button>
