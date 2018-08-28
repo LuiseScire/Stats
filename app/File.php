@@ -16,6 +16,7 @@ class File extends Model
         'file_back_name',
         'file_path',
         'file_user_id',
+        'file_journal_id',
         'file_version',
         'file_timestamp',
         'file_indices',

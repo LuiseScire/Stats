@@ -28,11 +28,14 @@ var changeFile = 0;
 
 //datos globales para validar si existe el documento
 var deleteExist = 0,
-		csvFile, fileName, storageFileName;
+		csvFile,
+        fileName,
+        storageFileName;
 
 var fileSizeExceeded = 0;
 
-var globalTypeReport, globalTypeReportAllowed;
+var globalTypeReport,
+    globalTypeReportAllowed;
 
 var preViewTable;
 
@@ -73,8 +76,8 @@ function validateExistFiles(){
     dataType: "JSON",
     success: function(response){
       var count = 0;
-
       $.each(response.filesList, function(index, v) {
+          console.log(v);
           var csvId = v.file_id;
           var csvName = v.file_front_name;
           var csvDBName = v.file_back_name;
@@ -83,6 +86,8 @@ function validateExistFiles(){
           var csvVersion = v.file_version;
           var csvTimestamp = v.file_timestamp;
           var csvTypeReport = v.file_report_name;
+
+          var fileUserName = v.name + ' ' + v.last_name;
 
           var fileName;
 
@@ -103,13 +108,12 @@ function validateExistFiles(){
               '          <span class="fa fa-trash fa-lg pull-right" style="cursor: pointer" onClick="deleteItem('+csvId+', '+"'"+fileName+"'"+')"></span>'+
                             csvTypeReport +
 			  '				<br>'+
-              '             <small class="date-format-es" style="color: #72777a; '+displayDateES+'">'+dateFormat(csvTimestamp, 'es') +'</small>' +
-			  '             <small class="date-format-en" style="color: #72777a; '+displayDateEN+'">'+dateFormat(csvTimestamp, 'en') +'</small>' +
+              '             <small class="date-format-es" style="color: #72777a; '+displayDateES+'">'+dateFormat(csvTimestamp, 'es', fileUserName) +'</small>' +
+			  '             <small class="date-format-en" style="color: #72777a; '+displayDateEN+'">'+dateFormat(csvTimestamp, 'en', fileUserName) +'</small>' +
               '        </div>\n' +
               '      </div>';
 
           $("#csvList").append(item);
-
           count++;
       });
 
@@ -1205,18 +1209,18 @@ function bytesToSize(bytes) {
     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 }
 
-function dateFormat(date, lang){
+function dateFormat(date, lang, fileUserName){
 	var months, dateFormat, date = new Date(date);
 	switch (lang) {
 		case 'es':
 			months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septimbre", "Octube", "Nomviembre", "Diciembre"];
-			dateFormat = 'Subido el ' + date.getDate() + ' de ' + months[date.getMonth()] + ' de ' + date.getFullYear();
+			dateFormat = 'Subido por ' + fileUserName + ' el ' + date.getDate() + ' de ' + months[date.getMonth()] + ' de ' + date.getFullYear();
 		    dateFormat += ' ' + date.toLocaleString("en-EU", { hour: "numeric", minute: "numeric", hour12: true });
 			return dateFormat;
 			break;
 		case 'en':
 			months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-			dateFormat = 'Uploaded on ' + months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+			dateFormat = 'Uploaded by ' + fileUserName + ' on ' + months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
 			dateFormat += ' ' + date.toLocaleString("en-EU", { hour: "numeric", minute: "numeric", hour12: true });
 			return dateFormat;
 			break;

@@ -48,6 +48,7 @@ class MainController extends Controller
         $last_file_db = new LastFileUploaded;
         $files_db =  new File;
         $auth_id = Auth::id();
+        $journal_id = Auth::user()->journal;
 
         $case = $request->case;
 
@@ -66,8 +67,12 @@ class MainController extends Controller
                 // $csv_list = $csv_file_db->where([['csv_user_id', $auth_id], ['csv_status', 'active']])->orderBy('csv_timestamp', 'desc')->get();
                 // $last_csv_file_data =  $last_csv_db->select()->where('last_user_id', $auth_id)->first();
 
-                $files_list = $files_db->where([['file_user_id', $auth_id], ['file_status', 'active']])->orderBy('file_timestamp', 'desc')->get();
+                $files_list = $files_db
+                    ->join('users AS U', 'files.file_user_id', '=', 'U.id')
+                    ->where([['file_journal_id', $journal_id], ['file_status', 'active']])->orderBy('file_timestamp', 'desc')->get();
+
                 $last_file_uploaded_data =  $last_file_db->select()->where('last_user_id', $auth_id)->first();
+
                 $response = array(
                     'filesList' => $files_list,
                     'lastFileData' => $last_file_uploaded_data,

@@ -43,6 +43,7 @@ var indexArray = [];//almacena los índices del documento seleccionados cuando s
 var indexArrayRoles = []
 var dataSet = [];//alamacena todos los datos parseados del csv
 var showCharts = [];
+
 $(document).ready(function() {
     $('.home-item-menu').css('display', 'none');
     $('.global-item-menu').css('display', 'block');
@@ -107,7 +108,6 @@ function getDataDB() {
                     generateArraysXML();
                     break;
             }
-
         }
     });
 }
@@ -233,10 +233,7 @@ function generateArraysXML(){
                         }
                     });
                 }
-
             }
-
-
         });
 
         $.each(usersDataSet, function(index, v) {
@@ -264,7 +261,6 @@ function generateArraysXML(){
         });
 
         switchData();
-
     });
 }
 
@@ -307,7 +303,7 @@ function generateArraysCSV() {
                         chartMonth = 1;
                         break;
                 }
-            })
+            });
         });
 
         var unusableData = 1;
