@@ -155,7 +155,7 @@
                                     <div id="itemFile" class="media">
                                        <div class="media-left">
                                            <a href="javascript:void(0)" class="csv-file-item seeAgain" data-csvname="">
-                                              <img class="media-object" src="{{ asset('images/csv-file-primary-color.svg') }}" alt="icon" width="64px" height="64px">
+                                              <img class="media-object" src="" alt="icon" width="64px" height="64px">
                                           </a>
                                        </div>
                                        <div class="media-body" style="color: #E05740">

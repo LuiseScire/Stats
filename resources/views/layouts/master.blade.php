@@ -106,16 +106,11 @@
         */
 
         @media (min-width: 481px) and (max-width: 767px) {
-
-
             footer{
                 margin: 0 !important;
                 width: 100% !important;
             }
         }
-
-
-
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script src="{{ asset('js/translate/translate.js') }}"></script>

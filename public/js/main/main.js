@@ -86,6 +86,7 @@ function validateExistFiles(){
           var csvVersion = v.file_version;
           var csvTimestamp = v.file_timestamp;
           var csvTypeReport = v.file_report_name;
+          var fileType = v.file_type;
 
           var fileUserName = v.name + ' ' + v.last_name;
 
@@ -97,10 +98,15 @@ function validateExistFiles(){
               fileName = csvName + "(" + csvVersion + ")";
           }
 
+         var iconFileSrc = (fileType == 'csv') ? '../public/images/csv-file-primary-color.svg' :
+                                                '../public/images/xml-file-primary-color.png';
+
+
           var item = '<div id="itemFile'+csvId+'" class="media">\n' +
               '        <div class="media-left">\n' +
               '          <a href="javascript:void(0)" class="csv-file-item" data-csvname="'+csvDBName+'">\n' +
-              '            <img class="media-object" src="../public/images/csv-file-primary-color.svg" alt="icon" width="64px" height="64px">\n' +
+
+              '            <img class="media-object" src="'+iconFileSrc+'" alt="icon" width="64px" height="64px">\n' +
               '          </a>\n' +
               '        </div>\n' +
               '        <div class="media-body" style="color: #E05740">\n' +
@@ -125,12 +131,17 @@ function validateExistFiles(){
           var fileName = lastElement.file_back_name;
           var _fileName = lastElement.file_front_name;
           var csvTypeReport = lastElement.file_report_name;
+          var fileType = lastElement.file_type;
 
           $('.fileNamePanels').text(_fileName);
           $('.typeReportPanels').text(csvTypeReport);
+
           $('.seeAgain').data('csvname', fileName);
+          var iconFileSrc = (fileType == 'csv') ? 'images/csv-file-primary-color.svg' :
+                                                 'images/xml-file-primary-color.png';
 
-
+          $('.seeAgain').find('img').attr('src', public_path + iconFileSrc);
+          
           //getCsv(getCsvFile, typeReport, fileName);
 		  var typeReport = 0,
 		  	  totals = 0,

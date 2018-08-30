@@ -29,8 +29,6 @@ var dataSet = [];//alamacena todos los datos parseados del csv
 var showCharts = [];
 $(document).ready(function() {
   if(fileName != 'noData'){
-
-
     $("#chartsContent").css('display', 'block');
     $("#noDataText").css('display', 'none');
     //$("#navLinkFileName").show();
@@ -1525,4 +1523,3 @@ $(".porcent").click(function() {
 
   chart.draw(data, options);
 });
-

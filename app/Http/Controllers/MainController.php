@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Authenticatable;
-use App\Csvfile;
+//use App\Csvfile;
 use App\File;
 use App\LastFileUploaded;
 use App\User;
-use App\Xmlfile;
+//use App\Xmlfile;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -44,7 +44,6 @@ class MainController extends Controller
     public function listcsvfiles(Request $request)
     {
         #Model
-        $csv_file_db = new Csvfile;
         $last_file_db = new LastFileUploaded;
         $files_db =  new File;
         $auth_id = Auth::id();
@@ -56,7 +55,7 @@ class MainController extends Controller
             case "delete":
                 //$delete = $csv_file_db->where('csv_id', $request->csv_id)->update(['csv_status', 'deleted']);
                 $csv_id = $request->csv_id;
-                $delete = $csv_file_db->where('csv_id', $csv_id)->update(['csv_status' => 'deleted']);
+                $delete = $files_db->where('file_id', $csv_id)->update(['file_status' => 'deleted']);
                 if ($delete) {
                     $response = array('status' => 'success', 'message' => 'Archivo eliminado satisfactóriamete');
                 } else {

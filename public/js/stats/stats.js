@@ -77,7 +77,16 @@ function getDataDB() {
 
             var typeReportIndex = response.filesData.file_report_index;
             var typeReport = response.filesData.file_report_name;
-            $("#titlePage").text(typeReport);
+            var fileFrontName = response.filesData.file_front_name;
+            //$("#titlePage").text(typeReport);
+
+            var iconFileSrc = (globalFileType == 'csv') ? 'images/csv-file-primary-color.svg' :
+                                                   'images/xml-file-primary-color.png';
+
+            $('.seeAgain').find('img').attr('src', public_path + iconFileSrc);
+            $('.fileNamePanels').text(fileFrontName);
+            $('.typeReportPanels').text(typeReport);
+
             /*alertContent += '<option value="0">Descargas del archivo del artículo</option>';
             alertContent += '<option value="1">Visitas a la página del resumen del artículo</option>';
             alertContent += '<option value="2">Descargas de Archivo del número</option>';
@@ -116,7 +125,10 @@ function generateArraysXML(){
     fadeOutLoader();
     var data = {'_token': CSRF_TOKEN, 'fileName': fileName, 'switchCase': 'stats'};
 
-    var usersDataSet = {};
+    //var usersDataSet = {};
+    //var usersDataSet = {'userType': '', 'totals': 0, 'national': 0, 'international': 0};
+    //var usersDataSet = {};
+    //var usersDataSet = [];
     var showOnlyGraph = [];
 
     //cabeceras del documento
@@ -152,8 +164,7 @@ function generateArraysXML(){
     $.post('../../readxml', data, function(response) {
         $.each(response, function(index, v){
             var country = v.country;
-            var gender = v.gender
-
+            var gender = v.gender;
 
             var counterRoles = 0;
             $.each(v.roles, function(index, v){
@@ -168,24 +179,21 @@ function generateArraysXML(){
                 } else {
                     if(country == v.code) {
                         v.downloads = v.downloads + counterRoles;
-
                     }
                 }
             });
-
-
 
             $.each(v.roles, function(index, v){
                 var existValue = 0,
                     existData = 0,
                     allowedType = 0;
 
-
                 for (i in headersRolesArray){
                     if(headersRolesArray[i] == v){
                         existValue = 1;
                     }
                 }
+
                 if(existValue == 0){
                     headersRolesArray.push(v);
                 }
@@ -196,16 +204,42 @@ function generateArraysXML(){
                     }
                 }
 
+                // if(allowedType){
+                //     for(var i in usersDataSet){
+                //         if(i == v){
+                //             existData = 1;
+                //             usersDataSet[i] = parseInt(usersDataSet[i]) + 1;
+                //         }
+                //     }
+                //
+                //     if(existData == 0){
+                //         usersDataSet[v] = 1;
+                //     }
+                // }
+
                 if(allowedType){
-                    for(var i in usersDataSet){
-                        if(i == v){
-                            existData = 1;
-                            usersDataSet[i] = parseInt(usersDataSet[i]) + 1;
-                        }
+                    if(country == ''){
+                        country = 'UNK';
                     }
 
-                    if(existData == 0){
-                        usersDataSet[v] = 1;
+                    if(rolesArrg.length == 0){
+                        var data = {'role': v, 'totals': 1, 'countries': Array(country)};
+                        rolesArrg.push(data);
+                    } else {
+                        $.each(rolesArrg, function(ind, val){
+                            var role = val.role
+                            var countries = val.countries;
+                            if(role == v){
+                                existData = 1;
+                                val.totals = val.totals + 1;
+                                countries.push(country);
+                            }
+                        });
+
+                        if(existData == 0) {
+                            var data = {'role': v, 'totals': 1, 'countries': Array(country)};
+                            rolesArrg.push(data);
+                        }
                     }
                 }
 
@@ -236,12 +270,13 @@ function generateArraysXML(){
             }
         });
 
-        $.each(usersDataSet, function(index, v) {
-            var userType = index;
-            var totals = v;
-            var data = {'userType': userType, 'totals': totals};
-            dataSet.push(data);
-        });
+        // $.each(usersDataSet, function(index, v) {
+        //     //console.log(v);
+        //     var userType = index;
+        //     var totals = v;
+        //     var data = {'userType': userType, 'totals': totals};
+        //     rolesArrg.push(data);
+        // });
 
         $.each(countriesObj, function(index, v) {
             var totals = parseInt(v.downloads);
@@ -1554,113 +1589,113 @@ function drawChartText() {
     chart.draw(view, options);
 }
 
-function drawChartPie() {
-    var _textArrg = textArrg.sort(dynamicSort("total"));
+// function drawChartPie() {
+//     var _textArrg = textArrg.sort(dynamicSort("total"));
+//
+//
+//     var rows = [
+//         ['Texto/Revistas', 'Totales'],
+//     ];
+//
+//     var previewLimit = 10;
+//     var countPreview = 0;
+//     $.each(_textArrg, function(index, v) {
+//         //console.log(v);
+//         color = colorHexa();
+//         var totals = v.total;
+//         var text = v.text;
+//         if(totals > 0){
+//             //console.log(v);
+//             if(countPreview < previewLimit) {
+//                 //console.log(v);
+//                 var bar = [text, totals];
+//                 rows.push(bar);
+//             }
+//             countPreview++;
+//         }
+//     });
+//
+//     var data = google.visualization.arrayToDataTable(rows);
+//
+//     var options = {
+//         title: 'Rating ' + previewLimit + ' de principales ' + globalTypeReport,
+//         is3D: true,
+//         chartArea:{left:10,top:20,width:"100%",height:"90%"}
+//     };
+//
+//     var chart = new google.visualization.PieChart(document.getElementById('chartContentText'));
+//
+//     chart.draw(data, options);
+// }
 
-
-    var rows = [
-        ['Texto/Revistas', 'Totales'],
-    ];
-
-    var previewLimit = 10;
-    var countPreview = 0;
-    $.each(_textArrg, function(index, v) {
-        //console.log(v);
-        color = colorHexa();
-        var totals = v.total;
-        var text = v.text;
-        if(totals > 0){
-            //console.log(v);
-            if(countPreview < previewLimit) {
-                //console.log(v);
-                var bar = [text, totals];
-                rows.push(bar);
-            }
-            countPreview++;
-        }
-    });
-
-    var data = google.visualization.arrayToDataTable(rows);
-
-    var options = {
-        title: 'Rating ' + previewLimit + ' de principales ' + globalTypeReport,
-        is3D: true,
-        chartArea:{left:10,top:20,width:"100%",height:"90%"}
-    };
-
-    var chart = new google.visualization.PieChart(document.getElementById('chartContentText'));
-
-    chart.draw(data, options);
-}
-
-function drawChartText_() {
-    var title;
-    //console.log();
-    var _textArrg = textArrg.sort(dynamicSort("total"));
-
-
-    var d = [
-        ['Texto/Revistas', 'Totales', { role: 'style' }],
-    ];
-
-    var previewLimit = 10;
-    var countPreview = 0;
-    $.each(_textArrg, function(index, v) {
-        //console.log(v);
-        color = colorHexa();
-        var totals = v.total;
-        var text = v.text;
-        if(totals > 0){
-            //console.log(v);
-            if(countPreview < previewLimit) {
-                //console.log(v);
-                var bar = [text, totals, 'color: '+color];
-                d.push(bar);
-            }
-            countPreview++;
-        }
-    });
-
-    var data = google.visualization.arrayToDataTable(d);
-
-    var view = new google.visualization.DataView(data);
-    view.setColumns([
-        0,
-        1,
-        {
-            calc: "stringify",
-            sourceColumn: 1,
-            type: "string",
-            role: "annotation"
-        },
-        2
-    ]);
-
-    title = '';
-
-    var options = {
-        title: title,
-        bar: {groupWidth: "70%"},
-        legend: { position: "none" },
-        height: "500",
-        vAxis: {
-            gridlines: {count: gridlinesCount},
-            format: 'short',
-        },
-    };
-
-    if(textChartDraw == 'bar') {
-        var chart = new google.visualization.BarChart(document.getElementById("chartContentText"));
-    } else {
-        var chart = new google.visualization.ColumnChart(document.getElementById("chartContentText"));
-    }
-
-    google.visualization.events.addListener(chart, 'ready', function () {
-        imageChartText = chart.getImageURI();
-    });
-
-    chart.draw(view, options);
-}
+// function drawChartText_() {
+//     var title;
+//     //console.log();
+//     var _textArrg = textArrg.sort(dynamicSort("total"));
+//
+//
+//     var d = [
+//         ['Texto/Revistas', 'Totales', { role: 'style' }],
+//     ];
+//
+//     var previewLimit = 10;
+//     var countPreview = 0;
+//     $.each(_textArrg, function(index, v) {
+//         //console.log(v);
+//         color = colorHexa();
+//         var totals = v.total;
+//         var text = v.text;
+//         if(totals > 0){
+//             //console.log(v);
+//             if(countPreview < previewLimit) {
+//                 //console.log(v);
+//                 var bar = [text, totals, 'color: '+color];
+//                 d.push(bar);
+//             }
+//             countPreview++;
+//         }
+//     });
+//
+//     var data = google.visualization.arrayToDataTable(d);
+//
+//     var view = new google.visualization.DataView(data);
+//     view.setColumns([
+//         0,
+//         1,
+//         {
+//             calc: "stringify",
+//             sourceColumn: 1,
+//             type: "string",
+//             role: "annotation"
+//         },
+//         2
+//     ]);
+//
+//     title = '';
+//
+//     var options = {
+//         title: title,
+//         bar: {groupWidth: "70%"},
+//         legend: { position: "none" },
+//         height: "500",
+//         vAxis: {
+//             gridlines: {count: gridlinesCount},
+//             format: 'short',
+//         },
+//     };
+//
+//     if(textChartDraw == 'bar') {
+//         var chart = new google.visualization.BarChart(document.getElementById("chartContentText"));
+//     } else {
+//         var chart = new google.visualization.ColumnChart(document.getElementById("chartContentText"));
+//     }
+//
+//     google.visualization.events.addListener(chart, 'ready', function () {
+//         imageChartText = chart.getImageURI();
+//     });
+//
+//     chart.draw(view, options);
+// }
 
 
 //############## [Type Total] #################
@@ -1752,61 +1787,67 @@ function processDataTotal(position) {
     // google.charts.setOnLoadCallback(drawChartT);
 }
 
-function drawChartTotal(countTotals) {
-    var data = google.visualization.arrayToDataTable([
-        ["option", "total", { role: "style" } ],
-        ["Totales", countTotals, colorHexa()],
-    ]);
-
-    var view = new google.visualization.DataView(data);
-    view.setColumns([
-        0,
-        1,
-        {
-            calc: "stringify",
-            sourceColumn: 1,
-            type: "string",
-            role: "annotation"
-        },
-        2
-    ]);
-
-    var options = {
-        title: "Descargas Totales: " + $.number(countTotals),
-        bar: {groupWidth: "30%"},
-        legend: { position: "none" },
-        height: "500",
-        vAxis: {
-            gridlines: {count: 30},
-            format: 'short',
-            viewWindow: {
-                max:countTotals,
-            }
-        },
-        animation:{
-            duration: 1000,
-            easing: 'out',
-        },
-
-    };
-
-    var chart = new google.visualization.ColumnChart(document.getElementById("chartContentTotal"));
-
-    google.visualization.events.addListener(chart, 'ready', function () {
-        imageChartTotal = chart.getImageURI();
-    });
-    chart.draw(view, options);
-}
+// function drawChartTotal(countTotals) {
+//     var data = google.visualization.arrayToDataTable([
+//         ["option", "total", { role: "style" } ],
+//         ["Totales", countTotals, colorHexa()],
+//     ]);
+//
+//     var view = new google.visualization.DataView(data);
+//     view.setColumns([
+//         0,
+//         1,
+//         {
+//             calc: "stringify",
+//             sourceColumn: 1,
+//             type: "string",
+//             role: "annotation"
+//         },
+//         2
+//     ]);
+//
+//     var options = {
+//         title: "Descargas Totales: " + $.number(countTotals),
+//         bar: {groupWidth: "30%"},
+//         legend: { position: "none" },
+//         height: "500",
+//         vAxis: {
+//             gridlines: {count: 30},
+//             format: 'short',
+//             viewWindow: {
+//                 max:countTotals,
+//             }
+//         },
+//         animation:{
+//             duration: 1000,
+//             easing: 'out',
+//         },
+//
+//     };
+//
+//     var chart = new google.visualization.ColumnChart(document.getElementById("chartContentTotal"));
+//
+//     google.visualization.events.addListener(chart, 'ready', function () {
+//         imageChartTotal = chart.getImageURI();
+//     });
+//     chart.draw(view, options);
+// }
 
 
 //############## [Type Roles] #################
 var rolesChartDraw = 'column';
+var rolesTypeColumn = 'stacked';
+var cloudWordsRolesStatus = 0
 $('.switchUserChart').click(function () {
     rolesChartDraw = $(this).data('chart');
+    rolesTypeColumn = $(this).data('typecolumn');
+
     if(!$(this).hasClass('btn-primary')) {
         $('.switchUserChart').removeClass('btn-primary').addClass('btn-default');
         $(this).addClass('btn-primary');
     }
+    $('#relesMainChart').show();
+    $('#rolesMapChart').hide();
     google.charts.setOnLoadCallback(drawChartRoles);
 });
 
@@ -1814,43 +1855,58 @@ function processDataRoles() {
     google.charts.setOnLoadCallback(drawChartRoles);
 }
 
+var rolesArrg = [];
 function drawChartRoles() {
-    var _dataSet = dataSet.sort(dynamicSort("totals"));
+    var _rolesArrg = rolesArrg.sort(dynamicSort("totals"));
 
-    var d;
+    var d, colors, isStacked;
+
     switch (rolesChartDraw) {
         case 'pie':
             d = [
                 ['Usuarios', 'total'],
             ];
+            colors = [];
             break;
         case 'column':
+            // d = [
+            //     ['Usuarios', 'total', { role: 'style' }],
+            // ];
             d = [
-                ['Usuarios', 'total', { role: 'style' }],
+                ['Usuarios', 'Nacional', 'Internacional', 'Desconocido', { role: 'annotation' }],
             ];
+            colors = ['#006D49', '#F6E300', '#E6E7E9'];
+            isStacked = rolesTypeColumn == 'stacked' ? true : false;
             break;
     }
 
-    var colors = [];
+    wordsRoles = [];
+
     $('#usersList').empty();
+    $.each(_rolesArrg, function(index, v){
 
-    $.each(_dataSet, function(index, v){
         colorHex = colorHexa();
-        var userType = v.userType;
-        var totals = v.totals;
 
-        switch (rolesChartDraw){
-            case 'pie':
-                var text = userType + '('+totals+')' + ' ' + globalTypeReport;
-                var bar = [text, totals];
-                d.push(bar);
-                var color = {color: colorHex};
-                colors.push(color);
-                break;
-            case 'column':
-                var bar = [userType, totals, 'color: '+colorHex];
-                d.push(bar);
-                break;
+        var roleType = v.role;
+        var totals = v.totals;
+        //console.log(v);
+        var countries = v.countries;
+
+        var totalNational = 0;
+        var totalUnknown = 0;
+        var totalInternational = 0;
+
+        for(i in countries) {
+            switch (countries[i]) {
+                case 'MX':
+                    totalNational = totalNational + 1;
+                    break;
+                case 'UNK':
+                    totalUnknown = totalUnknown + 1;
+                    break;
+                default:
+                    totalInternational = totalInternational + 1;
+            }
         }
 
         var per = (totals / globalTotals) * 100;
@@ -1860,23 +1916,84 @@ function drawChartRoles() {
             per = Math.round(per);
         }
 
-        var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
-            '              <small style="color: #72777a">'+ globalTypeReport+' de rol <span style="font-weight: bold; color: #000">'+userType+'</span></small>\n' +
-            '              <span class="pull-right">'+per+'%</span>\n' +
-            '              <div class="c-progress">\n' +
-            '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;">\n' +
-            '                </div>\n' +
-            '              </div></div>';
+        switch (rolesChartDraw){
+            case 'pie':
+                var text = roleType + '('+totals+')' + ' ' + globalTypeReport;
+                var bar = [text, totals];
+                d.push(bar);
+                var color = {color: colorHex};
+                colors.push(color);
 
-        $("#usersList").append(layer);
+                var per = (totals / globalTotals) * 100;
+                if(per < parseFloat(1.0)) {
+                    per = 1;
+                } else {
+                    per = Math.round(per);
+                }
 
-        var word = {text: userType, weight: totals};
+                var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
+                    '              <small style="color: #72777a">'+ globalTypeReport+' de rol <span style="font-weight: bold; color: #000">'+roleType+'</span></small>\n' +
+                    '              <span class="pull-right">'+per+'% Totales</span>\n' +
+
+                    '              <div class="c-progress">\n' +
+                    '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;"></div>\n' +
+
+                    '              </div></div>';
+
+                $("#usersList").append(layer);
+                break;
+            case 'column':
+                var bar = [roleType+'('+totals+')', totalNational, totalInternational, totalUnknown, ''];
+                d.push(bar);
+
+                var perNat = (totalNational / totals) * 100;
+                var perInternat = (totalInternational / totals) * 100;
+                var perUnknown = (totalUnknown / totals) * 100;
+
+                // if(perNat < parseFloat(1.0)) {
+                //     perNat = 1;
+                // } else {
+                //     perNat = Math.round(perNat);
+                // }
+                perNat = Math.round(perNat);
+
+                // if(perInternat < parseFloat(1.0)) {
+                //     perInternat = 1;
+                // } else {
+                //     perInternat = Math.round(perInternat);
+                // }
+                perInternat = Math.round(perInternat);
+
+                // if(perUnknown < parseFloat(1.0)){
+                //     perUnknown = 1;
+                // } else {
+                //     perUnknown = Math.round(perUnknown);
+                // }
+                perUnknown = Math.round(perUnknown);
+
+                var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
+                    '              <small style="color: #72777a">'+ globalTypeReport+' de rol <span style="font-weight: bold; color: #000">'+roleType+'</span></small>\n' +
+                    '              <span class="pull-right">'+per+'% Totales</span><br>\n' +
+                    '              <div style="width:100%"><small style="font-weight: bold; color: #000">Nacional: '+abbreviateNumber(totalNational)+'</small><small class="pull-right">'+perNat+'%</small></div>'+
+                    '              <div style="width:100%"><small style="font-weight: bold; color: #000">Intenacional: '+abbreviateNumber(totalInternational)+'</small><small class="pull-right">'+perInternat+'%</small></div>'+
+                    '              <div style="width:100%"><small style="font-weight: bold; color: #000">Desconocido: '+abbreviateNumber(totalUnknown)+'</small><small class="pull-right">'+perUnknown+'%</small></div>'+
+                    '              <div class="c-progress">\n' +
+                    '                <div class="c-progress-bar" style="width: '+perNat+'%; background: '+colors[0]+' !important; float:left"></div>\n' +
+                    '                <div class="c-progress-bar" style="width: '+perInternat+'%; background: '+colors[1]+' !important; float:left"></div>\n' +
+                    '              </div></div>';
+
+
+                $("#usersList").append(layer);
+                break;
+        }
+
+        var word = {text: roleType, weight: totals};
         wordsRoles.push(word);
     });
 
     var data = google.visualization.arrayToDataTable(d);
     var view = new google.visualization.DataView(data);
-    var title = 'Tipos de Usuarios registrados';
+    var title = 'Roles de Usuarios registrados';
 
     switch (rolesChartDraw){
         case 'pie':
@@ -1889,22 +2006,23 @@ function drawChartRoles() {
             var chart = new google.visualization.PieChart(document.getElementById("chartContentUsers"));
             break;
         case 'column':
-            view.setColumns([
-                0,
-                1,
-                {
-                    calc: "stringify",
-                    sourceColumn: 1,
-                    type: "string",
-                    role: "annotation"
-                },
-                2
-            ]);
+            // view.setColumns([
+            //     0,
+            //     1,
+            //     // {
+            //     //     calc: "stringify",
+            //     //     sourceColumn: 1,
+            //     //     type: "string",
+            //     //     role: "annotation"
+            //     // },
+            //     2,
+            //     3
+            // ]);
 
             var options = {
                 title: title,
                 bar: {groupWidth: "70%"},
-                legend: { position: "none" },
+                legend: { position: "top" },
                 height: "500",
                 vAxis: {
                     title: globalTypeReport,
@@ -1912,9 +2030,15 @@ function drawChartRoles() {
                     format: 'short',
                 },
                 hAxis: {
-                    title: 'Usuarios',
+                    title: 'Roles',
                 },
-                //chartArea:{left:50, top:20, width:"100%", height:"80%"},
+                isStacked: Boolean(isStacked),
+                series: {
+                    0:{color:colors[0]},
+                    1:{color:colors[1]},
+                    2:{color:colors[2]},
+                },
+                chartArea:{left:50, top:50, width:"100%", height:"80%"},
             };
             if(rolesChartDraw == 'column'){
                 var chart = new google.visualization.ColumnChart(document.getElementById("chartContentUsers"));
@@ -1928,7 +2052,213 @@ function drawChartRoles() {
         imageChartRoles = chart.getImageURI();
     });
     chart.draw(view, options);
-    $('#cloudWordsRoles').jQCloud(wordsRoles);
+
+    //chart.legend.updateState(false);
+
+    google.visualization.events.addListener(chart, 'select', selectHandle)
+
+    function selectHandle(e) {
+        var selection = chart.getSelection();
+        var column,
+            row,
+            totals,
+            index,
+            role,
+            allCountries,
+            countries = [];
+            national = 1;
+            passes = 0;
+        //var message = '';
+
+        for (var i = 0; i < selection.length; i++) {
+            var item = selection[i];
+
+            column = item.column;
+            row = item.row;
+            if (item.row != null && item.column != null) {
+              totals = data.getFormattedValue(item.row, item.column);
+            }
+
+
+
+            // if(row != null){
+            //     passes = 1;
+            // }
+            // if (item.row != null && item.column != null) {
+            //   var str = data.getFormattedValue(item.row, item.column);
+            //   message += '{row:' + item.row + ',column:' + item.column + '} = ' + str + '\n';
+            // } else if (item.row != null) {
+            //   var str = data.getFormattedValue(item.row, 0);
+            //   message += '{row:' + item.row + ', column:none}; value (col 0) = ' + str + '\n';
+            // } else if (item.column != null) {
+            //   var str = data.getFormattedValue(0, item.column);
+            //   message += '{row:none, column:' + item.column + '}; value (row 0) = ' + str + '\n';
+            // }
+        }
+        // if (message == '') {
+        //     message = 'nothing';
+        // }
+        //alert(message);
+        //if(Boolean(passes)){
+        if(row != null){
+            index = row;
+            role = _rolesArrg[index].role
+            allCountries = _rolesArrg[index].countries;
+            switch (column) {
+                case 1:
+                    //alert('Nacional');
+                    allCountries = _rolesArrg[index].countries;
+                    var counter = 0;
+                    $.each(allCountries, function(index, v){
+                        if(v == 'MX') {
+                            counter++;
+                        }
+                    });
+
+                    var obj = {code: 'MX', totals: counter};
+                    countries.push(obj);
+                    passes = 1;
+                    break;
+                case 2:
+                    //alert('Internacional');
+                    allCountries = _rolesArrg[index].countries;
+                    $.each(allCountries, function(index, v){
+                        if(v != 'MX' && v != 'UNK'){
+                            if(countries.length < 1){
+                                var obj = {code: v, totals: 1};
+                                countries.push(obj);
+                            } else {
+                                var foundValue = false;
+                                for(var i in countries) {
+                                    if(countries[i].code == v){
+                                        foundValue = true;
+                                        countries[i].totals = countries[i].totals + 1;
+                                    }
+                                }
+
+                                if(!Boolean(foundValue)){
+                                    var obj = {code: v, totals: 1};
+                                    countries.push(obj);
+                                }
+                            }
+                        }
+                    });
+                    national = 0;
+                    passes = 1;
+                    break;
+            }//end switch
+
+            // console.log(countries);
+            if(passes){
+                var drawMap = function(){ drawRolesMap(countries, totals, role, national) };
+                google.charts.setOnLoadCallback(drawMap);
+
+
+            }
+
+        }
+    }
+
+    if(Boolean(cloudWordsRolesStatus)){
+        $('#cloudWordsRoles').jQCloud('update', wordsRoles);
+    } else {
+        $('#cloudWordsRoles').jQCloud(wordsRoles);
+    }
+
+}
+
+function drawRolesMap(countries, gtotals, role, national) {
+    $('#relesMainChart').hide();
+    $('#rolesMapChart').show();
+    $('#rolesListMaps').empty();
+    $('.switchUserChart').removeClass('btn-primary').addClass('btn-default');
+    wordsRoles = [];
+    cloudWordsRolesStatus = 1;
+    //var wordsCountryRole = [];
+
+    var _countries = countries.sort(dynamicSort("totals"));
+    var d;
+    if(national){
+        d = [
+            ['Country', 'Totals'],
+        ]
+    } else {
+
+        d = [
+            ['Country', 'Totals'],
+        ]
+    }
+
+    var countriesCounter = 0;
+    $.each(_countries, function(index, v){
+        var code = v.code;
+        var totals = v.totals;
+        var country,
+            colorHex;
+
+        if(national){
+            d.push([code, totals]);
+            colorHex = '#00724B';
+        } else {
+            d.push([code, totals]);
+            colorHex = '#fff310';
+        }
+
+        for(i in countriesObj){
+            var _code = countriesObj[i].code;
+            if(_code == code){
+                country = countriesObj[i].name;
+            }
+        }
+
+
+        var per = Math.round((totals / gtotals) * 100);
+
+        var layer = '<div data-country="'+country+'"><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
+            '              <small style="color: #72777a">'+ role+' de <span style="font-weight: bold; color: #000">'+country+'</span></small>\n' +
+            '              <span class="pull-right">'+per+'%</span>\n' +
+            '              <div class="c-progress">\n' +
+            '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;">\n' +
+            '                </div>\n' +
+            '              </div></div>';
+
+        $("#rolesListMaps").append(layer);
+
+        countriesCounter++;
+
+        // var word = {text: country, weight: totals};
+        // wordsCountryRole.push(word);
+        var word = {text: country, weight: totals};
+        wordsRoles.push(word);
+    });
+
+    var data = google.visualization.arrayToDataTable(d);
+
+    var textLegend;
+    if(national){
+        var options = {
+            //region: 'MX',
+            region: '013',
+            height: "400",
+            colorAxis: {colors: ['#00724B', '#00724B']},
+        };
+        textLegend = '<strong>'+gtotals+'<strong> Usuarios de rol <strong>' + role + '</strong> en <strong>' + countriesCounter + ' en México</strong>';
+    } else {
+        var options = {
+            height: "400",
+            colorAxis: {colors: ['#fff310', '#dcd100']},
+        };
+        var foo = (countriesCounter > 1) ? 'países' : 'país';
+        textLegend = '<strong>'+gtotals+'<strong> Usuarios de rol <strong>' + role + '</strong> en <strong>' + countriesCounter + ' '+ foo +'</strong>';
+
+    }
+
+    $('#rolesMapLegend').html(textLegend);
+
+    var chart = new google.visualization.GeoChart(document.getElementById('chartContentRolesMaps'));
+
+    chart.draw(data, options);
+    $('#cloudWordsRoles').jQCloud('update', wordsRoles);
 }
 
 //############## [Type Genders] #################
@@ -1968,8 +2298,6 @@ function drawChartGenders(){
 
     $.each(_gendersObj, function(index, v){
         //var colorHex = colorHexa();
-
-
         var gEsName = v.esname;
         var gEnName = v.enname;
         var shortName = v.shortname;
@@ -2069,10 +2397,6 @@ function drawChartGenders(){
     });
     chart.draw(view, options);
 }
-
-
-
-
 
 $("#breakdownButton").click(function (){
     var target = $("#countryDesglosDownloadsPanel");
@@ -2446,7 +2770,7 @@ $('#saveChangesChartList').click(function () {
 
         for(i in typeReportArray){
             var typeReport = typeReportArray[i].v;
-            console.log(typeReport);
+
             if(typeReport == 'Roles'){
                 hasRoles = 1;
             }

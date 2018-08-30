@@ -122,7 +122,21 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="address-bar-content-header">
-                <h1 id="titlePage"></h1>
+                <!-- <h1>Datos de archivo: <span id="titlePage" style="color:#ad0004"></span></h1> -->
+                <br>
+                <div id="itemFile" class="media">
+                   <div class="media-left">
+                       <a href="javascript:void(0)" class="csv-file-item seeAgain" data-csvname="">
+                          <img class="media-object" src="" alt="icon" width="64px" height="64px">
+                      </a>
+                   </div>
+                   <div class="media-body" style="color: #E05740">
+                     <h4 class="media-heading csv-file-item fileNamePanels seeAgain" style="color: #A41C1E; cursor: pointer" data-csvname=""></h4>
+                     <span class="fa fa- fa-lg pull-right" style="cursor: pointer"></span><span class="pull-right"></span>
+                     <span class="typeReportPanels"></span>
+                     <br><small style="color: #72777a"></small>
+                   </div>
+                </div>
                 <ol class="breadcrumb">
                     <li class="address-item"><a href="{{ url('home') }}"><i class="fa fa-home"></i> Inicio</a></li>
                     <li class="address-item"><label><i class="fa fa-bar-chart"></i> Estadísticas</label></li>
@@ -328,7 +342,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-12 text-center" style="display: inline-block">
+                        <div class="col-md-12 text-center">
                             <div id="cloudWordsCountry" style="width:100%; height: 50%;"></div>
                             <hr>
                         </div>
@@ -803,18 +817,35 @@
                     <div class="panel-body">
                         <div class="col-md-12 text-center" style="z-index: 2;">
                             <div class="btn-group" role="group">
-                                <button class="switchUserChart btn btn-default" data-chart="pie"><i class="fa fa-pie-chart"></i></button>
-                                <button class="switchUserChart btn btn-primary" data-chart="column"><i class="fa fa-bar-chart"></i></button>
-                                <!-- <button class="switchCityChart btn btn-default" data-chart="line"><i class="fa fa-line-chart"></i></button> -->
+                                <!-- <button class="switchUserChart btn btn-default" data-chart="pie"><i class="fa fa-pie-chart"></i></button> -->
+                                <button class="switchUserChart btn btn-primary" data-chart="column" data-typecolumn="stacked"><i class="fa fa-bar-chart"></i> Apilados</button>
+                                <button class="switchUserChart btn btn-default" data-chart="column" data-typecolumn="column"><i class="fa fa-bar-chart"></i> Columnas separadas</button>
                             </div>
                         </div>
-                        <div class="col-md-9 col-xs-12">
-                            <div id="chartContentUsers"></div>
+                        <div id="relesMainChart">
+                            <div class="col-md-8 col-xs-12">
+                                <div id="chartContentUsers"></div>
+                            </div>
+                            <div class="col-md-4 col-xs-12">
+                                <div id="usersList" style="overflow: auto; max-height: 450px;"></div>
+                            </div>
                         </div>
-                        <div class="col-md-3 col-xs-12">
-                            <div id="usersList" style="overflow: auto; max-height: 250px;"></div>
-                            <div id="cloudWordsRoles" style="width:100%; height: 50%;"></div>
+                        <div id="rolesMapChart" style="display:none">
+                            <div class="col-md-12 text-center">
+                                <h3 id="rolesMapLegend"></h3>
+                            </div>
+                            <div class="col-md-8 col-xs-12">
+                                <div id="chartContentRolesMaps"></div>
+                            </div>
+                            <div class="col-md-4 col-xs-12">
+                                <div id="rolesListMaps" style="overflow: auto; max-height: 450px;"></div>
+                            </div>
                         </div>
+
+                        <div class="col-col-md-12">
+                            <div id="cloudWordsRoles" style="width:100%; height: 25%;"></div>
+                        </div>
+
 
                     </div>
                 </div>
