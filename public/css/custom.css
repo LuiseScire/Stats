@@ -140,25 +140,29 @@ a.ir-arriba {
   border-radius:0;
 }
 
-.navbar-custom .navbar-nav > li > a {
+.navbar-custom .navbar-n > li > a {
   /*color:#fff;*/
     color: #000000;
 }
 
-.navbar-custom .navbar-nav > .active > a {
+.navbar-custom .navbar-n > .active > a {
   color: #ffffff;
   background-color:transparent;
 }
 
-.navbar-custom .navbar-nav > li > a:hover,
-.navbar-custom .navbar-nav > li > a:focus,
-.navbar-custom .navbar-nav > .open > a:hover,
-.navbar-custom .navbar-nav > .open > a:focus,
-.navbar-custom .navbar-nav > .open > a {
+.navbar-custom .navbar-n > li > a:hover,
+.navbar-custom .navbar-n > li > a:focus,
+.navbar-custom .navbar-n > .open > a:hover,
+.navbar-custom .navbar-n > .open > a:focus,
+.navbar-custom .navbar-n > .open > a {
   text-decoration: none;
-  /*background-color: #23527c;
-  color: #ffffff;*/
+  background-color: #eee;
+  /* color: #ffffff; */
 }
+
+/* .navbar-custom .navbar-n > li > a > span{
+  font-size: 10px;
+} */
 
 .navbar-custom .navbar-brand {
   /*color:#eeeeee;*/

@@ -27,8 +27,15 @@ Route::group(['middleware' => 'journal'], function() {
   Route::get('/subircsv', 'MainController@subircsv')->name('subircsv');
   Route::get('/testpath', 'MainController@test');
 
+
+  //Route::match(['get', 'post'], 'config', 'MainController@config');
+  Route::get('config', 'MainController@config');
+  Route::match(['get', 'post'], 'stats/{filename?}', 'MainController@stats');
+
+
+
   Route::group(['prefix' => 'estadisticas'], function () {
-    Route::get('archivo/{filename?}/{target?}', 'MainController@stats');
+    Route::get('archivo/{filename?}/{target?}', 'MainController@stats_');
     Route::post('readcsv','MainController@readcsv');
     // Route::post('archivo/getdatacsv', 'MainController@getdatacsv')->name('getdatacsv');
     Route::post('archivo/getdatafiles', 'MainController@getDataFiles')->name('getdatafiles');

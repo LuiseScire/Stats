@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Authenticatable;
 //use App\Csvfile;
 use App\File;
+use App\Folder;
 use App\LastFileUploaded;
 use App\User;
 //use App\Xmlfile;
@@ -41,8 +42,7 @@ class MainController extends Controller
         return view('history');
     }
 
-    public function listcsvfiles(Request $request)
-    {
+    public function listcsvfiles(Request $request){
         #Model
         $last_file_db = new LastFileUploaded;
         $files_db =  new File;
@@ -85,15 +85,142 @@ class MainController extends Controller
     public function files(Request $request){
         #models
         $files_db = new File;
-        $lastcsv_db = new LastFileUploaded();
+        $folder_model = new Folder;
+        $lastcsv_db = new LastFileUploaded;
 
         $auth_id = Auth::id();
+        $journal_id = Auth::user()->journal;
 
         #Response
         $switch_case = $request->switchCase;
         $version = null;
 
         switch ($switch_case) {
+            case 'newFolder':
+                $folder_name = $request->folderName;
+
+                $newFolder = $folder_model->create([
+                    'folder_parent_id' => 0,
+                    'folder_name' => $folder_name,
+                    'folder_total_files' => 0,
+                    'folder_journal_id' => $journal_id,
+                    'folder_status' => 'Active'
+                ]);
+
+                if($newFolder){
+                    $response = array(
+                            'status' => 'success'
+                        );
+                } else {
+                    $response = array(
+                            'status' => 'error'
+                        );
+                }
+
+                break;
+            case 'deleteFolder':
+                $folder_id = $request->folderId;
+                $update = $folder_model->where('folder_id', $folder_id)->update(['folder_status' => 'Deleted']);
+
+                if($update !== false){
+                    //Updated
+                    $updateFiles = $files_db->where('file_folder_id', $folder_id)->update(['file_status' => 'Deleted']);
+                    if($updateFiles !== false){
+                        $response = array(
+                            'status' => 'success'
+                        );
+                    } else {
+                        $response = array(
+                            'status' => 'error',
+                            'message' => 'error al eliminar archivos'
+                        );
+                    }
+
+                } else {
+                    //Not updated
+                    $response = array(
+                        'status' => 'error'
+                    );
+                }
+
+                break;
+            case 'renameFolder':
+                $folder_id = $request->folderId;
+                $folder_name = $request->folderName;
+
+                $update = $folder_model->where('folder_id', $folder_id)->update(['folder_name' => $folder_name]);
+
+                if($update !== false){
+                    $response = array('status' => 'success');
+                } else {
+                    $response = array('status' => 'error');
+                }
+
+                break;
+            case 'seeFileAgain':
+                $file_back_name = $request->fileName;
+                $file = $files_db->where('file_back_name', $file_back_name)->first();
+
+                $response = array($file);
+                // $response = array(
+                //     'status' => 'success',
+                //     'message' => 'hello_world'
+                // );
+                break;
+            case 'getLastFileRequest':
+                $folder_id = $request->folderId;
+
+                $file = $files_db->where([['file_folder_id', $folder_id],['file_status', 'Active']])->orderBy('file_timestamp', 'desc')->first();
+
+                $response = array($file);
+
+                break;
+            case 'getDataFile':
+                $files_db = new File;
+
+                $file_back_name = $request->filename;
+                $file = $files_db->select()->where([['file_back_name', $file_back_name], ['file_journal_id', $journal_id]])->first();
+
+                $response = array($file);
+                break;
+            case 'getLastFile':
+                $file = $files_db
+                ->join('users as u', 'files.file_user_id', '=', 'u.id')
+                ->where([
+                    ['u.journal', $journal_id],
+                    ['file_status', 'Active']
+                ])->orderBy('file_timestamp', 'desc')->first();
+
+                $response = array($file);
+
+                break;
+            case 'getFolderFiles':
+                // $data = $folder_model
+                // ->join('files as f', 'folders.folder_id', '=', 'f.file_folder_id')
+                // ->where('folders.folder_journal_id', $journal_id)->get();
+                $data = $folder_model->where([
+                    ['folder_journal_id', $journal_id],
+                    ['folder_status', 'Active']
+                ])->get();
+
+                $response = array($data);
+                break;
+            case 'getFolders':
+                $folders = $folder_model->where([
+                    ['folder_journal_id', $journal_id],
+                    ['folder_status', 'Active'],
+                ])->get();
+
+                $response = array($folders);
+                break;
+            case 'getFiles':
+                $folder_id = $request->folderId;
+                $files = $files_db->where([
+                    ['file_folder_id', $folder_id],
+                    ['file_status', 'Active']
+                ])->get();
+                $response = array($files);
+                break;
             case 'upload'://upload file to preview
                 if (!empty($_FILES['file']['name'])) {
                     $file_type = $request->fileType;
@@ -133,17 +260,21 @@ class MainController extends Controller
                 $storage_file_name = $request->storageFileName;
                 $type_report = $request->typeReport;
                 $type_report_index = $request->typeReportIndex;
+
+                $folderId = $request->folderId;
+                $folder_default = $request->folderDefault;
+
                 $csv_file = '/files/tmp/' . $storage_file_name;
                 $origin_path = public_path() . $csv_file;
+                $journal_id = Auth::user()->journal;
 
                 $file_type = $request->fileType;
 
                 $search_match = $files_db->where([
-                    ['file_user_id' => $auth_id],
-                    ['file_status' => 'active'],
-                    ['file_front_name' => $file_name],
-                    ['file_type' => $file_type]
-                ]);
+                    ['file_user_id', $auth_id],
+                    ['file_status', 'Active'],
+                    ['file_front_name', $file_name]
+                ])->get();
 
                 // switch ($file_type) {
                 //     case 'csv':
@@ -163,7 +294,7 @@ class MainController extends Controller
 
                 $count = 0;
                 foreach ($search_match as $key => $value) {
-                    //dd($value->csv_id);
+                    //echo ($value->file_id);
                     $count++;
                 }
 
@@ -174,22 +305,52 @@ class MainController extends Controller
                 //$csv_final_p = '/csvfiles/' . $storage_file_name;
 
                 $targetDir = '/files/' . $storage_file_name;
-
                 $destination_path = public_path() . $targetDir;
                 if (rename($origin_path, $destination_path)) {
+
+                    if($folderId == 0){
+
+                        $folder = $folder_model->where([
+                            ['folder_name', $folder_default],
+                            ['folder_journal_id', $journal_id],
+                            ['folder_status', 'Active']
+                        ])->first();
+
+
+
+                        if(is_null($folder)){
+                            $newFolder = $folder_model->create([
+                                'folder_parent_id' => 0,
+                                'folder_name' => $folder_default,
+                                'folder_total_files' => 0,
+                                'folder_journal_id' => $journal_id,
+                                'folder_status' => 'Active'
+                            ]);
+
+                            $folderId = $newFolder->id;
+
+                        } else {
+                            $folderId = $folder->folder_id;
+                        }
+
+                    }
 
                     $newFile = $files_db->create([
                         'file_front_name' => $file_name,
                         'file_back_name' => $storage_file_name,
                         'file_path' => $targetDir,
                         'file_user_id' => $auth_id,
+                        'file_journal_id' => $journal_id,
                         'file_version' => $version,
                         'file_indices' => json_encode($index_array),
                         'file_role_indices' => json_encode($index_array_role),
                         'file_report_name' => $type_report,
                         'file_report_index' => $type_report_index,
                         'file_type' => $file_type,
+                        'file_folder_id' => $folderId,
                     ]);
+
+
                     // switch ($file_type) {
                     //     case 'csv':
                     //         $newRow = $csv_file_db->create([
@@ -469,6 +630,7 @@ class MainController extends Controller
             $email = $user->email;
             $gender = $user->gender;
             $country = $user->country;
+            $affiliation = $user->affiliation;
 
             $roles = array();
             $roles_types = array();
@@ -485,6 +647,7 @@ class MainController extends Controller
                 'gender' => (String)$gender,
                 'country' => (String)$country,
                 'roles' => $roles,
+                'affiliation' => (string)$affiliation
             ];
 
             array_push($xml_data, $data);
@@ -628,7 +791,15 @@ class MainController extends Controller
     }
 
     /*########################## [Stats Functions] #######################*/
-    public function stats($filename = "noData", $target = "noTarget") {
+    public function stats($filename = false){
+        return view('stats', array('filename' => $filename));
+    }
+
+    public function config(){
+        return view('config');
+    }
+
+    public function stats_($filename = "noData", $target = "noTarget") {
         return view('estadisticas', array('filename' => $filename, 'target' => $target));
     }
 
@@ -676,8 +847,7 @@ class MainController extends Controller
         return response()->json( array('stats' => 'success') );
     }
 
-    public function getdatacsv2(Request $request)
-    {
+    public function getdatacsv2(Request $request){
         #Models
         $csv_file_db = new Csvfile;
         $auth_id = Auth::id();
@@ -690,8 +860,7 @@ class MainController extends Controller
         return response()->json(array('csvFileData' => $csv_file_data));
     }
 
-    public function readcsv(Request $request)
-    {
+    public function readcsv(Request $request)    {
         $response = array(
             'filename' => $request->filename
         );
@@ -731,8 +900,7 @@ class MainController extends Controller
 
 
     /*########################## [Extra Functions] #######################*/
-    private function randCode()
-    {
+    private function randCode(){
         $key = '';
         $pattern = '1234567890abcdefghijklmnopqrstuvwxyz';
         $max = strlen($pattern) - 1;

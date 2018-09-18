@@ -59,6 +59,42 @@
         }
 
         /*css for list countries in panel countries*/
+
+        .bg-dodgerblue{
+            background-color: dodgerblue !important;
+            color: #fff !important;
+        }
+
+        .bg-green{
+            background-color: #00a65a !important;
+            color: #fff !important;
+        }
+
+        .bg-aqua{
+            background-color: #00c0ef !important;
+            color: #fff !important;
+        }
+
+        .bg-gold{
+            background-color: gold !important;
+            color: #fff !important;
+        }
+
+        .bg-red{
+            background-color: #dd4b39 !important;
+            color: #fff !important;
+        }
+
+        .bg-darkred{
+            background-color: darkred !important;
+            color: #fff !important;
+        }
+
+        .bg-cadetblue{
+            background-color: cadetblue !important;
+            color: #fff !important;
+        }
+
         .c-progress {
             height: 4px;
             background-color: #eaeef3;
@@ -66,6 +102,8 @@
             margin-bottom: 10px;
             margin-top: 10px;
         }
+
+
 
         .c-progress-bar {
             height: 4px;
@@ -80,32 +118,83 @@
 
         }
 
-        /*CHIPS*/
-
-        .md-chip {
-            display: inline-block;
-            background: #e0e0e0;
-            padding: 0 12px;
-            border-radius: 32px;
-            font-size: 13px;
-            margin: 5px;
+        /* info-box-countries  */
+        .info-box {
+            display: block;
+            min-height: 90px;
+            background: #fff;
+            width: 100%;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            border-radius: 2px;
+            margin-bottom: 15px;
         }
 
-        .md-chip, .md-chip-icon {
-            height: 32px;
-            line-height: 32px;
-        }
-
-        .md-chip-icon {
+        .info-box-icon {
+            border-top-left-radius: 2px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 2px;
             display: block;
             float: left;
-            background: #A41C1E;
-            width: 32px;
-            border-radius: 50%;
+            height: 90px;
+            width: 90px;
             text-align: center;
-            color: white;
-            margin: 0 8px 0 -12px;
+            font-size: 60px;
+            line-height: 90px;
+            background: rgba(0,0,0,0.2);
+            padding: 5%;
         }
+
+        .info-box-content {
+            padding: 5px 10px;
+            margin-left: 90px;
+        }
+
+        .info-box-text {
+            text-transform: uppercase;
+        }
+
+        .progress-description, .info-box-text {
+            display: block;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .info-box-number {
+            display: block;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .info-box .progress, .info-box .progress .progress-bar {
+            border-radius: 0;
+        }
+        .info-box .progress {
+            background: rgba(0,0,0,0.2);
+            margin: 5px -10px 5px -10px;
+            height: 2px;
+        }
+        .progress, .progress>.progress-bar, .progress .progress-bar, .progress>.progress-bar .progress-bar {
+            border-radius: 1px;
+        }
+        .progress, .progress>.progress-bar {
+            -webkit-box-shadow: none;
+            box-shadow: none;
+            background: #fff;
+        }
+        .progress {
+            height: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+        }
+
+
     </style>
 @stop
 
@@ -122,7 +211,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="address-bar-content-header">
-                <!-- <h1>Datos de archivo: <span id="titlePage" style="color:#ad0004"></span></h1> -->
+                <h3>Datos de archivo: <span id="titlePage" style="color:#ad0004"></span></h3>
                 <br>
                 <div id="itemFile" class="media">
                    <div class="media-left">
@@ -140,8 +229,7 @@
                 <ol class="breadcrumb">
                     <li class="address-item"><a href="{{ url('home') }}"><i class="fa fa-home"></i> Inicio</a></li>
                     <li class="address-item"><label><i class="fa fa-bar-chart"></i> Estadísticas</label></li>
-                    <li class="current-date pull-right"><span><i class="fa fa-calendar"></i> <span
-                                    id="current-date"></span></span></li>
+                    <li class="current-date pull-right"><span><i class="fa fa-calendar"></i> <span id="currentDateEN" class="date-format-en" style="display:none"></span><span id="currentDateES" class="date-format-es" style="display:none"></span></span></li>
                 </ol>
             </div>
         </div>
@@ -237,357 +325,564 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!--  ######################## [CHART PAÍS] ############################## -->
-                <div id="chartPanelCountries" class="panel" style="display: none; border-top: 3px solid dodgerblue;">
-                    <div class="panel-heading">
-                        <h4 style="color: dodgerblue;">
-                            <i class="fa fa-globe"></i>
-                            <span id="panelTitleCountries"></span>
-                            <div class="pull-right">
-                                <!--<span class="btn btn-default export-action" title="Descargar Imagen PNG"
-                                      data-charttype="country" data-typeexport="png" role="button">
-                                    <i class="fa fa-download"></i>
-                                </span>
-                                <span class="btn btn-default export-action" title="Compartir en mi página web"
-                                      data-charttype="country" data-typeexport="embed" role="button">
-                                    <i class="fa fa-share-alt"></i>
-                                </span>-->
-                                <span class="dropdown" style="margin-left: 5px;">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                        <span class="fa fa-download"></span>
+            <!--  ######################## [CHART PAÍS] ############################## -->
+            <div id="chartPanelCountries" style="display: none">
+                <div class="col-md-8 col-lg-8">
+                    <div class="panel" style="border-top: 3px solid dodgerblue;">
+                        <div class="panel-heading">
+                            <h4 style="color: dodgerblue;">
+                                <i class="fa fa-globe"></i>
+                                <span id="panelTitleCountries"></span>
+                                <div class="pull-right">
+                                    <!--<span class="btn btn-default export-action" title="Descargar Imagen PNG"
+                                          data-charttype="country" data-typeexport="png" role="button">
+                                        <i class="fa fa-download"></i>
+                                    </span>
+                                    <span class="btn btn-default export-action" title="Compartir en mi página web"
+                                          data-charttype="country" data-typeexport="embed" role="button">
+                                        <i class="fa fa-share-alt"></i>
+                                    </span>-->
+                                    <span class="dropdown" style="margin-left: 5px;">
+                                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <span class="fa fa-download"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                            <li>
+                                                <a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png">
+                                                    <i class="fa fa-image"></i> Descargar imagen PNG
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                    <span class="dropdown" style="margin-left: 5px;">
+                                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <span class="fa fa-share-alt"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                            <li>
+                                                <a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="embed">
+                                                    <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                </div>
+                            <!--<div class="dropdown pull-right">
+                                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-bars"></span>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                        <li><a href="{{ url('estadisticas/descargasporpais/'.$filename) }}"><i
+                                                        class="fa fa-list"></i> Más detalles <i
+                                                        class="fa fa-external-link"></i></a></li>
+                                        <li class="divider"></li>
                                         <li>
                                             <a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png">
-                                                <i class="fa fa-image"></i> Descargar imagen PNG
+                                              <i class="fa fa-image"></i> Descargar Imagen PNG
                                             </a>
                                         </li>
-                                    </ul>
-                                </span>
-                                <span class="dropdown" style="margin-left: 5px;">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                        <span class="fa fa-share-alt"></span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li class="divider"></li>
                                         <li>
                                             <a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="embed">
-                                                <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                              <i class="fa fa-share-alt"></i>
+                                              Compartir en mi página web
                                             </a>
                                         </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                          <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
+                                        </li>
                                     </ul>
-                                </span>
-                            </div>
-                        <!--<div class="dropdown pull-right">
-                                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <span class="fa fa-bars"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                    <li><a href="{{ url('estadisticas/descargasporpais/'.$filename) }}"><i
-                                                    class="fa fa-list"></i> Más detalles <i
-                                                    class="fa fa-external-link"></i></a></li>
-                                    <li class="divider"></li>
-                                    <li>
-                                        <a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="png">
-                                          <i class="fa fa-image"></i> Descargar Imagen PNG
-                                        </a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li>
-                                        <a href="javascript:void(0)" class="export-action" data-charttype="country" data-typeexport="embed">
-                                          <i class="fa fa-share-alt"></i>
-                                          Compartir en mi página web
-                                        </a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li>
-                                      <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
-                                    </li>
-                                </ul>
-                            </div>-->
-                        </h4>
-                    </div>
-                    <div class="panel-body collapse-up">
-                        <div class="col-md-12 text-center" style="z-index: 2;">
-                            <div class="btn-group" role="group" aria-label="...">
-                                <button class="switchCountryChart btn btn-primary" data-chart="geo">
-                                    <i class="fa fa-map"></i>
-                                </button>
-                                <button class="switchCountryChart btn btn-default" data-chart="pie">
-                                    <i class="fa fa-pie-chart"></i>
-                                </button>
-                                <button class="switchCountryChart btn btn-default" data-chart="column">
-                                    <i class="fa fa-bar-chart"></i>
-                                </button>
-                                <button class="switchCountryChart btn btn-default" data-chart="line">
-                                    <i class="fa fa-line-chart"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-9 col-xs-12">
-                            <div id="chartContentCountries"></div>
-                        </div>
-                        <div class="col-md-3 col-xs-12">
-                            <input id="searchCountry" type="text" class="form-control"
-                                   style="font-family: Arial, FontAwesome" placeholder="&#xF002; Buscar país">
-                            <div id="countriesList" style="overflow: auto; max-height: 400px;">
-                                <!--<h5 style="color: #72777a; font-weight: bold">100K</h5>
-                                <small style="color: #72777a">Visitantes de </small>
-                                <span class="pull-right">50%</span>
-                                <div class="c-progress">
-                                  <div class="c-progress-bar">
-                                  </div>
                                 </div>-->
+                            </h4>
+                        </div>
+                        <div class="panel-body collapse-up">
+                            <div class="col-md-12 text-center" style="z-index: 2;">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button class="switchCountryChart btn btn-primary" data-chart="geo">
+                                        <i class="fa fa-map"></i>
+                                    </button>
+                                    <button class="switchCountryChart btn btn-default" data-chart="pie">
+                                        <i class="fa fa-pie-chart"></i>
+                                    </button>
+                                    <button class="switchCountryChart btn btn-default" data-chart="column">
+                                        <i class="fa fa-bar-chart"></i>
+                                    </button>
+                                    <button class="switchCountryChart btn btn-default" data-chart="line">
+                                        <i class="fa fa-line-chart"></i>
+                                    </button>
+                                </div>
                             </div>
+                            <div class="col-md-12 col-xs-12">
+                                <div id="chartContentCountries"></div>
+                            </div>
+                            <!-- <div class="col-md-4 col-xs-12">
+                                <input id="searchCountry" type="text" class="form-control"
+                                       style="font-family: Arial, FontAwesome" placeholder="&#xF002; Buscar país">
+                                <div id="countriesList" style="overflow: scroll; max-height: 300px;"></div>
+                            </div> -->
+
+                            <!-- <div class="col-md-12 col-xs-12">
+                                <div class="text-center" id="cloudWordsCountry" style="width:100%; height: 50%;"></div>
+                                <hr>
+                            </div> -->
+
+                            <!-- <div class="col-md-2 col-xs-12 text-center">
+                                <i class="fa fa-globe" style="color: dodgerblue;"></i>
+                                <span id="totalContinentes" style="color: #72777a; font-weight: bold;"></span>
+                                <span style="color: #72777a"> Continentes </span>
+                            </div>
+                            <div class="col-md-2 col-xs-12 text-center">
+                                <i class="fa fa-flag" style="color: darkgreen;"></i>
+                                <span id="totalCountries" style="color: #72777a; font-weight: bold;"></span>
+                                <span style="color: #72777a;"> Países</span>
+                            </div>
+                            <div class="col-md-2 col-xs-12 totalType text-center">
+                                <i id="itotalType" class="fa"></i>
+                                <span id="totalType" style="color: #72777a; font-weight: bold;"></span>
+                                <span style="color: #72777a;"></span>
+                            </div>-->
+                            <!-- <div class="col-md-3 col-xs-12 mainCountry text-center">
+                                <i class="fa fa-trophy" style="color: gold"></i>
+                                <span id="mainCountry" style="color: #72777a; font-weight: bold;"></span>
+                                <span style="color: #72777a"></span>
+                            </div> -->
+                            <!-- <div class="col-md-3 col-xs-12 text-center">
+                                <i id="itotalTypeUnk" style="color: darkred" class="fa"></i>
+                                <span id="totalTypeUnk" style="color: #72777a; font-weight: bold;"></span>
+                                <span style="color: #72777a;"></span>
+                            </div> -->
                         </div>
 
-                        <div class="col-md-12 text-center">
-                            <div id="cloudWordsCountry" style="width:100%; height: 50%;"></div>
-                            <hr>
-                        </div>
-
-                        <div class="col-md-2 text-center">
-                            <i class="fa fa-globe" style="color: dodgerblue;"></i>
-                            <span id="totalContinentes" style="color: #72777a; font-weight: bold;"></span>
-                            <span style="color: #72777a"> Continentes </span>
-                        </div>
-                        <div class="col-md-2 text-center">
-                            <i class="fa fa-flag" style="color: darkgreen;"></i>
-                            <span id="totalCountries" style="color: #72777a; font-weight: bold;"></span>
-                            <span style="color: #72777a;"> Países</span>
-                        </div>
-                        <div class="col-md-2 totalType text-center">
-                            <i id="itotalType" class="fa"></i>
-                            <span id="totalType" style="color: #72777a; font-weight: bold;"></span>
-                            <span style="color: #72777a;"></span>
-                        </div>
-                        <div class="col-md-3 mainCountry text-center">
-                            <i class="fa fa-trophy" style="color: gold"></i>
-                            <span id="mainCountry" style="color: #72777a; font-weight: bold;"></span>
-                            <span style="color: #72777a"></span>
-                        </div>
-                        <div class="col-md-3 text-center">
-                            <i id="itotalTypeUnk" style="color: darkred" class="fa"></i>
-                            <span id="totalTypeUnk" style="color: #72777a; font-weight: bold;"></span>
-                            <span style="color: #72777a;"></span>
-                        </div>
                     </div>
-
                 </div>
 
-                <!-- ########################[CHART CIUDAD]######################## -->
-                <div id="chartPanelCity" class="panel" style="display: none; border-top: 3px solid cadetblue">
-                    <div class="panel-heading">
-                        <h4 style="color: cadetblue">
-                            <i class="fa fa-building"></i>
-                            <span id="panelTitleCity"></span>
+                <div class="col-lg-4 col-md-4">
+                    <div class="info-box bg-dodgerblue">
+                        <span class="info-box-icon totalType"><i id="itotalType" class="fa"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-number" id="totalType"></span>
+                            <span class="info-box-text"></span>
+                            <!-- <div class="progress">
+                                <div class="progress-bar" style="width: 50%"></div>
+                            </div> -->
+                            <span class="progress-description">
+
+                            </span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                    <div class="info-box bg-aqua">
+                        <span class="info-box-icon"><i class="fa fa-globe"></i></span>
+
+                        <div class="info-box-content">
+                            <span class="info-box-number" id="totalContinentes"></span>
+                            <span class="info-box-text">Continentes</span>
+
+                          <!-- <div class="progress">
+                            <div class="progress-bar" style="width: 50%"></div>
+                          </div> -->
+                          <!-- <span class="progress-description">
+                              <i class="fa fa-flag"></i>
+                              <span id="totalCountries" style="font-weight: bold;"></span>
+                              Países
+                          </span> -->
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                    <div class="info-box bg-green">
+                        <span class="info-box-icon"><i class="fa fa-flag"></i></span>
+
+                        <div class="info-box-content">
+                          <span class="info-box-number" id="totalCountries"></span>
+                          <span class="info-box-text">Países</span>
+
+                          <!-- <div class="progress">
+                            <div class="progress-bar" style="width: 50%"></div>
+                          </div> -->
+                          <!-- <span class="progress-description">
+                              <i class="fa fa-flag"></i>
+                              <span id="totalCountries" style="font-weight: bold;"></span>
+                              Países
+                          </span> -->
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                </div>
 
 
-                            <div class="pull-right">
-                                <!--<span class="btn btn-default export-action" title="Descargar Imagen PNG"
-                                      data-charttype="city" data-typeexport="png" role="button">
-                                    <i class="fa fa-download"></i>
-                                </span>
-                                <span class="btn btn-default export-action" title="Compartir en mi página web"
-                                      data-charttype="city" data-typeexport="embed" role="button">
-                                    <i class="fa fa-share-alt"></i>
-                                </span>-->
-                                <span class="dropdown" style="margin-left: 5px;">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                        <span class="fa fa-download"></span>
+
+
+
+
+                <div class="col-lg-4 col-md-4">
+                    <div class="info-box bg-gold">
+                        <span class="info-box-icon"><i class="fa fa-trophy"></i></span>
+
+                        <div class="info-box-content">
+                          <span class="info-box-number" id="mainCountry"></span>
+                          <span class="info-box-text"></span>
+                          <div class="progress">
+                            <div id="mainCountryProgress" class="progress-bar" style="width: 50%"></div>
+                          </div>
+                          <span class="progress-description">
+                              <i id="mainCountryPorcentIcon" class="fa"></i>
+                              <span id="mainCountryPorcent" style="font-weight: bold;"></span>
+
+                          </span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                    <div class="info-box bg-red">
+                        <span class="info-box-icon"><i id="itotalTypeUnk" style="color: darkred" class="itotalTypeUnk fa"></i></span>
+
+                        <div class="info-box-content">
+                          <span class="info-box-number" id="totalTypeUnk"></span>
+                          <span class="info-box-text"></span>
+                          <div class="progress">
+                            <div id="totalTypeUnkProgress" class="progress-bar" ></div>
+                          </div>
+                          <span class="progress-description">
+                              <i id="itotalTypeUnk2" class="itotalTypeUnk fa"></i>
+                              <span id="totalTypeUnkPorcent" style="font-weight: bold;"></span>
+
+                          </span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+
+                    <div class="panel" style="border-top: 3px solid dodgerblue;">
+                        <div class="panel-heading">
+                            <h4 style="color: dodgerblue;">
+                                <i class="fa fa-cloud"></i>
+                                <span id="panelTitleCloudWordsCountry"></span>
+                            </h4>
+                        </div>
+                        <div class="panel-body">
+                                <div class="text-center" id="cloudWordsCountry" style="width:100%; height: 50%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END  #chartPanelCountries-->
+
+            <!-- ########################[CHART CIUDAD]######################## -->
+            <div id="chartPanelCity" style="display: none">
+                <div class="col-lg-8">
+                    <div class="panel" style=" border-top: 3px solid cadetblue">
+                        <div class="panel-heading">
+                            <h4 style="color: cadetblue">
+                                <i class="fa fa-building"></i>
+                                <span id="panelTitleCity"></span>
+
+
+                                <div class="pull-right">
+                                    <!--<span class="btn btn-default export-action" title="Descargar Imagen PNG"
+                                          data-charttype="city" data-typeexport="png" role="button">
+                                        <i class="fa fa-download"></i>
+                                    </span>
+                                    <span class="btn btn-default export-action" title="Compartir en mi página web"
+                                          data-charttype="city" data-typeexport="embed" role="button">
+                                        <i class="fa fa-share-alt"></i>
+                                    </span>-->
+                                    <span class="dropdown" style="margin-left: 5px;">
+                                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <span class="fa fa-download"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                            <li>
+                                                <a href="javascript:void(0)" class="export-action" data-charttype="city" data-typeexport="png">
+                                                    <i class="fa fa-image"></i> Descargar imagen PNG
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                    <span class="dropdown" style="margin-left: 5px;">
+                                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <span class="fa fa-share-alt"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                            <li>
+                                                <a href="javascript:void(0)" class="export-action" data-charttype="city" data-typeexport="embed">
+                                                    <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                </div>
+
+
+                                <!--<div class="dropdown pull-right">
+                                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-bars"></span>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                                         <li>
-                                            <a href="javascript:void(0)" class="export-action" data-charttype="city" data-typeexport="png">
-                                                <i class="fa fa-image"></i> Descargar imagen PNG
-                                            </a>
+                                          <a href="javascript:void(0)" class="export-action" data-charttype="city" data-typeexport="png">
+                                            <i class="fa fa-image"></i>
+                                            Descargar Imagen PNG
+                                          </a>
                                         </li>
-                                    </ul>
-                                </span>
-                                <span class="dropdown" style="margin-left: 5px;">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                        <span class="fa fa-share-alt"></span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li class="divider"></li>
                                         <li>
                                             <a href="javascript:void(0)" class="export-action" data-charttype="city" data-typeexport="embed">
-                                                <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                              <i class="fa fa-share-alt"></i>
+                                              Compartir en mi página web
                                             </a>
                                         </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                          <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
+                                        </li>
                                     </ul>
-                                </span>
+                                </div>-->
+                            </h4>
+                        </div>
+                        <div class="panel-body collapse-up">
+                            <div class="col-md-12 text-center" style="z-index: 2;">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button class="switchCityChart btn btn-default" data-chart="pie"><i
+                                                class="fa fa-pie-chart"></i></button>
+                                    <button class="switchCityChart btn btn-primary" data-chart="column"><i
+                                                class="fa fa-bar-chart"></i></button>
+                                    <button class="switchCityChart btn btn-default" data-chart="line"><i
+                                                class="fa fa-line-chart"></i></button>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-xs-12">
+                                <div id="chartContentCities"></div>
                             </div>
 
 
-                            <!--<div class="dropdown pull-right">
-                                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <span class="fa fa-bars"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                    <li>
-                                      <a href="javascript:void(0)" class="export-action" data-charttype="city" data-typeexport="png">
-                                        <i class="fa fa-image"></i>
-                                        Descargar Imagen PNG
-                                      </a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li>
-                                        <a href="javascript:void(0)" class="export-action" data-charttype="city" data-typeexport="embed">
-                                          <i class="fa fa-share-alt"></i>
-                                          Compartir en mi página web
-                                        </a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li>
-                                      <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
-                                    </li>
-                                </ul>
-                            </div>-->
-                        </h4>
+                        </div>
                     </div>
-                    <div class="panel-body collapse-up">
-                        <div class="col-md-12 text-center" style="z-index: 2;">
-                            <div class="btn-group" role="group" aria-label="...">
-                                <button class="switchCityChart btn btn-default" data-chart="pie"><i
-                                            class="fa fa-pie-chart"></i></button>
-                                <button class="switchCityChart btn btn-primary" data-chart="column"><i
-                                            class="fa fa-bar-chart"></i></button>
-                                <button class="switchCityChart btn btn-default" data-chart="line"><i
-                                            class="fa fa-line-chart"></i></button>
-                            </div>
+
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                    <div class="info-box bg-cadetblue">
+                        <span class="info-box-icon"><i class="fa fa-building"></i></span>
+
+                        <div class="info-box-content">
+                          <span class="info-box-number" id="totalCities"></span>
+                          <span class="info-box-text">Ciudades</span>
+                          <!-- <div class="progress">
+                            <div id="totalTypeUnkProgress" class="progress-bar" ></div>
+                          </div> -->
+                          <span class="progress-description">
+                              <i class="fa fa-flag"></i>
+                              <span id="totalCountriesCities" style="font-weight: bold;"></span>
+                              Países
+                          </span>
                         </div>
-                        <div class="col-md-8 col-xs-12">
-                            <div id="chartContentCities"></div>
-                        </div>
-                        <div class="col-md-4">
+                        <!-- /.info-box-content -->
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="panel">
+                        <div class="panel-body">
                             <input id="searchCity" type="text" class="form-control"
                                    style="font-family: Arial, FontAwesome" placeholder="&#xF002; Buscar Ciudad">
-                            <div id="citiesList" style="overflow: auto; max-height: 400px;">
+                            <div id="citiesList" style="overflow: auto; max-height: 450px;">
 
                             </div>
                         </div>
-
-
-                        <div class="col-md-12 col-xs-12">
-                            <!--<div id="chartContentCities" class="chart" style="width: 1000px; height: 500px;"></div>-->
-                            <table id="tableContentCities" class="table table-striped table-bordered"
-                                   style="width:100%"></table>
-                        </div>
-
                     </div>
                 </div>
 
-                <!-- ########################[CHART MES]######################## -->
-                <div id="chartPanelMonths" class="panel" style="display: none; border-top: 3px solid darkred">
-                    <div class="panel-heading">
-                        <h4 style="color: darkred">
-                            <i class="fa fa-calendar"></i>
-                            <span id="panelTitleMonths"></span>
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
 
-                            <div class="pull-right">
-                               <!-- <span class="btn btn-default export-action" title="Descargar Imagen PNG"
-                                      data-charttype="month" data-typeexport="png" role="button">
-                                    <i class="fa fa-download"></i>
-                                </span>
-                                <span class="btn btn-default export-action" title="Compartir en mi página web"
-                                      data-charttype="month" data-typeexport="embed" role="button">
-                                    <i class="fa fa-share-alt"></i>
-                                </span>-->
-                                <span class="dropdown" style="margin-left: 5px;">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                        <span class="fa fa-download"></span>
+                                <div class="text-center" id="cloudWordsCity" style="width:100%; height: 50%;"></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END chartPanelCity -->
+
+            <!-- ########################[CHART MES]######################## -->
+            <div id="chartPanelMonths" style="display: none">
+                <div class="col-md-8">
+
+                    <div class="panel" style="border-top: 3px solid darkred">
+                        <div class="panel-heading">
+                            <h4 style="color: darkred">
+                                <i class="fa fa-calendar"></i>
+                                <span id="panelTitleMonths"></span>
+
+                                <div class="pull-right">
+                                   <!-- <span class="btn btn-default export-action" title="Descargar Imagen PNG"
+                                          data-charttype="month" data-typeexport="png" role="button">
+                                        <i class="fa fa-download"></i>
+                                    </span>
+                                    <span class="btn btn-default export-action" title="Compartir en mi página web"
+                                          data-charttype="month" data-typeexport="embed" role="button">
+                                        <i class="fa fa-share-alt"></i>
+                                    </span>-->
+                                    <span class="dropdown" style="margin-left: 5px;">
+                                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <span class="fa fa-download"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                            <li>
+                                                <a href="javascript:void(0)" class="export-action" data-charttype="month" data-typeexport="png">
+                                                    <i class="fa fa-image"></i> Descargar imagen PNG
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                    <span class="dropdown" style="margin-left: 5px;">
+                                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                            <span class="fa fa-share-alt"></span>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                            <li>
+                                                <a href="javascript:void(0)" class="export-action" data-charttype="month" data-typeexport="embed">
+                                                    <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </span>
+                                </div>
+                                <!--<div class="dropdown pull-right">
+                                    <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                        <span class="fa fa-bars"></span>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                                         <li>
-                                            <a href="javascript:void(0)" class="export-action" data-charttype="month" data-typeexport="png">
-                                                <i class="fa fa-image"></i> Descargar imagen PNG
-                                            </a>
+                                          <a href="javascript:void(0)" class="export-action" data-charttype="month" data-typeexport="png">
+                                             <i class="fa fa-image"></i>
+                                             Descargar Imagen PNG
+                                           </a>
                                         </li>
-                                    </ul>
-                                </span>
-                                <span class="dropdown" style="margin-left: 5px;">
-                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                        <span class="fa fa-share-alt"></span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                        <li class="divider"></li>
                                         <li>
                                             <a href="javascript:void(0)" class="export-action" data-charttype="month" data-typeexport="embed">
-                                                <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                              <i class="fa fa-share-alt"></i>
+                                              Compartir en mi página web
                                             </a>
                                         </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                          <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
+                                        </li>
                                     </ul>
-                                </span>
+                                </div>-->
+                            </h4>
+                        </div>
+                        <div class="panel-body collapse-up">
+                            <div class="col-md-12 text-center" style="z-index: 2;">
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button class="switchMonthChart btn btn-primary" data-chart="pie"><i
+                                                class="fa fa-pie-chart"></i></button>
+                                    <button class="switchMonthChart btn btn-default" data-chart="column"><i
+                                                class="fa fa-bar-chart"></i></button>
+                                    <button class="switchMonthChart btn btn-default" data-chart="line"><i
+                                                class="fa fa-line-chart"></i></button>
+                                </div>
                             </div>
-                            <!--<div class="dropdown pull-right">
-                                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    <span class="fa fa-bars"></span>
-                                </button>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                    <li>
-                                      <a href="javascript:void(0)" class="export-action" data-charttype="month" data-typeexport="png">
-                                         <i class="fa fa-image"></i>
-                                         Descargar Imagen PNG
-                                       </a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li>
-                                        <a href="javascript:void(0)" class="export-action" data-charttype="month" data-typeexport="embed">
-                                          <i class="fa fa-share-alt"></i>
-                                          Compartir en mi página web
-                                        </a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li>
-                                      <a href="javascript:void(0)" class="angle-panel-collapse">Ocultar</a>
-                                    </li>
-                                </ul>
-                            </div>-->
-                        </h4>
-                    </div>
-                    <div class="panel-body collapse-up">
-                        <div class="col-md-12 text-center" style="z-index: 2;">
-                            <div class="btn-group" role="group" aria-label="...">
-                                <button class="switchMonthChart btn btn-primary" data-chart="pie"><i
-                                            class="fa fa-pie-chart"></i></button>
-                                <button class="switchMonthChart btn btn-default" data-chart="column"><i
-                                            class="fa fa-bar-chart"></i></button>
-                                <button class="switchMonthChart btn btn-default" data-chart="line"><i
-                                            class="fa fa-line-chart"></i></button>
+                            <div class="col-md-12">
+                                <div id="chartContentMonths" style="height: 380px;"></div>
                             </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div id="chartContentMonths" style="height: 500px;"></div>
-                        </div>
-                        <div class="col-md-4 col-xs-12" style="overflow: auto; max-height: 500px;">
-                            <div id="monthsList" style="overflow: auto; max-height: 250px;"></div>
-                            <div id="cloudWordsMonth" style="width:100%; height: 50%; max-height: 250px;"></div>
-                        </div>
+                            <!-- <div class="col-md-4 col-xs-12" style="overflow: auto; max-height: 500px;">
+                                <div id="monthsList" style="overflow: auto; max-height: 250px;"></div>
+                            </div> -->
 
-                        <div class="col-md-12 text-center" style="display: inline-block">
-                            <hr>
-                        </div>
-                        <div class="col-md-12 text-center">
-                            <div class="col-md-6 totalType">
-                                <i id="itotalTypeMonth" class="fa"></i>
-                                <span id="totalMonth" style="color: #72777a; font-weight: bold;"></span>
-                                <span style="color: #72777a;"></span>
+                            <!-- <div class="col-md-12 text-center" style="display: inline-block">
+                                <hr>
                             </div>
-                            <div class="col-md-6">
-                                <span id="monthUp" style="color: #72777a; font-weight: bold;"></span>
-                                <span style="color: #72777a">  </span>
-                                <i class="fa fa-level-up fa-lg" style="color: green;"></i>
-                            </div>
+                            <div class="col-md-12 text-center">
+                                <div class="col-md-6 totalType">
+                                    <i id="itotalTypeMonth" class="fa"></i>
+                                    <span id="totalMonth" style="color: #72777a; font-weight: bold;"></span>
+                                    <span style="color: #72777a;"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <span id="monthUp" style="color: #72777a; font-weight: bold;"></span>
+                                    <span style="color: #72777a">  </span>
+                                    <i class="fa fa-level-up fa-lg" style="color: green;"></i>
+                                </div>
+                            </div> -->
+
                         </div>
 
                     </div>
 
                 </div>
 
+                <div class="col-lg-4 col-md-4">
+                    <div class="info-box bg-darkred">
+                        <span class="info-box-icon totalType"><i id="itotalTypeMonth" class="fa"></i></span>
 
-                <!-- ########################[CHART NÚMERO]######################## -->
+                        <div class="info-box-content">
+                          <span class="info-box-number" id="totalMonth"></span>
+                          <span class="info-box-text"></span>
+                          <!-- <div class="progress">
+                            <div id="totalTypeUnkProgress" class="progress-bar" ></div>
+                          </div> -->
+                          <span class="progress-description">
+                              <i class="itotalTypeUnk fa"></i>
+                              <span id="totalMonthLongFormat" style="font-weight: bold;"></span>
+
+                          </span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4">
+                    <div class="info-box bg-green">
+                        <span class="info-box-icon"><i class="fa fa-level-up"></i></span>
+
+                        <div class="info-box-content">
+                          <span class="info-box-number" id="monthUp"></span>
+                          <span class="info-box-text"></span>
+                          <div class="progress">
+                            <div id="totalMonthUpProgress" class="progress-bar" ></div>
+                          </div>
+                          <span class="progress-description">
+                              <i class="itotalTypeUnk fa"></i>
+                              <span id="totalMonthUpLongFormat" style="font-weight: bold;"></span>
+
+                          </span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="panel">
+                        <div class="panel-body">
+                            <div id="cloudWordsMonth" style="width:100%; height: 50%; max-height: 250px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ########################[CHART NÚMERO]######################## -->
+            <div class="col-md-12">
                 <div id="chartPanelNumber" class="panel" style="display: none; border-top: 3px solid darkgreen">
                     <div class="panel-heading">
                         <h4 style="color: darkgreen">
@@ -785,7 +1080,7 @@
                     <div class="panel-heading">
                         <h4 style="color: #555e81">
                             <i class="fa fa-users"></i>
-                            <span>Roles</span>
+                            <span id="panelTitleRoles"></span>
                             <div class="pull-right">
                                 <span class="dropdown" style="margin-left: 5px;">
                                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -855,7 +1150,7 @@
                     <div class="panel-heading">
                         <h4 style="color: #00adc1">
                             <i class="fa fa-transgender"></i>
-                            <span>Géneros</span>
+                            <span id="panelTitleGenders">Géneros</span>
                             <div class="pull-right">
                                 <span class="dropdown" style="margin-left: 5px;">
                                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -1168,6 +1463,6 @@
     <script src="{{ asset('js/pluggins/download.js') }}"></script>
     <script src="{{ asset('js/statsarrays.js') }}"></script>
     <script src="{{ asset('js/stats/translate.objects.js') }}" charset="utf-8"></script>
-    <script src="{{ asset('js/stats/stats.js') }}"></script>
+    <script src="{{ asset('js/stats/stats_.js') }}"></script>
 
 @stop

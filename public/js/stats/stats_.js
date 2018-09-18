@@ -1,12 +1,25 @@
-/*=================================================
-=============== STATS MODULE ======================
-==================================================*/
-var folderIdActive = 0;
+//config required for each views
+var displayDateES, displayDateEN, translate = [];
+switch (currentLang) {
+	case 'es':
+		for(var i in esObject) {
+			translate[i] = esObject[i];
+		}
+        //data for view
+		break;
+	case 'en':
+		for(var i in enObject) {
+			translate[i] = enObject[i];
+		}
+        //data for view
+		break;
+}
+// end config required for each views
 
 var descargas = 0;//Descargas totales
 var color;
 
-var globalFileId;//globalCSVID
+var globalCSVID = 0;
 
 var globalTypeReport;
 
@@ -19,7 +32,7 @@ var wordsCountry = [];
 var wordsCity = [];
 var wordsMonth = [];
 var wordsNumber = [];
-var wordsRoles = [];
+var wordsRoles = []
 
 var imageChartType,
     imageChartText,
@@ -31,8 +44,7 @@ var imageChartType,
     imageChartTotal;
 
 var imageChartRoles,
-    imageChartGenders,
-    imageChartAffiliation;
+    imageChartGenders;
 
 
 /*Deprecated*/
@@ -51,75 +63,76 @@ var indexArrayRoles = []
 var dataSet = [];//alamacena todos los datos parseados del csv
 var showCharts = [];
 
-var liFolderId;
-var filePath;
-
-/*=================================================
-===============  ======================
-==================================================*/
-// function startConfigModule(){
-//     $('#chartsModuleContent').hide();
-//     $('#configModuleContent').show();
-//     //$('#side-menu > li.folder-list').removeClass('active').find('ul').removeClass('in');
-// }
-
-/*=================================================
-=============== STATS MODULE ======================
-==================================================*/
-$(document).ready(function(){
-    var data;
-    if(!fileNameParam){
-        data = {'_token': CSRF_TOKEN, 'switchCase': 'getLastFile'};
-    } else {
-        data = {'_token': CSRF_TOKEN, 'switchCase': 'seeFileAgain', 'fileName': fileNameParam};
+var isMobile = {
+    Android: function() {
+        return navigator.userAgent.match(/Android/i);
+    },
+    BlackBerry: function() {
+        return navigator.userAgent.match(/BlackBerry/i);
+    },
+    iOS: function() {
+        return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+    },
+    Opera: function() {
+        return navigator.userAgent.match(/Opera Mini/i);
+    },
+    Windows: function() {
+        return navigator.userAgent.match(/IEMobile/i);
+    },
+    any: function() {
+        return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
     }
-    //fadeOutLoader();
-    start(data);
+};
+
+$(document).ready(function() {
+    $('.home-item-menu').css('display', 'none');
+    $('.global-item-menu').css('display', 'block');
+
+    if(fileName != 'noData'){
+        $("#chartsContent").css('display', 'block');
+        $("#noDataText").css('display', 'none');
+        getDataDB();
+    } else {
+        $("#noDataText")
+            .removeClass('alert-info')
+            .addClass('alert-danger')
+            .html('<strong>Error al recibir los datos. Inténtelo de nuevo, por favor.</strong>');
+    }
 });
 
-function start(data){
-    $('#chartsModuleContent').show();
-    var url;
-    if(!fileNameParam){
-        url = 'files';
-    } else {
-        url = '../files';
-    }
+function getDataDB() {
+    var data = {'_token': CSRF_TOKEN, 'filename': fileName};
+    $.ajax({
+        type: "POST",
+        url: "getdatafiles",
+        data: data,
+        dataType: "JSON",
+        success: function(response) {
+            globalCSVID = response.filesData.file_id;
+            var fileIndices = response.filesData.file_indices;
+            var fileIndicesRoles = response.filesData.file_role_indices;
+            indexArray = JSON.parse("[" + fileIndices + "]");
+            indexArrayRoles = JSON.parse("[" + fileIndicesRoles + "]");
+            globalFileType = response.filesData.file_type;
 
-    var counter = 0;
-    $.post(url, data, function(response){
-        var file_folder_id,
-            file_back_name,
-            file_front_name,
-            fileIndices,
-            fileIndicesRoles,
-            type_report,
-            typeReportIndex;
+            var typeReportIndex = response.filesData.file_report_index;
+            var typeReport = response.filesData.file_report_name;
+            var fileFrontName = response.filesData.file_front_name;
+            //$("#titlePage").text(typeReport);
 
-        if(response[0] == null){
-            location.href = 'config';
-        } else {
-            $.each(response, function(index, v){
-                file_folder_id = v.file_folder_id;
-                liFolderId = file_folder_id;
+            var iconFileSrc = (globalFileType == 'csv') ? 'images/csv-file-primary-color.svg' :
+                                                   'images/xml-file-primary-color.png';
 
-                file_back_name = v.file_back_name;
-                file_front_name = v.file_front_name;
-                globalFileId = v.file_id;
-                fileIndices = v.file_indices;
-                fileIndicesRoles = v.file_role_indices;
-                indexArray = JSON.parse("[" + fileIndices + "]");
-                indexArrayRoles = JSON.parse("[" + fileIndicesRoles + "]");
-                globalFileType = v.file_type;
-                typeReportIndex = v.file_report_index;
-                type_report = v.file_report_name;
+            $('.seeAgain').find('img').attr('src', public_path + iconFileSrc);
+            $('.fileNamePanels').text(fileFrontName);
+            $('.typeReportPanels').text(typeReport);
 
-            });
-
-            var text = 'Información obtenida del reporte <strong style="color: #ad0004;"><i>'+type_report+'</i></strong>.<br> <small>Archivo: ' + file_front_name + '</small>';
-            $('#topTitle').html(text);
-            filePath = public_path + 'files/'+file_back_name
-
+            /*alertContent += '<option value="0">Descargas del archivo del artículo</option>';
+            alertContent += '<option value="1">Visitas a la página del resumen del artículo</option>';
+            alertContent += '<option value="2">Descargas de Archivo del número</option>';
+            alertContent += '<option value="3">Visitas a la página de la tabla de contenidos del número</option>';
+            alertContent += '<option value="4">Visitas a la página principal de la revista</option>';
+  */
             switch (typeReportIndex){
                 case 0:
                 case 2:
@@ -135,121 +148,21 @@ function start(data){
                     break;
             }
 
-            folderIdActive = liFolderId;
-
-            var data = {'_token': CSRF_TOKEN, 'switchCase': 'getFolders'};
-            var countFolders = 2;
-            $.post(url, data, function(response){
-                $.each(response, function(index, v){
-                    $.each(v, function(ind, val){
-                        var folder_name = val.folder_name;
-                        var folder_id = val.folder_id;
-                        var sortOrder = countFolders;
-                        //console.log(file_folder_id);
-                        if(file_folder_id == folder_id){
-                            sortOrder = 1;
-                        }
-
-                        var li = '<li class="folder-list" id="liFolder'+folder_id+'" data-folderid="'+folder_id+'" data-folderorder="'+sortOrder+'">'+
-                                    '<a href="#"><i class="fa fa-bar-chart fa-fw" style="color: darkred"></i> Gráficas de '+folder_name+'<span class="fa arrow"></span></a>'+
-                                    '<ul class="nav nav-second-level" id="folder'+folder_id+'" data-folderid="'+folder_id+'">'+
-
-                                    '</ul>'+
-                                '</li>';
-
-                        $('#side-menu').append(li);
-                        countFolders++;
-                    });
-                });
-
-                // var sortList = $('#side-menu');
-                //
-                // var elements = sortList.children('li.folder-list').get();
-                // elements.sort(function(a,b) {
-                //   var A = $(a).data('folderorder');
-                //   var B = $(b).data('folderorder');
-                //   return (A < B) ? -1 : (A > B) ? 1 : 0;
-                // });
-                //
-                // elements.forEach(function(element) {
-                //   sortList.append(element);
-                // });
-
-                //getFileData(file_back_name);
-
-                //var folderId = $('.folder-list:first').find('ul').data('folderid');
-                // var data = {'_token': CSRF_TOKEN, 'switchCase': 'getFiles', 'folderId': folderId};
-                // $.post('files', data, function(response) {
-                //     $.each(response, function(index, v){
-                //         $.each(v, function(ind, val) {
-                //             var folder_id = val.file_folder_id;
-                //             var file_name = val.file_front_name;
-                //
-                //             var li = '<li class="file-list">'+
-                //                         '<a href="#"><i class="fa fa-file fa-fw"></i> '+file_name+'<span class="fa arrow"></span></a>'+
-                //                         '<ul class="nav nav-third-level">'+
-                //                             '<li>'+
-                //                                 '<a href="panels-wells.html">Panels and Wells</a>'+
-                //                             '</li>'+
-                //                         '</ul>'+
-                //                     '</li>';
-                //
-                //             $('#folder'+folder_id).append(li);
-                //         });
-                //     });
-                //
-                //
-                // });
-
-                $('.folder-list').find('ul#folder'+file_folder_id).addClass('in').parent('.folder-list').addClass('active');
-                //$('.folder-list:first').addClass('active').find('ul').addClass('in');
-
-                //google.charts.load("current", {packages:['corechart']});
-
-
-                google.charts.load("visualization", "1.1", {
-                    packages: ["corechart"]
-                });
-
-                google.charts.load('current', {'packages':['table']});
-                switch (globalFileType) {
-                    case 'csv':
-                        generateArraysCSV();
-                        break;
-                    case 'xml':
-                        generateArraysXML(file_back_name);
-                        break;
-                }
-            });
+            google.charts.load("current", {packages:['corechart']});
+            switch (globalFileType) {
+                case 'csv':
+                    generateArraysCSV();
+                    break;
+                case 'xml':
+                    generateArraysXML();
+                    break;
+            }
         }
-
-
     });
 }
 
-
-$(document).on('click', 'li.folder-list', function(){
-    var thisFolderId = $(this).data('folderid');
-
-    if(thisFolderId != folderIdActive) {
-        folderIdActive = thisFolderId;
-        $('#side-menu').find('li.folder-list').remove();
-        fadeInLoader();
-        // headers = [];
-        // indexArray = [];
-
-        var data = {'_token': CSRF_TOKEN, 'switchCase': 'getLastFileRequest', 'folderId': thisFolderId};
-        start(data);
-
-
-        // $.post('files', data, function(response){
-        //
-        // });
-    }
-
-});
-
-function generateArraysXML(fileName){
+function generateArraysXML(){
+    fadeOutLoader();
     var data = {'_token': CSRF_TOKEN, 'fileName': fileName, 'switchCase': 'stats'};
 
     //var usersDataSet = {};
@@ -259,14 +172,17 @@ function generateArraysXML(fileName){
     var showOnlyGraph = [];
 
     //cabeceras del documento
-    headers = ['Roles', 'Géneros', 'País', 'Afiliación'];
-
-
+    headers = ['Roles', 'Géneros', 'País'];
+    indexArrayRoles.forEach(function (values) {
+        values.forEach(function (value) {
+            //var index = value.i;
+            showOnlyGraph.push(value.v);
+        });
+    });
 
     var chartCountry = 0,
         chartGenders = 0,
-        chartRoles = 0,
-        chartAffiliation = 0;
+        chartRoles = 0;
 
     indexArray.forEach(function (values) {
         values.forEach(function (values) {
@@ -280,28 +196,15 @@ function generateArraysXML(fileName){
                 case 'Roles':
                     chartRoles = 1;
                     break;
-                case 'Afiliación':
-                    chartAffiliation = 1;
-                    break;
 
             }
         });
     });
 
-    if(Boolean(chartRoles)){
-        indexArrayRoles.forEach(function (values) {
-            values.forEach(function (value) {
-                //var index = value.i;
-                showOnlyGraph.push(value.v);
-            });
-        });
-    }
-
     $.post('../../readxml', data, function(response) {
         $.each(response, function(index, v){
             var country = v.country;
             var gender = v.gender;
-            var affiliation = v.affiliation;
 
             var counterRoles = 0;
             $.each(v.roles, function(index, v){
@@ -391,91 +294,20 @@ function generateArraysXML(fileName){
                 // }
 
                 globalTotals = globalTotals + 1;
+
             });
 
             if(chartGenders){
-                if(country == ''){
-                    country = 'UNK';
-                }
-
                 if(gender == ''){
                     gendersObj[0].totals = gendersObj[0].totals + counterRoles;
-                    for(var i = 0; i < counterRoles; i++){
-                        gendersObj[0].countries.push(country);
-                    }
-
                 } else {
                     $.each(gendersObj, function(index, v) {
                         if(gender == v.shortname) {
                             v.totals = v.totals + counterRoles;
-                            for(var i = 0; i < counterRoles; i++){
-                                v.countries.push(country);
-                            }
                         }
                     });
                 }
-             }
-
-             //en esta parte se comparará desde bd las coincidencias
-             if(chartAffiliation) {
-                 var match = [
-                    'El Colegio de México, A.C.',
-                    'El Colegio de México, CEE',
-                    'El Colegio de México, CEDUA',
-                    'El Colegio de México, A. C. CEDUA',
-                    'El Colegio de México, CES',
-                    'El Colegio de México, CEH',
-                    'El Colegio de México, Coordinación de Servicios de Cómputo',
-                    'El Colegio de México (Centro de Estudios Históricos)',
-                    'El Colegio de México, Centro de Estudios Sociológicos',
-                    'El Colegio de México, Centro de Estudios Internacionales',
-                    'El Colegio de México, Centro de Estudios Demográficos, Urbanos y Ambientales',
-                    'El Colegio de México, A.C., Centro de Estudios Económicos',
-                    'El Colegio de México',
-                    'Colegio de México',
-                    'COLEGIO DE MÉXICO',
-                    'Colegio de M[exico',
-                 ];
-
-                 //83
-                var foundValue = 0;
-                for(var i = 0; i < match.length; i++){
-                     if(match[i] == affiliation){
-                         foundValue = 1;
-                     }
-                 }
-
-                 if(foundValue == 1){
-                     // if(affiliationArrg.length < 1){
-                     //     var data = {'affiliation': 'El Colegio de México', 'totals': 1};
-                     //     affiliationArrg[0] = data
-                     //     //affiliationArrg.push(data);
-                     // } else {
-                     //     affiliationArrg[0].totals = affiliationArrg[0].totals + 1;
-                     // }
-                     affiliationArrg[0].totals = affiliationArrg[0].totals + 1;
-                 } else {
-                     if(affiliation == ''){
-                         // if(affiliationArrg.length < 1){
-                         //     var data = {'affiliation': 'Desconocido', 'totals': 1};
-                         //     affiliationArrg[2] = data;
-                         //     //affiliationArrg.push(data);
-                         // } else {
-                         //     affiliationArrg[2].totals = affiliationArrg[2].totals + 1;
-                         // }
-                          affiliationArrg[2].totals = affiliationArrg[2].totals + 1;
-                     } else {
-                         // if(affiliationArrg.length < 1){
-                         //     var data = {'affiliation': 'Otros', 'totals': 1};
-                         //     affiliationArrg[1] = data;
-                         //     //affiliationArrg.push(data);
-                         // } else {
-                         //     affiliationArrg[1].totals = affiliationArrg[1].totals + 1;
-                         // }
-                         affiliationArrg[1].totals = affiliationArrg[1].totals + 1;
-                     }
-                 }
-             }
+            }
         });
 
         // $.each(usersDataSet, function(index, v) {
@@ -503,15 +335,12 @@ function generateArraysXML(fileName){
 
         });
 
-        //console.log(affiliationArrg);
         switchData();
     });
 }
 
-
 function generateArraysCSV() {
-    dataSet = [];
-    d3.text(filePath, function(data) {
+    d3.text(getCsvFile, function(data) {
         var parsedCSV = d3.csv.parseRows(data);
 
         var indexNumber = 0;
@@ -559,7 +388,6 @@ function generateArraysCSV() {
 
         var contador = 0;
         $.each(parsedCSV, function(index, v){
-
             var temp = v;
             if(temp.length > 1) {
                 if (unusableData) {
@@ -686,6 +514,7 @@ function generateArraysCSV() {
                     }// end if chartCity
                 }
                 contador++;
+
                 dataSet.push(temp);
             }
 
@@ -704,23 +533,18 @@ function generateArraysCSV() {
                     });
                 }
             }
-        });
 
-        //console.log(dataSet[0]);
+        });
 
         headers = dataSet[0];
         dataSet.shift();
         switchData();
-    });
+    });//end d3.text()
 }
 
 function switchData() {
-    var panelTitle, li, liHeaderNT;
-    var panelTitleCloudWords;
-
-    var showNumber = 0,
-        showText = 0;
-
+    var panelTitle;
+    var panelTitleCloudWords = 'Nube de palabras de ';
     // switch (globalTypeReport) {
     //     case 'Descargas':
     //         panelTitle += globalTypeReport + '';
@@ -736,319 +560,91 @@ function switchData() {
     //
     // }
 
-    var chartList = $("#liFolder"+liFolderId).find('ul#folder'+liFolderId);
-
     google.charts.load("current", {packages:['corechart']});
     indexArray.forEach(function(objects) {
         objects.forEach(function(v) {
             showCharts.push(v.v);
-
             switch(v.v){
                 case 'Texto':
-                    //$("#chartPanelText").show();
-                    switch (globalTypeReport) {
-                        case 'Descargas':
-                            panelTitle = 'Gráfica comparativa de los principales artículos más descargados';
-                            break;
-                        case 'Visitas':
-                            panelTitle = 'Gráfica comparativa de los principales artículos más visitados';
-                            break;
-                    }
-                    $("#panelTitleText").text(panelTitle);
-                    //$('#liMenuChartText').show();
-                    // li =
-                    // '<li class="header">'+
-                    //     '<a>'+
-                    //         '<i class="fa fa-file fa-fw"></i>'+
-                    //         '<span>Principales Artículos</span>'+
-                    //     '</a>'+
-                    // '</li>'+
-                    // '<li id="liMenuChartText" data-orderid="5" class="chartOption" data-paneltarget="chartPanelText" data-position="'+v.i+'">'+
-                    //     '<a class="link-menu"> '+
-                    //         '<i class="fa fa-font"></i> '+
-                    //         'Por Artículo'+
-                    //     '</a>'+
-                    // '</li>';
-                    li =
-                    '<li id="liMenuChartText" data-orderid="5" class="chartOption" data-paneltarget="chartPanelText" data-position="'+v.i+'">'+
-                        '<a class="link-menu"> '+
-                            '<i class="fa fa-newspaper-o"></i> '+
-                            'Principales Artículos'+
-                        '</a>'+
-                    '</li>';
-
-                    // li = '<li data-orderid="5">'+
-                    //         '<a href="javascript:void(0)"><i class="fa fa-bar-chart fa-fw" style="color: darkred"></i> Principales Artículos <span class="fa arrow"></span></a>'+
-                    //         '<ul class="nav nav-third-level">'+
-                    //             '<li id="liMenuChartText"  class="chartOption" data-paneltarget="chartPanelText" data-position="'+v.i+'">'+
-                    //                 '<a class="link-menu"> '+
-                    //                     '<i class="fa fa-font"></i> '+
-                    //                     'Por Artículo'+
-                    //                 '</a>'+
-                    //             '</li>'+
-                    //         '</ul>'+
-                    //     '</li>';
-
-                    //processDataText(v.i);
+                    $("#chartPanelText").show();
+                    $("#panelTitleText").text(v.v);
+                    $('#liMenuChartText').show();
+                    processDataText(v.i);
                     break;
                 case 'Número':
-                    //$("#chartPanelNumber").show();
-                    switch (globalTypeReport) {
-                        case 'Descargas':
-                            panelTitle = 'Gráfica descriptiva de los principales números más descargados';
-                            panelTitleCloudWords = 'Nube de palabras de todos los números descargados';
-                            break;
-                        case 'Visitas':
-                            panelTitle = 'Gráfica descriptiva de los principales números más visitados';
-                            panelTitleCloudWords = 'Nube de palabras de todos los números visitados';
-                            break;
-                    }
-
-                    $("#panelTitleNumber").text(panelTitle);
-                    $('#panelTitleCloudWordsNumber').text(panelTitleCloudWords);
-
-                    //$('#liMenuChartNumber').show();
-
-                    // li =
-                    // '<li>'+
-                    //     '<a>'+
-                    //         '<i class="fa fa-file fa-fw"></i>'+
-                    //         '<span>Principales Números</span>'+
-                    //     '</a>'+
-                    // '</li>'+
-                    // '<li id="liMenuChartNumber" data-orderid="4" class="chartOption" data-paneltarget="chartPanelNumber" data-position="'+v.i+'">'+
-                    //     '<a class="link-menu">'+
-                    //         '<i class="fa fa-hashtag" style="color: darkgreen"></i> '+
-                    //         'Por Número'+
-                    //     '</a>'+
-                    // '</li>';
-
-                    li =
-                    '<li id="liMenuChartNumber" data-orderid="4" class="chartOption" data-paneltarget="chartPanelNumber" data-position="'+v.i+'">'+
-                        '<a class="link-menu">'+
-                            '<i class="fa fa-hashtag" style="color: darkgreen"></i> '+
-                            'Principales Números'+
-                        '</a>'+
-                    '</li>';
-
-                    // li = '<li data-orderid="4">'+
-                    //         '<a href="javascript:void(0)"><i class="fa fa-bar-chart fa-fw" style="color: darkred"></i> Principales Números <span class="fa arrow"></span></a>'+
-                    //         '<ul class="nav nav-third-level">'+
-                    //             '<li id="liMenuChartNumber" class="chartOption" data-paneltarget="chartPanelNumber" data-position="'+v.i+'">'+
-                    //                 '<a class="link-menu">'+
-                    //                     '<i class="fa fa-hashtag" style="color: darkgreen"></i> '+
-                    //                     'Por Número'+
-                    //                 '</a>'+
-                    //             '</li>'+
-                    //         '</ul>'+
-                    //     '</li>';
-
-                    //processDataNumber(v.i);
+                    $("#chartPanelNumber").show();
+                    $("#panelTitleNumber").text(v.v);
+                    $('#liMenuChartNumber').show();
+                    processDataNumber(v.i);
                     break;
                 case 'Ciudad':
-                    //$("#chartPanelCity").show();
-                    switch (globalTypeReport) {
-                        case 'Descargas':
-                            panelTitle = 'Las principales ciudades donde realizan descargas';
-                            panelTitleCloudWords = 'Nube de palabras de todas las ciudades que realizan descargas';
-                            break;
-                        case 'Visitas':
-                            panelTitle = 'Las principales ciudades desde donde realizan visitas';
-                            panelTitleCloudWords = 'Nube de palabras de todas las ciudades que realizan visitas';
-                            break;
-                        case 'Usuarios':
-                            panelTitle = 'Las principales ciudades con usuarios registrados';
-                            panelTitleCloudWords = 'Nube de palabras de todas las ciudades con usuarios registrados';
-                            break;
-                        default:
-                    }
-
-                    $("#panelTitleCity").text(panelTitle);
-                    $('#panelTitleCloudWordsCity').text(panelTitleCloudWords);
-                    //$('#liMenuChartCity').show();
-                    li = '<li id="liMenuChartCity" data-orderid="2" class="chartOption" data-paneltarget="chartPanelCity" data-position="'+v.i+'">'+
-                        '<a class="link-menu">'+
-                            '<i class="fa fa-building" style="color: cadetblue;"></i> '+
-                            'Por Ciudad'+
-                        '</a>'+
-                    '</li>';
-                    //processDataCities();
+                    $("#chartPanelCity").show();
+                    $("#panelTitleCity").text(panelTitle + ' ' + v.v);
+                    $('#liMenuChartCity').show();
+                    processDataCities();
                     break;
                 case 'País':
                     switch (globalTypeReport) {
                         case 'Descargas':
-                            //panelTitle = 'Gráfica de Países desde donde realizan descargas en el mundo';
-                            panelTitleCloudWords = 'Nube de palabras de los países que realizan descargas';
+                            panelTitle = 'Países que realizan descargas';
+                            panelTitleCloudWords += ' los países que realizan descargas';
                             break;
                         case 'Visitas':
-                            //panelTitle = 'Gráfica de Países desde donde realizan visitas en el mundo';
-                            panelTitleCloudWords = 'Nube de palabras de los países que realizan visitas';
+                            panelTitle = 'Países donde realizan visitas';
+                            panelTitleCloudWords += ' los países que realizan visitas';
                             break;
                         case 'Usuarios':
-                            //panelTitle = 'Gráfica de usuarios regitrados por País';
-                            panelTitleCloudWords = 'Nube de palabras de los países con usuarios registrados';
+                            panelTitle = 'Países con usuarios registrados';
+                            panelTitleCloudWords += ' los países con usuarios registrados';
                             break;
+                        default:
+
                     }
 
-                    //si se cambia el título, cambiarlo también en la función processDataCountries()
                     $("#panelTitleCountries").text(panelTitle);
                     $('#panelTitleCloudWordsCountry').text(panelTitleCloudWords);
                     $("#chartPanelCountries").show();
-                    //$('#liMenuChartCountry').show();
-                    li = '<li id="liMenuChartCountry" data-orderid="1" class="chartOption"  data-paneltarget="chartPanelCountries" data-position="'+v.i+'">'+
-                        '<a class="link-menu">'+
-                            '<i class="fa fa-globe" style="color: dodgerblue;"></i> '+
-                            'Por País'+
-                        '</a>'+
-                    '</li>';
-                    //processDataCountries();
+                    $('#liMenuChartCountry').show();
+                    processDataCountries();
                     break;
                 case 'Mes':
-                    //$("#chartPanelMonths").show();
-                    switch (globalTypeReport) {
-                        case 'Descargas':
-                            panelTitle = 'Comparación de descargas realizadas por mes';
-                            panelTitleCloudWords = 'Nube de palabras de los meses en que se realizaron descargas';
-                            break;
-                        case 'Visitas':
-                            panelTitle = 'Comparación de visitas realizadas por mes';
-                            panelTitleCloudWords = 'Nube de palabras de los meses en que se realizaron descargas';
-                            break;
-                        // case 'Usuarios':
-                        //     panelTitle = 'Países con usuarios registrados';
-                        //     panelTitleCloudWords = 'Nube de palabras de los países con usuarios registrados';
-                        //     break;
-                    }
+                    $("#chartPanelMonths").show();
                     $("#panelTitleMonths").text(panelTitle);
-                    $('#panelTitleCloudWordsMonth').text(panelTitleCloudWords);
-                    //$('#liMenuChartMonth').show();
-                    li = '<li id="liMenuChartMonth" data-orderid="3" class="chartOption" data-paneltarget="chartPanelMonths" data-position="'+v.i+'">'+
-                        '<a class="link-menu">'+
-                            '<i class="fa fa-calendar" style="color: darkred"></i> '+
-                            'Por Mes'+
-                        '</a>'+
-                    '</li>';
-                    //processDataMonths();
+                    $('#liMenuChartMonth').show();
+                    processDataMonths();
                     break;
                 case 'Total':
-                    //$("#chartPanelTotal").show();
+                    $("#chartPanelTotal").show();
                     $("#panelTitleTotal").text(v.v);
                     $('#liMenuChartTotal').show();
-                    //processDataTotal(v.i);
+                    processDataTotal(v.i);
                     break;
                 case 'Roles':
-                    panelTitle = 'Gráfica comparativa por tipo de usuario';
-                    panelTitleCloudWords = 'Nube de palabras por tipo de usuario';
-                    $('#panelTitleRoles').text(panelTitle);
-                    $('#panelTitleCloudWordsRoles').text(panelTitleCloudWords);
-                    //$("#chartPanelRoles").show();
-                    //$('#liMenuChartRole').show();
-                    li = '<li id="liMenuChartRole" data-orderid="2" class="chartOption" data-paneltarget="chartPanelRoles" data-position="'+v.i+'">'+
-                        '<a class="link-menu">'+
-                            '<i class="fa fa-users" style="color: #555e81"></i> '+
-                            'Por Tipo de usuario'+
-                        '</a>'+
-                    '</li>';
-                    //processDataRoles();
+                    $('#panelTitleRoles').text(panelTitle + 'Tipo');
+                    $("#chartPanelRoles").show();
+                    $('#liMenuChartRole').show();
+                    processDataRoles();
                     break;
                 case 'Géneros':
-                    panelTitle = 'Gráfica comparativa de usuarios por Géneros';
-                    $('#panelTitleGenders').text(panelTitle);
+                    $('#panelTitleGenders').text(panelTitle + ' ' + v.v);
                     $('#chartPanelGenders').show();
-                    //$('#liMenuChartGender').show();
-                    li = '<li id="liMenuChartGender" data-orderid="3" class="chartOption" data-paneltarget="chartPanelGenders" data-position="'+v.i+'">'+
-                        '<a class="link-menu">'+
-                            '<i class="fa fa-transgender" style="color: #00adc1"></i> '+
-                            'Por Géneros'+
-                        '</a>'+
-                    '</li>';
-                    //processDataGenders();
-                    break;
-                case 'Afiliación':
-                    panelTitle = 'Gráfica comparativa por afiliación';
-                    $('#panelTitleAffiliation').text(panelTitle);
-                    li = '<li id="liMenuChartAffiliation" data-orderid="4" class="chartOption" data-paneltarget="chartPanelAffiliation" data-position="'+v.i+'">'+
-                        '<a class="link-menu">'+
-                            '<i class="fa fa-handshake-o" style="color: purple"></i> '+
-                            'Por Afiliación'+
-                        '</a>'+
-                    '</li>';
+                    $('#liMenuChartGender').show();
+                    processDataGenders();
                     break;
             }// end switch
-            //$("#liFolder"+liFolderId).find('ul#folder'+liFolderId).append(li);
-            chartList.append(li);
         });
     });
 
-    $('#side-menu').metisMenu();
+    if(isMobile.any()) {
 
-    var elements = chartList.children('li').get();
-    elements.sort(function(a,b) {
-      var A = $(a).data('orderid');
-      var B = $(b).data('orderid');
-      return (A < B) ? -1 : (A > B) ? 1 : 0;
-    });
+    } else {
+        $("#menuOptionCharts").css('display', 'block').addClass('active').find('ul').addClass('in');
+    }
 
-    elements.forEach(function(element) {
-      chartList.append(element);
-    });
-
-    // if(isMobile.any()) {
-    //
-    // } else {
-    //
-    //     //$("#liFolder"+liFolderId).addClass('active').find('ul').addClass('in');
-    //     //$('.folder-list').find('ul#folder'+liFolderId).addClass('in').parent('.folder-list').addClass('Active');
-    // }
-    $('.chartOption:first').click();
     fadeOutLoader();
 }
 
-$(document).on('click', '.chartOption', function() {
-    var element = $(this).data('paneltarget');
-    var position = $(this).data('position');
-
-    $('.chartContent').hide();
-    $('.chartOption').find('a').removeClass('active');
-    $(this).find('a').addClass('active');
-    $('#'+element).slideDown('slow');
-
-    switch (element) {
-        case 'chartPanelText':
-            processDataText(position);
-            break;
-        case 'chartPanelNumber':
-            processDataNumber(position);
-            break;
-        case 'chartPanelCity':
-            processDataCities(position);
-            break;
-        case 'chartPanelCountries':
-            processDataCountries();
-            break;
-        case 'chartPanelMonths':
-            processDataMonths(position);
-            break;
-        case 'chartPanelRoles':
-            processDataRoles();
-            break;
-        case 'chartPanelGenders':
-            processDataGenders();
-            break;
-        case 'chartPanelAffiliation':
-            processDataAffiliation();
-            break;
-        default:
-    }
-
-
-});
-
-/*========================================
-============COUNTRIES CHART===============
-========================================*/
-// var enter = 0;
-// cloudWordsCountryStatus = 0;
+//############## [Countries Chart] #################
 var countryChartDraw = 'geo';
 $('.switchCountryChart').click(function () {
     countryChartDraw = $(this).data('chart');
@@ -1069,10 +665,6 @@ function processDataCountries() {
 }
 
 function drawChartCountries() {
-    // if(enter > 0) {
-    //     cloudWordsCountryStatus = 1;
-    // }
-    // enter++;
     var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
 
     /*var d = [
@@ -1100,7 +692,6 @@ function drawChartCountries() {
     }
 
     var colors = [];
-    //wordsCountry = [];
 
     $('#countriesList').empty();
 
@@ -1152,7 +743,6 @@ function drawChartCountries() {
                         }
                         break;
                 }
-
                 countPreview++;
 
                 var layer = '<div data-country="'+country+'"><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
@@ -1167,7 +757,6 @@ function drawChartCountries() {
 
                 var word = {text: country, weight: totals};
                 wordsCountry.push(word);
-
             } else {
                 unknowTotals = totals;
                 unknowPercent = Math.round((totals / globalTotals) * 100);
@@ -1209,22 +798,19 @@ function drawChartCountries() {
         default:
     }
 
-    $('#totalType').text(abbreviateNumber(globalTotals)).next('span').text(' '+globalTypeReport + ' totales');
+    $('#totalType').text(abbreviateNumber(globalTotals)).next('span').text(' '+globalTypeReport);
 
     /*********************/
     var str = mainCountry+' '+abbreviateNumber(mainTotals)+' ';
-    var str = mainCountry;
-    var str2 = 'País principal en ' + globalTypeReport;
-    $('#mainCountry').text(str).next('span').text(str2);
+    $('#mainCountry').text(str).next('span').text(globalTypeReport);
     $('#mainCountryProgress').css('width', mainPercent+'%');
-    var bcProgressDescription = abbreviateNumber(mainTotals) +', '+mainPercent+'%'
-    $('#mainCountryPorcent').text(bcProgressDescription);
+    $('#mainCountryPorcent').text(mainPercent+'%');
     /*********************/
     $('#totalTypeUnk').text(abbreviateNumber(unknowTotals)).next('span')
         .text(' '+globalTypeReport + ' sin especificar');
 
     $('#totalTypeUnkProgress').css('width', unknowPercent+'%');
-    $('#totalTypeUnkPorcent').text(unknowPercent+ '%');
+    $('#totalTypeUnkPorcent').text(unknowPercent+ '%')
 
 
     var data = google.visualization.arrayToDataTable(d);
@@ -1232,28 +818,10 @@ function drawChartCountries() {
     var view = new google.visualization.DataView(data);
 
     var title = 'Rating ' + previewLimit + ' de países con mayores ' + globalTypeReport;
-    var panelTitle;
-
 
     switch (countryChartDraw){
         case 'geo':
             //title = 'Todos los países que realizan ' + globalTypeReport;
-            switch (globalTypeReport) {
-                case 'Descargas':
-                    //panelTitle = 'Gráfica de Países desde donde realizan descargas en el mundo';
-                    panelTitle = 'Gráfica de Países donde realizan descargas';
-                    //panelTitleCloudWords += ' los países que realizan descargas';
-                    break;
-                case 'Visitas':
-                    panelTitle = 'Gráfica de Países desde donde realizan visitas en el mundo';
-                    //panelTitleCloudWords += ' los países que realizan visitas';
-                    break;
-                case 'Usuarios':
-                    panelTitle = 'Gráfica de usuarios regitrados por País';
-                    //panelTitleCloudWords += ' los países con usuarios registrados';
-                    break;
-            }
-
             var options = {
                 height: "400",
                 colorAxis: {colors: ['#E05740', '#A41C1E']},
@@ -1261,25 +829,6 @@ function drawChartCountries() {
             var chart = new google.visualization.GeoChart(document.getElementById("chartContentCountries"));
             break;
         case 'pie':
-            switch (globalTypeReport) {
-
-                case 'Descargas':
-                    panelTitle = 'Principales Países con mayores descargas en el mundo';
-                    title = panelTitle;
-                    //panelTitleCloudWords += ' los países que realizan descargas';
-                    break;
-                case 'Visitas':
-                    panelTitle = 'Principales Países con mayores visitas en el mundo';
-                    title = panelTitle;
-                    //panelTitleCloudWords += ' los países que realizan visitas';
-                    break;
-                case 'Usuarios':
-                    panelTitle = 'Principales Países con mayores usuarios registrados en el mundo';
-                    title = panelTitle;
-                    //panelTitleCloudWords += ' los países con usuarios registrados';
-                    break;
-            }
-
             var options = {
                 title: title,
                 is3D: true,
@@ -1290,21 +839,6 @@ function drawChartCountries() {
             break;
         case 'column':
         case 'line':
-            switch (globalTypeReport) {
-                case 'Descargas':
-                    panelTitle = 'Principales Países con mayores descargas en el mundo';
-                    title = panelTitle;
-                    break;
-                case 'Visitas':
-                    panelTitle = 'Principales Países con mayores visitas en el mundo';
-                    title = panelTitle;
-                    break;
-                case 'Usuarios':
-                    panelTitle = 'Principales Países con mayores usuarios registrados en el mundo';
-                    title = panelTitle;
-                    break;
-            }
-
             view.setColumns([
                 0,
                 1,
@@ -1321,7 +855,7 @@ function drawChartCountries() {
                 title: title,
                 bar: {groupWidth: "70%"},
                 legend: { position: "none" },
-                height: "400",
+                height: "500",
                 vAxis: {
                     title: globalTypeReport,
                     gridlines: {count: gridlinesCount},
@@ -1329,12 +863,7 @@ function drawChartCountries() {
                 },
                 hAxis: {
                     title: 'Ciudades',
-                },
-                chartArea:{left:50,top:50,width:"100%",height:"75%"},
-                animation: {
-                    duration: 1500,
-                    startup: true
-                },
+                }
 
             };
             if(countryChartDraw == 'column'){
@@ -1344,8 +873,6 @@ function drawChartCountries() {
             }
             break;
     }
-
-    $("#panelTitleCountries").text(panelTitle);
 
     google.visualization.events.addListener(chart, 'ready', function () {
         imageChartCountry = chart.getImageURI();
@@ -1366,9 +893,7 @@ $("#searchCountry").keyup(function() {
     });
 });
 
-/*========================================
-===============CITIES CHART===============
-========================================*/
+//############## [Cities Chart] #################
 var cityChartDraw = 'column';
 $('.switchCityChart').click(function () {
     cityChartDraw = $(this).data('chart');
@@ -1473,20 +998,7 @@ function drawChartCities() {
 
     var view = new google.visualization.DataView(data);
 
-    var title;
-
-    switch (globalTypeReport) {
-        case 'Descargas':
-            title = 'Las principales ciudades donde realizan descargas';
-            break;
-        case 'Visitas':
-            title = 'Las principales ciudades desde donde realizan visitas';
-            break;
-        case 'Usuarios':
-            title = 'Las principales ciudades con usuarios registrados';
-            break;
-    }
-
+    var title = 'Rating de las '+previewLimit+' ciudades con mayores ' + globalTypeReport;
     switch (cityChartDraw){
         case 'pie':
             var options = {
@@ -1525,10 +1037,6 @@ function drawChartCities() {
                     title: 'Ciudades',
                 },
                 chartArea:{left:50,top:20,width:"100%",height:"75%"},
-                animation: {
-                    duration: 1500,
-                    startup: true
-                },
 
             };
             if(cityChartDraw == 'column'){
@@ -1569,9 +1077,7 @@ $("#searchCity").keyup(function() {
     });
 });
 
-/*========================================
-===============MONTHS CHART===============
-========================================*/
+//############# [Month Chart] #################
 var monthsChartDraw = 'pie';
 $('.switchMonthChart').click(function () {
     monthsChartDraw = $(this).data('chart');
@@ -1645,33 +1151,15 @@ function drawChartMonths(){
         d.push(bar);
         $('#monthsList').append(layer);
 
-        if(v.downloads > 0){
-            var word = {text: v.name, weight: v.downloads};
-            wordsMonth.push(word);
-        }
-
-
+        var word = {text: v.name, weight: v.downloads};
+        wordsMonth.push(word);
     });
 
-    var title = '';
-    switch (globalTypeReport) {
-        case 'Visitas':
-            $('#itotalTypeMonth').addClass('fa-eye');
-            title = 'Comparación de visitas realizadas por mes';
-            break;
-        case 'Descargas':
-            $('#itotalTypeMonth').addClass('fa-download');
-            title = 'Comparación de descargas realizadas por mes';
-            break;
-        default:
-
+    if(globalTypeReport == 'Visitas') {
+        $('#itotalTypeMonth').addClass('fa-eye');
+    } else {
+        $('#itotalTypeMonth').addClass('fa-download');
     }
-
-    // if(globalTypeReport == 'Visitas') {
-    //     $('#itotalTypeMonth').addClass('fa-eye');
-    // } else {
-    //     $('#itotalTypeMonth').addClass('fa-download');
-    // }
 
     //$('#totalMonth').text(abbreviateNumber(globalTotals) + ' ' + globalTypeReport).next('span').text($.number(globalTotals));
     $('#totalMonth').text(abbreviateNumber(globalTotals)).next('span').text(globalTypeReport);
@@ -1695,7 +1183,7 @@ function drawChartMonths(){
 
     var view = new google.visualization.DataView(data);
 
-    // var title = 'Comparación por mes de las descargas realizadas';
+    var title = globalTypeReport + ' por mes';
 
     switch (monthsChartDraw){
         case 'pie':
@@ -1733,11 +1221,7 @@ function drawChartMonths(){
                 hAxis: {
                     title: 'Meses',
                 },
-                chartArea:{left:50,top:20,width:"95%",height:"80%"},
-                animation: {
-                    duration: 1500,
-                    startup: true
-                },
+                chartArea:{left:50,top:20,width:"950%",height:"80%"},
             };
 
 
@@ -1772,9 +1256,7 @@ function drawChartMonths(){
     $('#cloudWordsMonth').jQCloud(wordsMonth);
 }
 
-/*========================================
-===============NUMBER CHART===============
-========================================*/
+//############## [Number Chart] #################
 $("#searchNumber").keyup(function() {
     _this = this;
     // Show only matching TR, hide rest of them
@@ -1912,7 +1394,6 @@ function drawChartNumber() {
             } else {
                 per = Math.round(per);
             }
-
             var layer = '<div data-number="'+text+'"><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
                 '              <small style="color: #72777a">'+ globalTypeReport+' del <span style="font-weight: bold; color: #000">#'+text+'</span></small>\n' +
                 '              <span class="pull-right">'+per+'%</span>\n' +
@@ -1923,9 +1404,6 @@ function drawChartNumber() {
 
 
             $('#numbersList').append(layer);
-
-            var word = {text: '#'+text, weight: totals};
-            wordsNumber.push(word);
 
             totalNumbers++;
         }
@@ -1939,15 +1417,7 @@ function drawChartNumber() {
 
     var dov = (globalTypeReport == 'descargas') ? 'descargados' : 'visitados';
     var ratingPercent = Math.round((ratingdov / globalTotals) * 100);
-    var title = '';
-    switch (globalTypeReport) {
-        case 'Descargas':
-            title = 'Gráfica descriptiva de los principales números más descargados';
-            break;
-        case 'Visitas':
-            title = 'Gráfica descriptiva de los principales números más visitados';
-            break;
-    }
+    var title = 'Rating de los '+ previewLimit +' números más ' + dov + ' ('+ ratingPercent +'%)';
 
     switch (numbersChartDraw){
         case 'pie':
@@ -1982,11 +1452,6 @@ function drawChartNumber() {
                 hAxis: {
                     title: 'Números',
                 },
-                chartArea:{left:50,top:20,width:"95%",height:"80%"},
-                animation: {
-                    duration: 1500,
-                    startup: true
-                },
             };
 
             if(numbersChartDraw == 'column') {
@@ -2015,16 +1480,12 @@ function drawChartNumber() {
         imageChartNumber = chart.getImageURI();
     });
     chart.draw(view, options);
-    $('#cloudWordsNumber').jQCloud(wordsNumber);
 }
 
-
-/*========================================
-===============TEXT CHART===============
-========================================*/
+//############## [Text Chart] #################
 var textChartDraw = 'pie';
 var textArrg = [];
-var tableContentText;
+
 $('.switchTextChart').click(function () {
     textChartDraw = $(this).data('chart');
 
@@ -2045,7 +1506,6 @@ $('.switchTextChart').click(function () {
     }*/
 
     google.charts.setOnLoadCallback(drawChartText);
-
 });
 
 $("#searchText").keyup(function() {
@@ -2062,11 +1522,10 @@ function processDataText(position) {
     var count = 0;
     $.each(dataSet, function(index, value) {
         var text = value[position];
-        var number = value[position + 1];
         var total = parseInt(value[value.length -1]);
         //if(count > 30127) {
         if(textArrg.length == 0){
-            var x = {"text": text, "total": total, "loops": 1, 'number': number};
+            var x = {"text": text, "total": total, "loops": 1};
             textArrg.push(x);
         } else {
             var match = false;
@@ -2084,7 +1543,7 @@ function processDataText(position) {
             }//end for
 
             if(!match) {
-                var x = {"text": text, "total": total, "loops": 1,  'number': number};
+                var x = {"text": text, "total": total, "loops": 1};
                 textArrg.push(x);
             }
         }// end if textArrg.length
@@ -2122,36 +1581,18 @@ function processDataText(position) {
 }
 
 function drawChartText() {
-    var faIcon = (globalTypeReport == 'Descargas') ? '<i class="fa fa-download"></i>' : '<i class="fa fa-eye"></i>';
-    // tableContentText = $('#tableContentText').DataTable({
-    //     columns : [
-    //         {'title': '<i class="fa fa-newspaper-o"></i> Artículo',  'width': '80%'},
-    //         {'title': faIcon + ' ' + globalTypeReport}
-    //     ],
-    // });
-    // tableContentText.destroy();
-    var tdataSet = [];
-
     var _textArrg = textArrg.sort(dynamicSort("total"));
 
     var rows;
 
-    switch (textChartDraw) {
-        case 'pie':
-            rows = [
-                ['Texto', 'Totales'],
-            ];
-            break;
-        case 'column':
-            rows = [
-                ['Texto', 'Totales', { role: 'style' }],
-            ];
-            break;
-        // case 'table':
-        //     rows = [
-        //         ['Texto', globalTypeReport],
-        //     ];
-        //     break;
+    if(textChartDraw == 'pie'){
+        rows = [
+            ['Texto', 'Totales'],
+        ];
+    } else {
+        rows = [
+            ['Texto', 'Totales', { role: 'style' }],
+        ];
     }
     var colors = [];
 
@@ -2163,23 +1604,15 @@ function drawChartText() {
         var colorhexa = colorHexa();
         var totals = v.total;
         var text = v.text;
-        var number =  v.number;
         if(totals > 0){
             if(countPreview < previewLimit) {
-                switch (textChartDraw) {
-                    case 'pie':
-                        var bar = [text, totals];
-                        var color = {color: colorhexa};
-                        colors.push(color);
-                        break;
-                    case 'column':
-                        var bar = [text, totals, 'color: '+colorhexa];
-                        break;
-                    // case 'table':
-                    //     var bar = [text, totals];
-                    //     break;
-                    // default:
 
+                if(textChartDraw == 'pie') {
+                    var bar = [text, totals];
+                    var color = {color: colorhexa};
+                    colors.push(color);
+                } else {
+                    var bar = [text, totals, 'color: '+colorhexa];
                 }
                 rows.push(bar);
             }
@@ -2187,96 +1620,66 @@ function drawChartText() {
 
             var per = (totals / globalTotals) * 100;
 
-
             if(per < parseFloat(1.0)) {
                 per = 1;
             } else {
                 per = Math.round(per);
             }
-            // var layer = '<div data-text="'+text+'"><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
-            //     '              <small style="color: #72777a">'+ globalTypeReport+' del <span style="font-weight: bold; color: #000">'+text+'</span></small>\n' +
-            //     '              <span class="pull-right">'+per+'%</span>\n' +
-            //     '              <div class="c-progress">\n' +
-            //     '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorhexa+' !important">\n' +
-            //     '                </div>\n' +
-            //     '              </div></div>';
-            //
-            //
-            // $('#textList').append(layer);
+            var layer = '<div data-text="'+text+'"><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
+                '              <small style="color: #72777a">'+ globalTypeReport+' del <span style="font-weight: bold; color: #000">'+text+'</span></small>\n' +
+                '              <span class="pull-right">'+per+'%</span>\n' +
+                '              <div class="c-progress">\n' +
+                '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorhexa+' !important">\n' +
+                '                </div>\n' +
+                '              </div></div>';
 
-            var data = [
-                number,
-                text,
-                $.number(totals),
-            ];
 
-            tdataSet.push(data);
+            $('#textList').append(layer);
         }
     });
-
 
     var data = google.visualization.arrayToDataTable(rows);
     var view = new google.visualization.DataView(data);
 
-    var title = '';
-    switch (globalTypeReport) {
-        case 'Descargas':
-            title = 'Gráfica comparativa de los principales artículos más descargados';
-            break;
-        case 'Visitas':
-            title = 'Gráfica comparativa de los principales artículos más visitados';
-            break;
-    }
-    // var title = 'Rating ' + previewLimit + ' de principales ' + globalTypeReport;
+    var title = 'Rating ' + previewLimit + ' de principales ' + globalTypeReport;
 
-    switch (textChartDraw) {
-        // case 'table':
-        //     var chart = new google.visualization.Table(document.getElementById('chartContentText'));
-        //     break;
-        case 'pie':
-            var options = {
-                title: title,
-                is3D: true,
-                chartArea:{left:10,top:20,width:"100%",height:"90%"},
-                slices: colors
-            };
-            var chart = new google.visualization.PieChart(document.getElementById('chartContentText'));
-            break;
-        case 'column':
-            view.setColumns([
-                0,
-                1,
-                {
-                    calc: "stringify",
-                    sourceColumn: 1,
-                    type: "string",
-                    role: "annotation"
-                },
-                2
-            ]);
+    if(textChartDraw == 'pie'){
+        var options = {
+            title: title,
+            is3D: true,
+            chartArea:{left:10,top:20,width:"100%",height:"90%"},
+            slices: colors
+        };
+        var chart = new google.visualization.PieChart(document.getElementById('chartContentText'));
+    } else {
+        view.setColumns([
+            0,
+            1,
+            {
+                calc: "stringify",
+                sourceColumn: 1,
+                type: "string",
+                role: "annotation"
+            },
+            2
+        ]);
 
-            var options = {
-                title: title,
-                bar: {groupWidth: "70%"},
-                legend: { position: "none" },
-                height: "500",
-                vAxis: {
-                    title: globalTypeReport,
-                    gridlines: {count: gridlinesCount},
-                    format: 'short',
-                },
-                hAxis: {
-                    title: 'Textos',
-                },
-                chartArea:{left:50,top:20,width:"95%",height:"80%"},
-                animation: {
-                    duration: 1500,
-                    startup: true
-                },
-            };
+        var options = {
+            title: title,
+            bar: {groupWidth: "70%"},
+            legend: { position: "none" },
+            height: "500",
+            vAxis: {
+                title: globalTypeReport,
+                gridlines: {count: gridlinesCount},
+                format: 'short',
+            },
+            hAxis: {
+                title: 'Textos',
+            },
+        };
 
-            var chart = new google.visualization.ColumnChart(document.getElementById("chartContentText"));
-            break;
+        var chart = new google.visualization.ColumnChart(document.getElementById("chartContentText"));
     }
 
     google.visualization.events.addListener(chart, 'ready', function () {
@@ -2284,57 +1687,260 @@ function drawChartText() {
     });
 
     chart.draw(view, options);
-
-    $('#tableContentTextLabel').html('<i class="fa fa-newspaper-o"></i> Lista de todos los artículos ordenados por el total de '+ globalTypeReport +' de mayor a menor<small class="pull-right">Artículos totales: ' + $.number(countPreview) + '</small>');
-
-    currentLang = 'es';
-    dataTableLangeURL = (currentLang == 'es')
-    ? '//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json'
-    : '//cdn.datatables.net/plug-ins/1.10.19/i18n/English.json';
-
-    if ( $.fn.dataTable.isDataTable( '#tableContentText' ) ) {
-
-    } else {
-        var faIcon = (globalTypeReport == 'Descargas') ? '<i class="fa fa-download"></i>' : '<i class="fa fa-eye"></i>';
-
-        tableContentText =  $('#tableContentText').DataTable({
-            columns : [
-                {'title': '# Número', 'width': '10%'},
-                {'title': '<i class="fa fa-newspaper-o"></i> Artículo'},
-                {'title': faIcon + ' ' + globalTypeReport, 'width': '15%'}
-            ],
-            data: tdataSet,
-            "ordering": false,
-            "order": [[ 1, "desc" ]],
-            "language": {
-                "url": dataTableLangeURL
-            },
-            responsive: true,
-        });
-    }
 }
 
-/*========================================
-===============ROLES CHART================
-========================================*/
-var rolesChartDraw = 'column';
-var rolesTypeColumn = 'stacked';
-var cloudWordsRolesStatus = 0,
-    rolesTypePie = '';
+// function drawChartPie() {
+//     var _textArrg = textArrg.sort(dynamicSort("total"));
+//
+//
+//     var rows = [
+//         ['Texto/Revistas', 'Totales'],
+//     ];
+//
+//     var previewLimit = 10;
+//     var countPreview = 0;
+//     $.each(_textArrg, function(index, v) {
+//         //console.log(v);
+//         color = colorHexa();
+//         var totals = v.total;
+//         var text = v.text;
+//         if(totals > 0){
+//             //console.log(v);
+//             if(countPreview < previewLimit) {
+//                 //console.log(v);
+//                 var bar = [text, totals];
+//                 rows.push(bar);
+//             }
+//             countPreview++;
+//         }
+//     });
+//
+//     var data = google.visualization.arrayToDataTable(rows);
+//
+//     var options = {
+//         title: 'Rating ' + previewLimit + ' de principales ' + globalTypeReport,
+//         is3D: true,
+//         chartArea:{left:10,top:20,width:"100%",height:"90%"}
+//     };
+//
+//     var chart = new google.visualization.PieChart(document.getElementById('chartContentText'));
+//
+//     chart.draw(data, options);
+// }
 
-$(document).on('click', '.switchUserChart', function() {
-//$('.switchUserChart').click(function () {
-    rolesChartDraw = $(this).data('chart');
+// function drawChartText_() {
+//     var title;
+//     //console.log();
+//     var _textArrg = textArrg.sort(dynamicSort("total"));
+//
+//
+//     var d = [
+//         ['Texto/Revistas', 'Totales', { role: 'style' }],
+//     ];
+//
+//     var previewLimit = 10;
+//     var countPreview = 0;
+//     $.each(_textArrg, function(index, v) {
+//         //console.log(v);
+//         color = colorHexa();
+//         var totals = v.total;
+//         var text = v.text;
+//         if(totals > 0){
+//             //console.log(v);
+//             if(countPreview < previewLimit) {
+//                 //console.log(v);
+//                 var bar = [text, totals, 'color: '+color];
+//                 d.push(bar);
+//             }
+//             countPreview++;
+//         }
+//     });
+//
+//     var data = google.visualization.arrayToDataTable(d);
+//
+//     var view = new google.visualization.DataView(data);
+//     view.setColumns([
+//         0,
+//         1,
+//         {
+//             calc: "stringify",
+//             sourceColumn: 1,
+//             type: "string",
+//             role: "annotation"
+//         },
+//         2
+//     ]);
+//
+//     title = '';
+//
+//     var options = {
+//         title: title,
+//         bar: {groupWidth: "70%"},
+//         legend: { position: "none" },
+//         height: "500",
+//         vAxis: {
+//             gridlines: {count: gridlinesCount},
+//             format: 'short',
+//         },
+//     };
+//
+//     if(textChartDraw == 'bar') {
+//         var chart = new google.visualization.BarChart(document.getElementById("chartContentText"));
+//     } else {
+//         var chart = new google.visualization.ColumnChart(document.getElementById("chartContentText"));
+//     }
+//
+//     google.visualization.events.addListener(chart, 'ready', function () {
+//         imageChartText = chart.getImageURI();
+//     });
+//
+//     chart.draw(view, options);
+// }
 
-    switch (rolesChartDraw) {
-        case 'column':
-            rolesTypeColumn = $(this).data('typecolumn');
+
+//############## [Type Total] #################
+function processDataTotal(position) {
+    //totals
+
+    switch (globalTypeReport) {
+        case 'Visitas':
+            $('#panelTotalIcon, #panelUnknowsIcon').addClass('fa-eye');
             break;
-        case 'pie':
-            rolesTypePie = $(this).data('typepie');
+        case 'Descargas':
+            $('#panelTotalIcon, #panelUnknowsIcon').addClass('fa-download');
             break;
     }
-    //rolesTypeColumn = $(this).data('typecolumn');
+
+    $('#panelTotals').text(abbreviateNumber(globalTotals));
+    $('#panelTotalsTypeReport').text(globalTypeReport + '(' + $.number(globalTotals) + ')');
+
+    //months
+    var totalMonths = 0;
+    $.each(monthsObj, function(index, v) {
+        if(v.downloads > 0){
+            totalMonths++;
+        }
+    });
+    $('#panelMonths').text(totalMonths);
+
+    //countries
+    $('#panelCountries').text(globaltotalCountries);
+
+    /*var unKnows = countriesObj[0];
+    var unktotals = unKnows.downloads;
+    var percent = Math.round((unktotals / globalTotals) * 100);
+    $('#panelUnknows').text($.number(unktotals));
+    $('#panelUnknowsSpan').text(percent);*/
+
+
+    /*var mainData = d[1];
+
+    var mainCountry =  mainData[0];
+    var mainTotals = mainData[1];
+    var mainPercent = mainData[2];
+
+    var continents = 0;
+    $.each(continentsObj, function (index, v) {
+        var theyreThere = Boolean(v.totals);
+        if(theyreThere){
+            continents++;
+        }
+    });
+
+
+    $('#totalContinentes, #panelCountContinents').text(continents);
+
+
+
+    $('#totalCountries, #panelCountCountries').text(countCountries);
+
+
+
+    if(globalTypeReport == 'Visitas') {
+        $('#itotalType, #panelTypeReport').addClass('fa-eye');
+    } else {
+        $('#itotalType, #panelTypeReport').addClass('fa-download');
+    }
+
+    $('#totalType').text(abbreviateNumber(globalTotals)).next('span').text(' '+globalTypeReport);
+    $('#panelTotalType').text(abbreviateNumber(globalTotals)).next('div').text(globalTypeReport);
+
+
+
+    var str = mainCountry+' '+abbreviateNumber(mainTotals)+' '+globalTypeReport;
+    $('#mainCountry').text(str).next('span').text(' '+mainPercent+'%');*/
+
+
+    /*var countTotals = 0;
+    $.each(dataSet, function(index, value) {
+      var totals = parseInt(value[position]);
+      countTotals = countTotals + totals;
+    });*/
+
+    //totals = countTotals;
+
+
+    //console.log(countTotals);
+    //google.charts.setOnLoadCallback(drawChartMonths);
+    //var countryDownloads = function() { drawChartCountryDownloads(print, tipoExport); }
+    // var drawChartT = function(){ drawChartTotal(globalTotals) };
+    // google.charts.setOnLoadCallback(drawChartT);
+}
+
+// function drawChartTotal(countTotals) {
+//     var data = google.visualization.arrayToDataTable([
+//         ["option", "total", { role: "style" } ],
+//         ["Totales", countTotals, colorHexa()],
+//     ]);
+//
+//     var view = new google.visualization.DataView(data);
+//     view.setColumns([
+//         0,
+//         1,
+//         {
+//             calc: "stringify",
+//             sourceColumn: 1,
+//             type: "string",
+//             role: "annotation"
+//         },
+//         2
+//     ]);
+//
+//     var options = {
+//         title: "Descargas Totales: " + $.number(countTotals),
+//         bar: {groupWidth: "30%"},
+//         legend: { position: "none" },
+//         height: "500",
+//         vAxis: {
+//             gridlines: {count: 30},
+//             format: 'short',
+//             viewWindow: {
+//                 max:countTotals,
+//             }
+//         },
+//         animation:{
+//             duration: 1000,
+//             easing: 'out',
+//         },
+//
+//     };
+//
+//     var chart = new google.visualization.ColumnChart(document.getElementById("chartContentTotal"));
+//
+//     google.visualization.events.addListener(chart, 'ready', function () {
+//         imageChartTotal = chart.getImageURI();
+//     });
+//     chart.draw(view, options);
+// }
+
+
+//############## [Type Roles] #################
+var rolesChartDraw = 'column';
+var rolesTypeColumn = 'stacked';
+var cloudWordsRolesStatus = 0
+$('.switchUserChart').click(function () {
+    rolesChartDraw = $(this).data('chart');
+    rolesTypeColumn = $(this).data('typecolumn');
 
     if(!$(this).hasClass('btn-primary')) {
         $('.switchUserChart').removeClass('btn-primary').addClass('btn-default');
@@ -2375,10 +1981,10 @@ function drawChartRoles() {
     }
 
     wordsRoles = [];
-    $('#rolesPieChartList').empty();
 
     $('#usersList').empty();
     $.each(_rolesArrg, function(index, v){
+
         colorHex = colorHexa();
 
         var roleType = v.role;
@@ -2412,100 +2018,32 @@ function drawChartRoles() {
 
         switch (rolesChartDraw){
             case 'pie':
-                // var text = roleType + '('+totals+')' + ' ' + globalTypeReport;
-                // var bar = [text, totals];
-                // d.push(bar);
+                var text = roleType + '('+totals+')' + ' ' + globalTypeReport;
+                var bar = [text, totals];
+                d.push(bar);
+                var color = {color: colorHex};
+                colors.push(color);
 
-                if(rolesTypePie == roleType){
-                    d.push(['Nacional - ' + totalNational + ' usuarios', totalNational]);
-                    colors.push({color: '#006D49'});
-                    d.push(['Internacional - ' + totalInternational + ' usuarios', totalInternational]);
-                    colors.push({color: '#F6E300'});
-                    d.push(['Desconocido - ' + totalUnknown + ' usuarios', totalUnknown]);
-                    colors.push({color: '#E6E7E9'});
-
-                    var totalNational = 0;
-                    var totalUnknown = 0;
-                    var totalInternational = 0;
-
-                    for(i in countries) {
-                        switch (countries[i]) {
-                            case 'MX':
-                                totalNational = totalNational + 1;
-                                break;
-                            case 'UNK':
-                                totalUnknown = totalUnknown + 1;
-                                break;
-                            default:
-                                totalInternational = totalInternational + 1;
-                        }
-                    }
-
-                    var per = (totals / globalTotals) * 100;
-
-                    if(per < parseFloat(1.0)) {
-                        per = 1;
-                    } else {
-                        per = Math.round(per);
-                    }
-
-                    // var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
-                    //     '              <small style="color: #72777a">'+ globalTypeReport+' de tipo <span style="font-weight: bold; color: #000">'+roleType+'</span></small>\n' +
-                    //     '              <span class="pull-right">'+per+'% Totales</span>\n' +
-                    //
-                    //     '              <div class="c-progress">\n' +
-                    //     '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;"></div>\n' +
-                    //
-                    //     '              </div></div>';
-                    var perNat = (totalNational / totals) * 100;
-                    var perInternat = (totalInternational / totals) * 100;
-                    var perUnknown = (totalUnknown / totals) * 100;
-
-                    // if(perNat < parseFloat(1.0)) {
-                    //     perNat = 1;
-                    // } else {
-                    //     perNat = Math.round(perNat);
-                    // }
-                    perNat = Math.round(perNat);
-
-                    // if(perInternat < parseFloat(1.0)) {
-                    //     perInternat = 1;
-                    // } else {
-                    //     perInternat = Math.round(perInternat);
-                    // }
-                    perInternat = Math.round(perInternat);
-
-                    // if(perUnknown < parseFloat(1.0)){
-                    //     perUnknown = 1;
-                    // } else {
-                    //     perUnknown = Math.round(perUnknown);
-                    // }
-                    perUnknown = Math.round(perUnknown);
-
-                    var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
-                        '              <small style="color: #72777a">'+ globalTypeReport+' de tipo <span style="font-weight: bold; color: #000">'+roleType+'</span></small>\n' +
-                        '              <span class="pull-right">'+per+'% Totales</span><br>\n' +
-                        '              <div style="width:100%"><small style="font-weight: bold; color: #000">Nacional: '+abbreviateNumber(totalNational)+'</small><small class="pull-right">'+perNat+'%</small></div>'+
-                        '              <div style="width:100%"><small style="font-weight: bold; color: #000">Intenacional: '+abbreviateNumber(totalInternational)+'</small><small class="pull-right">'+perInternat+'%</small></div>'+
-                        '              <div style="width:100%"><small style="font-weight: bold; color: #000">Desconocido: '+abbreviateNumber(totalUnknown)+'</small><small class="pull-right">'+perUnknown+'%</small></div>'+
-                        '              <div class="c-progress">\n' +
-                        '                <div class="c-progress-bar" style="width: '+perNat+'%; background: '+colors[0].color+' !important; float:left"></div>\n' +
-                        '                <div class="c-progress-bar" style="width: '+perInternat+'%; background: '+colors[1].color+' !important; float:left"></div>\n' +
-                        '              </div></div>';
-
-                    $("#usersList").append(layer);
+                var per = (totals / globalTotals) * 100;
+                if(per < parseFloat(1.0)) {
+                    per = 1;
+                } else {
+                    per = Math.round(per);
                 }
 
+                var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
+                    '              <small style="color: #72777a">'+ globalTypeReport+' de rol <span style="font-weight: bold; color: #000">'+roleType+'</span></small>\n' +
+                    '              <span class="pull-right">'+per+'% Totales</span>\n' +
 
+                    '              <div class="c-progress">\n' +
+                    '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;"></div>\n' +
+
+                    '              </div></div>';
+
+                $("#usersList").append(layer);
                 break;
             case 'column':
-                var bar = [
-                    roleType+'('+totals+')',
-                    totalNational,
-                    totalInternational,
-                    totalUnknown,
-                    ''
-                ];
+                var bar = [roleType+'('+totals+')', totalNational, totalInternational, totalUnknown, ''];
                 d.push(bar);
 
                 var perNat = (totalNational / totals) * 100;
@@ -2534,7 +2072,7 @@ function drawChartRoles() {
                 perUnknown = Math.round(perUnknown);
 
                 var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
-                    '              <small style="color: #72777a">'+ globalTypeReport+' de tipo <span style="font-weight: bold; color: #000">'+roleType+'</span></small>\n' +
+                    '              <small style="color: #72777a">'+ globalTypeReport+' de rol <span style="font-weight: bold; color: #000">'+roleType+'</span></small>\n' +
                     '              <span class="pull-right">'+per+'% Totales</span><br>\n' +
                     '              <div style="width:100%"><small style="font-weight: bold; color: #000">Nacional: '+abbreviateNumber(totalNational)+'</small><small class="pull-right">'+perNat+'%</small></div>'+
                     '              <div style="width:100%"><small style="font-weight: bold; color: #000">Intenacional: '+abbreviateNumber(totalInternational)+'</small><small class="pull-right">'+perInternat+'%</small></div>'+
@@ -2544,12 +2082,10 @@ function drawChartRoles() {
                     '                <div class="c-progress-bar" style="width: '+perInternat+'%; background: '+colors[1]+' !important; float:left"></div>\n' +
                     '              </div></div>';
 
+
                 $("#usersList").append(layer);
                 break;
         }
-
-        var options = '<li class="switchUserChart" data-chart="pie" data-typepie="'+roleType+'"><a href="javascript:void(0)"><i class="fa fa-user"></i> '+roleType+'</a></li>';
-        $('#rolesPieChartList').append(options);
 
         var word = {text: roleType, weight: totals};
         wordsRoles.push(word);
@@ -2557,11 +2093,10 @@ function drawChartRoles() {
 
     var data = google.visualization.arrayToDataTable(d);
     var view = new google.visualization.DataView(data);
-    var title = 'Gráfica comparativa por tipo de usuario';
+    var title = 'Roles de Usuarios registrados';
 
     switch (rolesChartDraw){
         case 'pie':
-            title = 'Gráfica comparativa por usuario de tipo Autor';
             var options = {
                 title: title,
                 is3D: true,
@@ -2595,17 +2130,13 @@ function drawChartRoles() {
                     format: 'short',
                 },
                 hAxis: {
-                    title: 'Tipo de usuarios',
+                    title: 'Roles',
                 },
                 isStacked: Boolean(isStacked),
                 series: {
                     0:{color:colors[0]},
                     1:{color:colors[1]},
                     2:{color:colors[2]},
-                },
-                animation: {
-                    duration: 1500,
-                    startup: true
                 },
                 chartArea:{left:50, top:50, width:"100%", height:"80%"},
             };
@@ -2721,6 +2252,8 @@ function drawChartRoles() {
             if(passes){
                 var drawMap = function(){ drawRolesMap(countries, totals, role, national) };
                 google.charts.setOnLoadCallback(drawMap);
+
+
             }
 
         }
@@ -2738,10 +2271,7 @@ function drawRolesMap(countries, gtotals, role, national) {
     $('#relesMainChart').hide();
     $('#rolesMapChart').show();
     $('#rolesListMaps').empty();
-
-    $('.switchUserChart').hide();//.removeClass('btn-primary').addClass('btn-default');
-    $('.backUserRole').show();
-
+    $('.switchUserChart').removeClass('btn-primary').addClass('btn-default');
     wordsRoles = [];
     cloudWordsRolesStatus = 1;
     //var wordsCountryRole = [];
@@ -2785,7 +2315,7 @@ function drawRolesMap(countries, gtotals, role, national) {
         var per = Math.round((totals / gtotals) * 100);
 
         var layer = '<div data-country="'+country+'"><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
-            '              <small style="color: #72777a">Usuarios en <span style="font-weight: bold; color: #000">'+country+'</span></small>\n' +
+            '              <small style="color: #72777a">'+ role+' de <span style="font-weight: bold; color: #000">'+country+'</span></small>\n' +
             '              <span class="pull-right">'+per+'%</span>\n' +
             '              <div class="c-progress">\n' +
             '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;">\n' +
@@ -2812,20 +2342,16 @@ function drawRolesMap(countries, gtotals, role, national) {
             height: "400",
             colorAxis: {colors: ['#00724B', '#00724B']},
         };
-        textLegend = '<strong style="color: #A41C1E">'+gtotals+'</strong> usuarios de tipo <strong style="color: #A41C1E">' + role + '</strong> en <strong style="color: #A41C1E">' + countriesCounter + ' en México</strong>';
+        textLegend = '<strong>'+gtotals+'<strong> Usuarios de rol <strong>' + role + '</strong> en <strong>' + countriesCounter + ' en México</strong>';
     } else {
         var options = {
             height: "400",
             colorAxis: {colors: ['#fff310', '#dcd100']},
         };
-        var foo = (countriesCounter > 1) ? 'países' : 'países';
-        textLegend = '<strong style="color: #A41C1E">'+gtotals+'</strong> usuarios de tipo <strong style="color: #A41C1E">' + role + '</strong> en <strong style="color: #A41C1E">' + countriesCounter + ' '+ foo +'</strong>';
-    }
+        var foo = (countriesCounter > 1) ? 'países' : 'país';
+        textLegend = '<strong>'+gtotals+'<strong> Usuarios de rol <strong>' + role + '</strong> en <strong>' + countriesCounter + ' '+ foo +'</strong>';
 
-    var panelTitle = 'Usuarios internacionales de tipo ' + role;
-    var panelTitleCloudWords = 'Nube de palabras con países de usuarios de tipo ' + role;
-    $('#panelTitleRoles').text(panelTitle);
-    $('#panelTitleCloudWordsRoles').text(panelTitleCloudWords);
+    }
 
     $('#rolesMapLegend').html(textLegend);
 
@@ -2835,18 +2361,7 @@ function drawRolesMap(countries, gtotals, role, national) {
     $('#cloudWordsRoles').jQCloud('update', wordsRoles);
 }
 
-$('.backUserRole').click(function(){
-    $('.switchUserChart').show().first().click();
-    $(this).hide();
-    panelTitle = 'Gráfica comparativa por tipo de usuario';
-    panelTitleCloudWords = 'Nube de palabras por tipo de usuario';
-    $('#panelTitleRoles').text(panelTitle);
-    $('#panelTitleCloudWordsRoles').text(panelTitleCloudWords);
-});
-
-/*========================================
-===============Genders CHART================
-========================================*/
+//############## [Type Genders] #################
 var gendersChartDraw = 'column';
 $('.switchGenderChart').click(function () {
     gendersChartDraw = $(this).data('chart');
@@ -2865,7 +2380,6 @@ function processDataGenders() {
 function drawChartGenders(){
     var _gendersObj = gendersObj.sort(dynamicSort("totals"));
 
-    var colors = [];
     var d;
     switch (gendersChartDraw) {
         case 'pie':
@@ -2877,54 +2391,23 @@ function drawChartGenders(){
             d = [
                 ['Usuarios', 'total', { role: 'style' }],
             ];
-            // d = [
-            //     ['Géneros', 'Nacional', 'Internacional', 'Desconocido', { role: 'annotation' }],
-            // ];
-            // colors = ['#0081a0', '#00BFEC', '#E6E7E9'];
-            // isStacked = true;
             break;
     }
 
-
-    $("#gendersList").empty();
+    var colors = [];
 
     $.each(_gendersObj, function(index, v){
-
         //var colorHex = colorHexa();
         var gEsName = v.esname;
         var gEnName = v.enname;
         var shortName = v.shortname;
         var totals = v.totals;
 
-        var countries = v.countries;
-        var totalNational = 0;
-        var totalUnknown = 0;
-        var totalInternational = 0;
         //definir idioma
         var gender = gEsName;
         var colorHex =  shortName == 'M' ? '#00BFEC' :
                         shortName == 'F' ? '#E15BB7' :
-                        '#ffff00';
-
-        // for(i in countries) {
-        //     switch (countries[i]) {
-        //         case 'MX':
-        //             totalNational = totalNational + 1;
-        //             break;
-        //         case 'UNK':
-        //             totalUnknown = totalUnknown + 1;
-        //             break;
-        //         default:
-        //             totalInternational = totalInternational + 1;
-        //     }
-        // }
-
-        var per = (totals / globalTotals) * 100;
-        if(per < parseFloat(1.0)) {
-            per = 1;
-        } else {
-            per = Math.round(per);
-        }
+                        '#00adc1';
 
         switch (gendersChartDraw){
             case 'pie':
@@ -2934,47 +2417,34 @@ function drawChartGenders(){
 
                 var color = {color: colorHex};
                 colors.push(color);
-
-                var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
-                    '              <small style="color: #72777a">'+ globalTypeReport+' de género <span style="font-weight: bold; color: #000">'+gender+'</span></small>\n' +
-                    '              <span class="pull-right">'+per+'%</span>\n' +
-                    '              <div class="c-progress">\n' +
-                    '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;">\n' +
-                    '                </div>\n' +
-                    '              </div></div>';
-
-                $("#gendersList").append(layer);
                 break;
             case 'column':
-                var bar = [gender+'('+totals+')', totals, 'color: '+colorHex];
+                var bar = [gender, totals, 'color: '+colorHex];
                 d.push(bar);
-
-                // var bar = [
-                //     gender+'('+totals+')',
-                //     totalNational,
-                //     totalInternational,
-                //     totalUnknown,
-                //     ''
-                // ];
-                // d.push(bar);
-
-                var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
-                    '              <small style="color: #72777a">'+ globalTypeReport+' de género <span style="font-weight: bold; color: #000">'+gender+'</span></small>\n' +
-                    '              <span class="pull-right">'+per+'%</span>\n' +
-                    '              <div class="c-progress">\n' +
-                    '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;">\n' +
-                    '                </div>\n' +
-                    '              </div></div>';
-
-                $("#gendersList").append(layer);
                 break;
         }
 
+        var per = (totals / globalTotals) * 100;
+        if(per < parseFloat(1.0)) {
+            per = 1;
+        } else {
+            per = Math.round(per);
+        }
+
+        var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
+            '              <small style="color: #72777a">'+ globalTypeReport+' de género <span style="font-weight: bold; color: #000">'+gender+'</span></small>\n' +
+            '              <span class="pull-right">'+per+'%</span>\n' +
+            '              <div class="c-progress">\n' +
+            '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;">\n' +
+            '                </div>\n' +
+            '              </div></div>';
+
+        $("#gendersList").append(layer);
     });
 
     var data = google.visualization.arrayToDataTable(d);
     var view = new google.visualization.DataView(data);
-    var title = 'Gráfica comparativa de usuarios por Géneros';
+    var title = 'Géneros';
 
     switch (gendersChartDraw){
         case 'pie':
@@ -2987,23 +2457,23 @@ function drawChartGenders(){
             var chart = new google.visualization.PieChart(document.getElementById("chartContentGenders"));
             break;
         case 'column':
-            // view.setColumns([
-            //     0,
-            //     1,
-            //     {
-            //         calc: "stringify",
-            //         sourceColumn: 1,
-            //         type: "string",
-            //         role: "annotation"
-            //     },
-            //     2
-            // ]);
+            view.setColumns([
+                0,
+                1,
+                {
+                    calc: "stringify",
+                    sourceColumn: 1,
+                    type: "string",
+                    role: "annotation"
+                },
+                2
+            ]);
 
             var options = {
                 title: title,
                 bar: {groupWidth: "70%"},
                 legend: { position: "none" },
-                height: "400",
+                height: "500",
                 vAxis: {
                     title: globalTypeReport,
                     gridlines: {count: gridlinesCount},
@@ -3012,7 +2482,7 @@ function drawChartGenders(){
                 hAxis: {
                     title: 'Géneros',
                 },
-                chartArea:{left:50, top:20, width:"100%", height:"80%"},
+                //chartArea:{left:50, top:20, width:"100%", height:"80%"},
             };
             if(rolesChartDraw == 'column'){
                 var chart = new google.visualization.ColumnChart(document.getElementById("chartContentGenders"));
@@ -3028,132 +2498,54 @@ function drawChartGenders(){
     chart.draw(view, options);
 }
 
+$("#breakdownButton").click(function (){
+    var target = $("#countryDesglosDownloadsPanel");
+    if(target.hasClass('hide')){
+        target.css('display', 'block').removeClass('hide');
+        //$(".porcent:first").click();
+        $("select.porcents").val($("select.porcents option:first").val()).change();
 
-/*========================================
-=========== AFFILIATION CHART ============
-========================================*/
-var affiliationArrg = [
-    {'affiliation': 'El Colegio de México A.C.', 'totals': 0},
-    {'affiliation': 'Otros', 'totals': 0},
-    {'affiliation': 'Desconocido', 'totals': 0},
-];
-
-var affiliationChartDraw = 'column';
-$('.switchAffiliationChart').click(function () {
-    affiliationChartDraw = $(this).data('chart');
-    if(!$(this).hasClass('btn-primary')) {
-        $('.switchAffiliationChart').removeClass('btn-primary').addClass('btn-default');
-        $(this).addClass('btn-primary');
     }
-    google.charts.setOnLoadCallback(drawChartAffiliation);
+    $("html, body").animate({scrollTop: target.offset().top}, 500);
+    return false;
 });
 
-function processDataAffiliation(){
-    google.charts.setOnLoadCallback(drawChartAffiliation);
-}
+$('select.porcents').change(function() {
+    var porcent = parseInt($(this).val());
+    var downloads = parseFloat(globalTotals);
+    var total = Math.floor(porcent * downloads) / 100;
+    var totalDecimal = parseInt(total);
+    var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
 
-function drawChartAffiliation(){
-    var _affiliationArrg = affiliationArrg.sort(dynamicSort("totals"));
-
-    var d,
-        isStacked,
-        colors = [];
-
-    switch (affiliationChartDraw) {
-        case 'pie':
-            d = [
-                ['Afiliación', 'total'],
-            ];
-            break;
-        case 'column':
-             d = [
-                ['Afiliación', 'total', { role: 'style' }],
-            ];
-            break;
-    }
-
-
-    $.each(_affiliationArrg, function(index, v) {
-        var affiliation = v.affiliation;
-        var totals = v.totals;
-
-        switch (affiliation) {
-            case 'Otros':
-                color =  '#0000ff';
-                break;
-            case 'Desconocido':
-                color = '#E6E7E9';
-                break;
-            default:
-                color = '#A41C1E';
-        }
-
-        switch (affiliationChartDraw) {
-            case 'pie':
-                var text = affiliation;
-                var bar = [text, totals];
+    var d = [
+        ['Task', 'Hours per Day'],
+    ];
+    var countDownloads = 0;
+    var restante = 0;
+    $.each(_countriesObj, function(index, v) {
+        color = colorHexa();
+        var descargas = v.downloads;
+        var pais = v.name;
+        if(descargas > 0){
+            countDownloads = countDownloads + descargas;
+            if(countDownloads < totalDecimal){
+                var bar = [pais + "("+abbreviateNumber(descargas)+")", descargas];
                 d.push(bar);
-                var color = {color: color};
-                colors.push(color);
-                break;
-            case 'column':
-                var data = [affiliation, totals, 'color:' + color];
-                d.push(data);
-                break;
+            }
         }
-
     });
 
     var data = google.visualization.arrayToDataTable(d);
-    var view = new google.visualization.DataView(data);
-    var title = 'Gráfica comparativa por Afilicación';
 
-    switch (affiliationChartDraw){
-        case 'pie':
-            var options = {
-                title: title,
-                is3D: true,
-                chartArea:{left:10, top:20, width:"100%", height:"90%"},
-                slices: colors
-            };
-            var chart = new google.visualization.PieChart(document.getElementById("chartContentAffiliation"));
-            break;
-        case 'column':
-
-            var options = {
-                title: title,
-                bar: {groupWidth: "70%"},
-                legend: { position: "none" },
-                height: "500",
-                vAxis: {
-                    title: globalTypeReport,
-                    gridlines: {count: gridlinesCount},
-                    format: 'short',
-                },
-                hAxis: {
-                    title: 'Afiliación',
-                },
-                chartArea:{left:50, top:50, width:"100%", height:"80%"},
-                animation: {
-                    duration: 1500,
-                    startup: true
-                },
-            };
-
-            var chart = new google.visualization.ColumnChart(document.getElementById("chartContentAffiliation"));
-            break;
+    var options = {
+        title: porcent + '% por países',
+        is3D: true,
     };
 
-    google.visualization.events.addListener(chart, 'ready', function () {
-        imageChartAffiliation = chart.getImageURI();
-    });
-    chart.draw(view, options);
-}
+    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
 
-
-
-// extra functions
-
+    chart.draw(data, options);
+});
 
 $(".export-action").click(function() {
     var chart = $(this).data("charttype");
@@ -3215,13 +2607,6 @@ $(".export-action").click(function() {
             name = globalTypeReport+'-por-generos';
             typeReport = 'Géneros';
             icon = '<i class="fa fa-transgender"></i>';
-            pass = true;
-            break;
-        case 'affiliation':
-            image = imageChartAffiliation;
-            name =  globalTypeReport+'-por-afiliación';
-            typeReport = 'Afiliación';
-            icon = '<i class="fa fa-handshake-o"></i>';
             pass = true;
             break;
         default:
@@ -3317,10 +2702,7 @@ $('#chartOptions').click(function () {
     chartList.empty();
     var input;
 
-    var theresRoles = 0;
-
     headers.forEach(function (value, index) {
-
         if(value != 'Tipo' && value != 'Revista') {
             var orderId = 0,
                 icon;
@@ -3350,26 +2732,22 @@ $('#chartOptions').click(function () {
                 icon = '<i class="fa fa-font"></i>';
                 break;
               case 'Roles':
-                orderId = 3;//3
+                orderId = 3;
                 icon = '<i class="fa fa-users" style="color: #555e81;"></i>';
+                /*NOTE orderId = 4 asignado a Roles */
                 break;
               case 'Géneros':
-                orderId = 5;//5
+                orderId = 5;
                 icon = '<i class="fa fa-transgender" style="color: #00adc1;"></i>';
                 break;
-             case 'Afiliación':
-                orderId = 6;//6
-                icon = '<i class="fa fa-handshake-o" style="color: purple;"></i>';
-                break;
             }
-
 
             input ='<li class="list-group-item" id="orderId'+orderId+'"><label style="width: 100%;">'+icon+' '+value+' <input type="checkbox" name="checkChart" data-index="'+index+'"  data-typechart="'+value+'" value="'+value+'" class="pull-right"></label></li>';
 
             if(value == 'Roles') {
                 input+= '<li class="list-group-item" id="orderId4" style="display:none"><label>Lista de Roles</label><ul class="list-group">';
                 headersRolesArray.forEach(function(value, index){
-                    input+= '<li class="list-group-item"><label style="width: 100%;"><i class="fa fa-user" style="color: #555e81;"></i> '+value+' <input type="checkbox" name="checkChartRole" data-index="'+index+'"  data-typerole="'+value+'" value="'+value+'" class="pull-right"></label></li>';
+                    input+= '<li class="list-group-item"><label style="width: 100%;"><i class="fa fa-user" style="color: #555e81;;"></i> '+value+' <input type="checkbox" name="checkChartRole" data-index="'+index+'"  data-typerole="'+value+'" value="'+value+'" class="pull-right"></label></li>';
                 });
                 input+= '</ul></li>';
             }
@@ -3401,7 +2779,6 @@ $('#chartOptions').click(function () {
                         var dataArrg = {"i": index, "v": value};
                         typeReportArray.push(dataArrg);
                         if(value == 'Roles'){
-                            theresRoles = 1;
                             $('#orderId4').css('display', 'block');
                         }
                     }
@@ -3410,26 +2787,23 @@ $('#chartOptions').click(function () {
         });
     });
 
-
     if(globalTypeReport == 'Usuarios'){
-        if(theresRoles == 1){
-            indexArrayRoles.forEach(function(values){
-                values.forEach(function(value){
-                    var index = value.i;
-                    $('input[name="checkChartRole"]').each(function() {
-                        var _index = $(this).data('index');
-                        var value = $(this).val();
-                        if(index == _index){
-                            if(!$(this).is(':checked')){
-                                $(this).prop('checked', true);
-                                var dataArrg = {'i': index, 'v': value};
-                                typeReportRoleArray.push(dataArrg);
-                            }
+        indexArrayRoles.forEach(function(values){
+            values.forEach(function(value){
+                var index = value.i;
+                $('input[name="checkChartRole"]').each(function() {
+                    var _index = $(this).data('index');
+                    var value = $(this).val();
+                    if(index == _index){
+                        if(!$(this).is(':checked')){
+                            $(this).prop('checked', true);
+                            var dataArrg = {'i': index, 'v': value};
+                            typeReportRoleArray.push(dataArrg);
                         }
-                    });
+                    }
                 });
             });
-        }
+        });
     }
 
 
@@ -3514,7 +2888,7 @@ $('#saveChangesChartList').click(function () {
             var data = {
                 '_token': CSRF_TOKEN,
                 'switchCase': 'upload_report_index',
-                'fileId' : globalFileId,
+                'fileId' : globalCSVID,
                 'indexArray': typeReportArray,
                 'roleIndexArray': typeReportRoleArray,
             };
@@ -3585,33 +2959,80 @@ function dynamicSortMenor(property) {
 }
 
 function abbreviateNumber(value) {
-  let newValue = value;
-  const suffixes = ["", "K", "M", "B","T"];
-  let suffixNum = 0;
-  while (newValue >= 1000) {
-    newValue /= 1000;
-    suffixNum++;
-  }
-
-  newValue = newValue.toPrecision(3);
-
-  newValue += suffixes[suffixNum];
-  return newValue;
+    var newValue = value;
+    if (value >= 1000) {
+        var suffixes = ["", "k", "m", "b","t"];
+        var suffixNum = Math.floor( (""+value).length/3 );
+        var shortValue = '';
+        for (var precision = 2; precision >= 1; precision--) {
+            shortValue = parseFloat( (suffixNum != 0 ? (value / Math.pow(1000,suffixNum) ) : value).toPrecision(precision));
+            var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g,'');
+            if (dotLessShortValue.length <= 2) { break; }
+        }
+        if (shortValue % 1 != 0)  shortNum = shortValue.toFixed(1);
+        newValue = shortValue+suffixes[suffixNum];
+    }
+    return newValue;
 }
 
-// function abbreviateNumber(value) {
-//     var newValue = value;
-//     if (value >= 1000) {
-//         var suffixes = ["", "k", "m", "b","t"];
-//         var suffixNum = Math.floor( (""+value).length/3 );
-//         var shortValue = '';
-//         for (var precision = 2; precision >= 1; precision--) {
-//             shortValue = parseFloat( (suffixNum != 0 ? (value / Math.pow(1000,suffixNum) ) : value).toPrecision(precision));
-//             var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g,'');
-//             if (dotLessShortValue.length <= 2) { break; }
-//         }
-//         if (shortValue % 1 != 0)  shortNum = shortValue.toFixed(1);
-//         newValue = shortValue+suffixes[suffixNum];
-//     }
-//     return newValue;
-// }
+
+$(".angle-panel-collapse").click(function(event) {
+    var parents = $(this).parentsUntil('.col-lg-12');
+    var parentElement = parents[parents.length - 1];
+    var panelBody = $(parentElement).find('div.panel-body');
+
+    /*var angleUP = 'Oculpar Panel <i class="fa fa-angle-up fa-lg">';
+    var angleDown = 'Mostrar Panel <i class="fa fa-angle-down fa-lg">';*/
+
+    var angleUP = 'Ocultar';
+    var angleDown = 'Mostar';
+
+    if(panelBody.hasClass('collapse-up')) {
+        $(parentElement).find('div.panel-body').slideUp("slow").removeClass('collapse-up').addClass('collapse-down');
+        $(this).attr('title', 'Mostrar').html(angleDown);
+    } else if (panelBody.hasClass('collapse-down')) {
+        $(parentElement).find('div.panel-body').slideDown("slow").removeClass('collapse-down').addClass('collapse-up');
+        $(this).attr('title', 'Ocultar').html(angleUP);
+        $("html, body").animate({scrollTop: $(parentElement).offset().top}, 500);
+        return false;
+    }
+});
+
+
+
+$(".porcent").click(function() {
+    var porcent = $(this).data('porcent');
+    var downloads = parseFloat(totals);
+    var total = Math.floor(porcent * downloads) / 100;
+    var totalDecimal = parseInt(total);
+    var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
+
+    var d = [
+        ['Task', 'Hours per Day'],
+    ];
+    var countDownloads = 0;
+    var restante = 0;
+    $.each(_countriesObj, function(index, v) {
+        color = colorHexa();
+        var descargas = v.downloads;
+        var pais = v.name;
+        if(descargas > 0){
+            countDownloads = countDownloads + descargas;
+            if(countDownloads < totalDecimal){
+                var bar = [pais + "("+abbreviateNumber(descargas)+")", descargas];
+                d.push(bar);
+            }
+        }
+    });
+
+    var data = google.visualization.arrayToDataTable(d);
+
+    var options = {
+        title: porcent + '% por países',
+        is3D: true,
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+    chart.draw(data, options);
+});

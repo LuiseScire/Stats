@@ -24,6 +24,7 @@ class File extends Model
         'file_report_name',
         'file_report_index',
         'file_type',
+        'file_folder_id',
         'file_status',
     ];
 }

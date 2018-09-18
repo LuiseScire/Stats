@@ -1,0 +1,76 @@
+#uploadFilesContent i.upload {
+    transform: scale(0.8);
+    opacity: 0.3;
+    font-size: 100px;
+    margin-bottom: 1rem;
+}
+
+ .thumbnail:hover{
+    cursor: pointer;
+    border: 1px solid #A41C1E;
+
+}
+
+/* .thumbnail > */
+.st-menu::before{
+    content: "\f142";
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+}
+.st-menu{
+    width: 30px;
+    /* background-color: rgb(230, 230, 230); */
+    text-align: center;
+    float: right;
+    font-weight: bold;
+    border-radius: 50px;
+    padding: 5px;
+}
+
+.st-menu:hover{
+    background-color: rgb(245, 245, 245);
+    border-radius: 50px;
+}
+/* .thumbnail > .st-deleted{
+
+} */
+
+/* .thumbnail >  */
+
+
+.thumbnail > .caption > p{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-style: italic;
+    font-weight: bold;
+}
+
+.media-card{
+    /* margin-bottom: 2px; */
+    background-color: #fff;
+    padding: 5px 10px;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12);
+}
+
+/* Portrait Screen */
+@media (min-width: 320px) and (max-width: 480px){
+    .thumbnail > img {
+        width: 100px;
+    }
+    .thumbnail > .caption > p{
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 767px){
+    .thumbnail > img{
+        width: 200px
+    }
+
+    .thumbnail > .caption > p{
+        font-size: 20px;
+    }
+}

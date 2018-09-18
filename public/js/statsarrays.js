@@ -16,9 +16,9 @@ var monthsObj = [
 ];
 
 var gendersObj = [
-    {esname: 'Desconocido', enname: 'Unknown',  shortname: 'UNK',   totals: 0},
-    {esname: 'Femenino',    enname: 'Female',   shortname: 'F',     totals: 0},
-    {esname: 'Masculino',   enname: 'Male',     shortname: 'M',     totals: 0}
+    {esname: 'Desconocido', enname: 'Unknown',  shortname: 'UNK',   totals: 0, 'countries': Array()},
+    {esname: 'Femenino',    enname: 'Female',   shortname: 'F',     totals: 0, 'countries': Array()},
+    {esname: 'Masculino',   enname: 'Male',     shortname: 'M',     totals: 0, 'countries': Array()}
 ];
 
 var continentsObj = [

@@ -10,7 +10,6 @@
             font-size: 50px;
             margin-bottom: 1rem;
         }
-
     </style>
 @stop
 

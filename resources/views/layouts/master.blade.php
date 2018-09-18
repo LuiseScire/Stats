@@ -91,7 +91,7 @@
               white-space: nowrap;
               overflow: hidden;
               text-overflow: ellipsis;
-              width: 85%;
+              width: 80%;
             }
 
             footer{
@@ -110,6 +110,21 @@
                 margin: 0 !important;
                 width: 100% !important;
             }
+        }
+
+        /*#F5F6FA*/
+        li.header{
+            background-color: #F5F6FA;
+        }
+
+        .nav > li.header > a > span{
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .nav > li.header > a:hover, .nav > li.header > a:focus {
+            text-decoration: none;
+            background-color: #F5F6FA; !important
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
@@ -130,6 +145,7 @@
                 $('#langPreloader').fadeOut('slow');
                 $('#wrapper').removeClass('blur');
             }
+
           }
         }, 100);
 
@@ -228,8 +244,7 @@
 
 <div id="wrapper" class="blur">
     @section('sidebar')
-        <nav id="navBar" class="navbar navbar-default navbar-custom navbar-fixed-top" role="navigation"
-             style="margin-bottom: 0">
+        <nav id="navBar" class="navbar navbar-default navbar-custom navbar-fixed-top" role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -237,7 +252,6 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <!-- {{ url('home') }} -->
 
                 @if(Auth::user()->user_type == 'Admin')
                 <a class="navbar-brand" href="javascript:void(0)" style="padding:0">
@@ -269,19 +283,43 @@
                 </a>
                 <!-- -->
             </div>
-            <ul class="nav navbar-nav navbar-top-links navbar-right">
-                <li class="dropdown">
+            <ul class="nav navbar-n navbar-top-links navbar-right">
+                <li>
+                    <a href="javascript:void(0)">
+                        <i class="fa fa-language fa-fw"></i>
+                        <span id="translate" data-text="EN,ES" data-file="es,en" data-index="1" data-page="home">EN</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="javascript:void(0)">
+                        <i class="fa fa-user fa-fw"></i><span id="translate">{{ Auth::user()->name }} {{ Auth::user()->last_name }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url('config') }}">
+                        <i class="fa fa-folder"></i>
+                        <span>
+                            &nbsp;
+                            <!-- Configuración -->
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{{ route('logout') }}"
+                       onclick="event.preventDefault();
+                                 document.getElementById('logout-form').submit();">
+                        <i class="fa fa-sign-out"></i><span data-lang="menu-opt-logout">&nbsp;<!-- {{ __('Salir') }} --></span>
+                    </a>
+
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        @csrf
+                    </form>
+                </li>
+                <!-- <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fa fa-user fa-fw"></i>{{ Auth::user()->name }} {{ Auth::user()->last_name }}<i class="fa fa-caret-down"></i>
                     </a>
                     <ul class="dropdown-menu dropdown-user">
-                        <!--<li>
-                          <a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
-                        </li>
-                        <li>
-                          <a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
-                        </li>
-                        <li class="divider"></li>-->
                         <li>
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                onclick="event.preventDefault();
@@ -295,14 +333,8 @@
                             </form>
                         </li>
                     </ul>
-                    <!-- /.dropdown-user -->
-                </li>
-                <li>
-                    <a href="javascript:void(0)">
-                        <i class="fa fa-language"></i>
-                        <span id="translate" data-text="EN,ES" data-file="es,en" data-index="1" data-page="home">EN</span>
-                    </a>
-                </li>
+                </li> -->
+
                 <!-- /.dropdown -->
             </ul>
 
@@ -314,12 +346,39 @@
                     <ul class="nav nav-colors" id="side-menu">
                         <!--MENU INICIO-->
 
-                        <li class="home-item-menu">
+                        <!--  -->
+                        <!-- <li class="home-item-menu">
                             <a href="{{ url('home') }}" class="link-menu">
                                 <i class="fa fa-home fa-fw" style="color: #337ab7;"></i>
                                 <span data-lang="menu-opt-home">Inicio</span>
                             </a>
+                        </li> -->
+
+                        <li class="header">
+                            <a>
+                                <i class="fa fa-folder fa-fw" style="color: #ffcd00"></i>
+                                <span>Mis Archivos</span>
+                            </a>
                         </li>
+
+                        <!-- <li id="">
+                            <a href="#">
+                                <i class="fa fa-bar-chart" style="color: #D800FC;"></i>
+                                <span data-lang="menu-opt-charts">Gráficas</span>
+                                <span class="fa arrow"></span>
+                            </a>
+                            <ul class="nav nav-second-level nav-colors">
+                                <li>
+                                    <a class="link-menu">
+                                        <i class="fa fa-trophy" style="color: gold;"></i>
+                                        Total
+                                    </a>
+                                </li>
+                            </ul>
+                        </li> -->
+
+
+
                         <!--<li class="home-item-menu">
                             <a href="#history" class="link-menu"><i class="fa fa-list" style="color: #A41C1E"></i> Historial</a>
                         </li>-->
@@ -341,44 +400,59 @@
 
 
                         <li id="menuOptionCharts" style="display: none">
-                            <a href="#"><i class="fa fa-bar-chart" style="color: #D800FC;"></i> <span data-lang="menu-opt-charts">Gráficas</span><span
-                                        class="fa arrow"></span></a>
+                            <a href="#">
+                                <i class="fa fa-bar-chart" style="color: #D800FC;"></i>
+                                <span data-lang="menu-opt-charts">Gráficas</span>
+                                <span class="fa arrow"></span>
+                            </a>
                             <ul class="nav nav-second-level nav-colors">
                                 <li id="liMenuChartTotal" style="display: none">
-                                    <a href="#chartPanelTotal" class="link-menu"> <i class="fa fa-trophy"
-                                                                                     style="color: gold;"></i>
-                                        Total</a>
+                                    <a href="#chartPanelTotal" class="link-menu">
+                                        <i class="fa fa-trophy" style="color: gold;"></i>
+                                        Total
+                                    </a>
                                 </li>
                                 <li id="liMenuChartCountry" style="display: none">
-                                    <a href="#chartPanelCountries" class="link-menu"><i class="fa fa-globe"
-                                                                                        style="color: dodgerblue;"></i>
-                                        País</a>
+                                    <a href="#chartPanelCountries" class="link-menu">
+                                        <i class="fa fa-globe" style="color: dodgerblue;"></i>
+                                        País
+                                    </a>
                                 </li>
                                 <li id="liMenuChartCity" style="display: none">
-                                    <a href="#chartPanelCity" class="link-menu"><i class="fa fa-building" style="color: cadetblue;"></i>
-                                        Ciudad</a>
+                                    <a href="#chartPanelCity" class="link-menu">
+                                        <i class="fa fa-building" style="color: cadetblue;"></i>
+                                        Ciudad
+                                    </a>
                                 </li>
                                 <li id="liMenuChartMonth" style="display: none">
-                                    <a href="#chartPanelMonths" class="link-menu"><i class="fa fa-calendar"
-                                                                                     style="color: darkred"></i> Mes</a>
+                                    <a href="#chartPanelMonths" class="link-menu">
+                                        <i class="fa fa-calendar" style="color: darkred"></i>
+                                        Mes
+                                    </a>
                                 </li>
                                 <li id="liMenuChartNumber" style="display: none">
-                                    <a href="#chartPanelNumber" class="link-menu"><i class="fa fa-hashtag"
-                                                                                     style="color: darkgreen"></i>
-                                        Número</a>
+                                    <a href="#chartPanelNumber" class="link-menu">
+                                        <i class="fa fa-hashtag" style="color: darkgreen"></i>
+                                        Número
+                                    </a>
                                 </li>
                                 <li id="liMenuChartText" style="display: none">
-                                    <a href="#chartPanelText" class="link-menu"><i class="fa fa-font"></i>
-                                        Texto</a>
+                                    <a href="#chartPanelText" class="link-menu">
+                                        <i class="fa fa-font"></i>
+                                        Texto
+                                    </a>
                                 </li>
                                 <li id="liMenuChartRole" style="display: none">
-                                    <a href="#chartPanelRoles" class="link-menu"><i class="fa fa-users"
-                                                                                     style="color: #555e81"></i>
-                                        Roles</a>
+                                    <a href="#chartPanelRoles" class="link-menu">
+                                        <i class="fa fa-users" style="color: #555e81"></i>
+                                        Roles
+                                    </a>
                                 </li>
                                 <li id="liMenuChartGender" style="display: none">
-                                    <a href="#chartPanelGenders" class="link-menu"><i class="fa fa-transgender" style="color: #00adc1"></i>
-                                        Géneros</a>
+                                    <a href="#chartPanelGenders" class="link-menu">
+                                        <i class="fa fa-transgender" style="color: #00adc1"></i>
+                                        Géneros
+                                    </a>
                                 </li>
                                 <!--<li>
                                   <a href="#totalDownloadsPanel" class="link-menu"><i class="fa fa-bar-chart"></i> Descargas Totales</a>
@@ -418,9 +492,9 @@
     </div>
 
 
-     <footer class="main-footer text-center" style="">
+     <!-- <footer class="main-footer text-center" style="">
          <strong>Copyright © 2018 <a href="javascript:void(0)" style="text-decoration: none; color: #A41C1E">stats.escire.net</a></strong> Todos los derechos reservados.
-     </footer>
+     </footer> -->
     <!-- <div class="page-footer">
         <div class="page-footer-text text-center">
                 © Copyright 2018 stats.escire.net - Todos los derechos reservados
@@ -431,12 +505,11 @@
 
 <!--<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" charset="utf-8"></script>
 -->
+
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
 <script src="{{ asset('js/bootstrap.js') }}"></script>
 <script src="{{ asset('pluggins/bootstrap-select-picker/dist/js/bootstrap-select.js') }}"></script>
-<script src="{{ asset('js/metisMenu.js') }}"></script>
-<script src="{{ asset('js/main.js') }}"></script>
 <script src="{{ asset('js/pluggins/jquery.number.js') }}"></script>
 <script src="https://www.gstatic.com/charts/loader.js"></script>
 <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -445,6 +518,14 @@
 <script>
     var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
     $(document).ready(function () {
+
+        // if(isMobile.any()) {
+        //     $('#navBar').removeClass('navbar-fixed-top');
+        //     $('#page-wrapper').css('margin-top', '0 !important');
+        // } else {
+        //
+        // }
+
         $('.ir-arriba').click(function () {
             $('body, html').animate({
                 scrollTop: '0px'
@@ -463,12 +544,12 @@
             }
         });
 
-        $(document).on('click', 'a.link-menu[href^="#"]', function () {
-            var target = $(this.hash);
-            var scroll = target.offset().top - 55;
-            $('html, body').animate({scrollTop: scroll}, 500);
-            return false;
-        });
+        // $(document).on('click', 'a.link-menu[href^="#"]', function () {
+        //     var target = $(this.hash);
+        //     var scroll = target.offset().top - 55;
+        //     $('html, body').animate({scrollTop: scroll}, 500);
+        //     return false;
+        // });
 
         $('#currentDateES').text(currentDateFormat('es'));
         $('#currentDateEN').text(currentDateFormat('en'));
@@ -499,8 +580,96 @@
         }
         return dateFormat;
     }
-</script>
 
+
+    // $(document).ready(function(){
+    //     var data = {'_token': CSRF_TOKEN, 'switchCase': 'getLastFile'};
+    //     start(data);
+    // });
+    //
+    // function start(data){
+    //     $.post('../files', data, function(response){
+    //         var file_folder_id,
+    //             file_back_name,
+    //             file_front_name,
+    //             fileIndices,
+    //             fileIndicesRoles,
+    //             type_report,
+    //             typeReportIndex;
+    //
+    //         $.each(response, function(index, v){
+    //             file_folder_id = v.file_folder_id;
+    //             liFolderId = file_folder_id;
+    //
+    //             file_back_name = v.file_back_name;
+    //             file_front_name = v.file_front_name;
+    //             globalFileId = v.file_id;
+    //             fileIndices = v.file_indices;
+    //             fileIndicesRoles = v.file_role_indices;
+    //             indexArray = JSON.parse("[" + fileIndices + "]");
+    //             indexArrayRoles = JSON.parse("[" + fileIndicesRoles + "]");
+    //             globalFileType = v.file_type;
+    //             typeReportIndex = v.file_report_index;
+    //             type_report = v.file_report_name;
+    //         });
+    //
+    //         var data = {'_token': CSRF_TOKEN, 'switchCase': 'getFolders'};
+    //         var countFolders = 2;
+    //         $.post('../files', data, function(response){
+    //             $.each(response, function(index, v){
+    //                 $.each(v, function(ind, val){
+    //                     var folder_name = val.folder_name;
+    //                     var folder_id = val.folder_id;
+    //                     var sortOrder = countFolders;
+    //                     //console.log(file_folder_id);
+    //                     if(file_folder_id == folder_id){
+    //                         sortOrder = 1;
+    //                     }
+    //
+    //                     var li = '<li class="folder-list" id="liFolder'+folder_id+'" data-folderid="'+folder_id+'" data-folderorder="'+sortOrder+'">'+
+    //                                 '<a href="#"><i class="fa fa-bar-chart fa-fw" style="color: darkred"></i> Gráfica de '+folder_name+'<span class="fa arrow"></span></a>'+
+    //                                 '<ul class="nav nav-second-level" id="folder'+folder_id+'" data-folderid="'+folder_id+'">'+
+    //
+    //                                 '</ul>'+
+    //                             '</li>';
+    //
+    //                     $('#side-menu').append(li);
+    //                     countFolders++;
+    //                 });
+    //             });
+    //
+    //             //$('.folder-list').find('ul#folder'+file_folder_id).addClass('in').parent('.folder-list').addClass('active');
+    //
+    //         });
+    //     });
+    // }
+
+
+    var isMobile = {
+        Android: function() {
+            return navigator.userAgent.match(/Android/i);
+        },
+        BlackBerry: function() {
+            return navigator.userAgent.match(/BlackBerry/i);
+        },
+        iOS: function() {
+            return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+        },
+        Opera: function() {
+            return navigator.userAgent.match(/Opera Mini/i);
+        },
+        Windows: function() {
+            return navigator.userAgent.match(/IEMobile/i);
+        },
+        any: function() {
+            return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+        }
+    };
+
+</script>
 @yield('javascript')
+<script src="{{ asset('js/metisMenu.js') }}"></script>
+<script src="{{ asset('js/main.js') }}"></script>
+
 </body>
 </html>
