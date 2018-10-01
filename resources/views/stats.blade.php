@@ -59,7 +59,6 @@
         }
 
         /*css for list countries in panel countries*/
-
         .bg-dodgerblue{
             background-color: dodgerblue !important;
             color: #fff !important;
@@ -103,8 +102,6 @@
             margin-top: 10px;
         }
 
-
-
         .c-progress-bar {
             height: 4px;
             -webkit-box-align: center;
@@ -115,7 +112,6 @@
             justify-content: center;
             background: #A41C1E;
             background: linear-gradient(to right, #E05740, #A41C1E);
-
         }
 
         /* info-box-countries  */
@@ -193,6 +189,22 @@
             -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
             box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
         }
+
+        /* ******************************************** */
+        .folder-list > a > .folder-title::before{
+            content: '\f080';
+            font-family: FontAwesome;
+            color: darkred;
+        }
+
+        .folder-list > a > .folder-title{
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            width: 95%;
+        }
+
 
 
     </style>
@@ -313,7 +325,7 @@
     </div>
 
     <!--  ######################## [CHART PAÍS] ############################## -->
-    <div class="row chartContent" id="chartPanelCountries" style="display:block">
+    <div class="row chartContent" id="chartPanelCountries" style="display:none">
         <div class="col-md-8 col-lg-8">
             <div class="panel" style="border-top: 3px solid dodgerblue;">
                 <div class="panel-heading">
@@ -501,7 +513,7 @@
     </div>
 
     <!-- ######################## [CHART CIUDAD]######################## -->
-    <div class="row chartContent" id="chartPanelCity" style="display: block">
+    <div class="row chartContent" id="chartPanelCity" style="display: none">
         <div class="col-lg-8">
             <div class="panel" style=" border-top: 3px solid cadetblue">
                 <div class="panel-heading">
@@ -645,7 +657,7 @@
     </div>
 
     <!-- ######################## [CHART MES]######################## -->
-    <div class="row chartContent" id="chartPanelMonths" style="display: block">
+    <div class="row chartContent" id="chartPanelMonths" style="display: none">
         <div class="col-md-8">
             <div class="panel" style="border-top: 3px solid darkred">
                 <div class="panel-heading">
@@ -812,7 +824,7 @@
     </div>
 
     <!-- ######################## [CHART NÚMERO]######################## -->
-    <div class="row chartContent" id="chartPanelNumber" style="display: block;">
+    <div class="row chartContent" id="chartPanelNumber" style="display: none;">
         <div class="col-md-12">
             <div  class="panel" style="border-top: 3px solid darkgreen">
                 <div class="panel-heading">
@@ -1048,7 +1060,7 @@
     </div>
 
     <!--  ######################## [CHART ROLES] ######################## -->
-    <div class="row chartContent" id="chartPanelRoles" style="display: block;">
+    <div class="row chartContent" id="chartPanelRoles" style="display: none;">
         <div class="col-md-12">
             <div class="panel"  style="border-top: 3px solid #555e81;">
                 <div class="panel-heading">
@@ -1222,7 +1234,7 @@
     </div>
 
     <!--  ######################## [CHART AFFILIATION] ######################## -->
-    <div class="row chartContent" id="chartPanelAffiliation">
+    <div class="row chartContent" id="chartPanelAffiliation" style="display: none">
         <div class="col-md-12">
             <div class="panel" style="border-top: 3px solid purple;">
                 <div class="panel-heading">
@@ -1272,6 +1284,63 @@
                     </div>
                     <div class="col-md-9 col-xs-12">
                         <div id="chartContentAffiliation"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  ######################## [CHART ACCEPTED/REFUSED] ######################## -->
+    <div class="row chartContent" id="chartPanelAcceptedRefused" style="display: none">
+        <div class="col-md-12">
+            <div class="panel" style="border-top: 3px solid #CBC717;">
+                <div class="panel-heading">
+                    <h4 style="color: #CBC717">
+                        <div class="pull-right">
+                            <span class="dropdown" style="margin-left: 5px;">
+                                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span class="fa fa-download"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <li>
+                                        <a href="javascript:void(0)" class="export-action" data-charttype="acceptedRefused" data-typeexport="png">
+                                            <i class="fa fa-image"></i> Descargar imagen PNG
+                                        </a>
+                                    </li>
+                                </ul>
+                            </span>
+                            <span class="dropdown" style="margin-left: 5px;">
+                                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span class="fa fa-share-alt"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <li>
+                                        <a href="javascript:void(0)" class="export-action" data-charttype="acceptedRefused" data-typeexport="embed">
+                                            <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                        </a>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
+                        <i class="fa fa-check-square-o"></i>
+                        <span id="panelTitleAcceptedRefused"></span>
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-12 text-center">
+                        <div class="btn-group" role="group" aria-label="...">
+                            <button class="switchAcceptedRefusedChart btn btn-default" data-chart="pie">
+                                <i class="fa fa-pie-chart"></i>
+                                Pastel
+                            </button>
+                            <button class="switchAcceptedRefusedChart btn btn-primary" data-chart="column">
+                                <i class="fa fa-bar-chart"></i>
+                                Columnas
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-xs-12">
+                        <div id="chartContentAcceptedRefused"></div>
                     </div>
                 </div>
             </div>
@@ -1334,7 +1403,6 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @section('javascript')
@@ -1345,6 +1413,7 @@
 
     <script type="text/javascript">
         var fileNameParam = '{{ $filename }}';
-
+        var configLocation = '{{ url("config") }}';
+        var jnalAffiliation = $('#jnal_affiliation').val(); //this element is in div#wrapper in master view
     </script>
 @stop

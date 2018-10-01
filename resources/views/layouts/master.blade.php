@@ -22,6 +22,13 @@
     @yield('css')
 
     <style>
+        /* @import url(https://fonts.googleapis.com/css?family=Seaweed+Script); */
+
+        .navbar-brand{
+            font-style: italic;
+            font-size: 40px;
+        }
+
         #sidebar > .sidebar-nav > .nav > li > a,
         #sidebar > .sidebar-nav > .nav > li > .nav-second-level > li > a {
             color: #000000;
@@ -213,7 +220,24 @@
             $("#preloader").fadeOut("slow");
             clearInterval(timer);
             timer = null;
+        }
 
+        function showPreloader(msg){
+            $('#preloaderx').find('.msgx').text(msg);
+            $('#preloaderx').fadeIn('slow');
+
+            //showText(".msgx", msg, 0, 100);
+        }
+
+        function hidePreloader(){
+            $('#preloaderx').fadeOut('slow');
+        }
+
+        function showText(target, message, index, interval) {
+          if (index < message.length) {
+            $(target).append(message[index++]);
+            setTimeout(function () { showText(target, message, index, interval); }, interval);
+          }
         }
     </script>
 </head>
@@ -232,6 +256,15 @@
         <div class="msg">Loading...</div>
     @else
         <div class="msg">Cargando...</div>
+    @endif
+</div>
+
+<div id="preloaderx">
+    <div class="loaderx"></div>
+    @if(Auth::user()->lang == 'en')
+        <div class="msgx parpadea"></div>
+    @else
+        <div class="msgx parpadea"></div>
     @endif
 </div>
 
@@ -259,10 +292,15 @@
                 </a>
                 @else
                     @php
+                        $journal = App\Journal::journalAffiliation(Auth::user()->journal);
+                    @endphp
+                    <input type="hidden" id="jnal_affiliation" value="{{ $journal->jnal_affiliation }}">
+                    @php
                         $logo = App\JournalUser::getLogo(Auth::user()->journal);
                     @endphp
                     @if(!$logo)
-                    <a class="navbar-brand" href="javascript:void(0)">{{ App\JournalUser::getJName(Auth::user()->journal) }} </a>
+                    <!-- <div class="navbar-brand plate"><p class="script"><span>{{ App\JournalUser::getJName(Auth::user()->journal) }}</span></p> -->
+                    <a class="navbar-brand brand-name" href="javascript:void(0)"> {{ App\JournalUser::getJName(Auth::user()->journal) }}</a>
                     @else
                     <a class="navbar-brand" href="javascript:void(0)" style="padding:0">
                         <img alt="Brand" src="http://escire.mx/assets/website/images/logo.png" style="min-height: 50px; max-height: 50px">
@@ -347,19 +385,24 @@
                         <!--MENU INICIO-->
 
                         <!--  -->
-                        <!-- <li class="home-item-menu">
-                            <a href="{{ url('home') }}" class="link-menu">
-                                <i class="fa fa-home fa-fw" style="color: #337ab7;"></i>
-                                <span data-lang="menu-opt-home">Inicio</span>
-                            </a>
-                        </li> -->
 
+                        <!--  -->
+                        @if(Auth::user()->user_type == 'Admin')
+                            <li class="home-item-menu">
+                                <a href="{{ url('home') }}" class="link-menu">
+                                    <i class="fa fa-home fa-fw" style="color: #337ab7;"></i>
+                                    <span data-lang="menu-opt-home">Inicio</span>
+                                </a>
+                            </li>
+                        @else
                         <li class="header">
                             <a>
                                 <i class="fa fa-folder fa-fw" style="color: #ffcd00"></i>
                                 <span>Mis Archivos</span>
                             </a>
                         </li>
+                        @endif
+
 
                         <!-- <li id="">
                             <a href="#">

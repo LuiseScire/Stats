@@ -34,6 +34,73 @@
 }
 /*end preloader*/
 
+/*preloader x*/
+#preloaderx {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #FFFFFF;
+    /*background-color: #DFE3E9;*/
+    z-index: 9999;
+    display: none;
+}
+
+#preloaderx .loaderx{
+    position:fixed;
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    height: 310px;
+    margin: -210px 0 0 -200px;
+    background-image: url("../../public/images/preloader_chart.gif");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#preloaderx .msgx{
+    position:fixed;
+    top: 50%;
+    width: 100%;
+    margin-top: 100px;
+    text-align: center;
+    font-size: 30px;
+    font-style: italic;
+    color: #72777a;
+}
+
+.parpadea {
+  animation-name: parpadeo;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+
+  -webkit-animation-name:parpadeo;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-timing-function: linear;
+  -webkit-animation-iteration-count: infinite;
+}
+
+@-moz-keyframes parpadeo{
+  0% { opacity: 1.0; }
+  50% { opacity: 0.0; }
+  100% { opacity: 1.0; }
+}
+
+@-webkit-keyframes parpadeo {
+  0% { opacity: 1.0; }
+  50% { opacity: 0.0; }
+   100% { opacity: 1.0; }
+}
+
+@keyframes parpadeo {
+  0% { opacity: 1.0; }
+   50% { opacity: 0.0; }
+  100% { opacity: 1.0; }
+}
+/*end preloader x*/
+
 /*language preloader*/
 #langPreloader{
     position: fixed;

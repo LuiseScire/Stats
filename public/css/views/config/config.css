@@ -5,21 +5,38 @@
     margin-bottom: 1rem;
 }
 
- .thumbnail:hover{
-    cursor: pointer;
-    border: 1px solid #A41C1E;
+.thumbnail {
+    border: 1px solid #f5e190;
+}
 
+.thumbnail:hover {
+    cursor: pointer;
+    border: 1px solid #e1af15;/* #A41C1E */
+    /* background-color: #F5F6FA; */
+}
+
+
+/* .thumbnail > img {
+    transition: all .2s ease-in-out;
+}
+
+.thumbnail > img:hover {
+    transform: scale(1.1);
+} */
+
+.thumbnail:hover ~ .folder-image {
+    display: none;
 }
 
 /* .thumbnail > */
-.st-menu::before{
+.st-menu::before {
     content: "\f142";
     font-family: FontAwesome;
     font-style: normal;
     font-weight: normal;
     text-decoration: inherit;
 }
-.st-menu{
+.st-menu {
     width: 30px;
     /* background-color: rgb(230, 230, 230); */
     text-align: center;
@@ -29,7 +46,7 @@
     padding: 5px;
 }
 
-.st-menu:hover{
+.st-menu:hover {
     background-color: rgb(245, 245, 245);
     border-radius: 50px;
 }
@@ -40,7 +57,7 @@
 /* .thumbnail >  */
 
 
-.thumbnail > .caption > p{
+.thumbnail > .caption > p {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -48,7 +65,7 @@
     font-weight: bold;
 }
 
-.media-card{
+.media-card {
     /* margin-bottom: 2px; */
     background-color: #fff;
     padding: 5px 10px;
@@ -56,7 +73,7 @@
 }
 
 /* Portrait Screen */
-@media (min-width: 320px) and (max-width: 480px){
+@media (min-width: 320px) and (max-width: 480px) {
     .thumbnail > img {
         width: 100px;
     }
@@ -65,12 +82,12 @@
     }
 }
 
-@media (min-width: 481px) and (max-width: 767px){
+@media (min-width: 481px) and (max-width: 767px) {
     .thumbnail > img{
         width: 200px
     }
 
-    .thumbnail > .caption > p{
+    .thumbnail > .caption > p {
         font-size: 20px;
     }
 }

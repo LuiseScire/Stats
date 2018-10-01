@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Stats\Http\Controllers;
 
-use App\AcademicDegree;
-use App\Country;
-use App\JournalUser;
-use App\User;
+use Stats\AcademicDegree;
+use Stats\Country;
+use Stats\JournalUser;
+use Stats\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

@@ -1,8 +1,8 @@
 <?php
 
-namespace App;
+namespace Stats;
 
-use App\JournalUser;
+use Stats\JournalUser;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,6 +22,7 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
+        'decrypted_password',
         'user_type',
         'journal_type',
         'pack',
@@ -58,4 +59,6 @@ class User extends Authenticatable
         $j_user_type = JournalUser::where('jnals_user_id', $user_id)->select('jnals_user_type')->first();
         return $j_user_type->jnals_user_type;
     }
+
+
 }

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace Stats\Http\Middleware;
 
 use Closure;
-use App\User;
+use Stats\User;
 
 class CheckRole
 {

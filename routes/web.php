@@ -40,7 +40,7 @@ Route::group(['middleware' => 'journal'], function() {
     // Route::post('archivo/getdatacsv', 'MainController@getdatacsv')->name('getdatacsv');
     Route::post('archivo/getdatafiles', 'MainController@getDataFiles')->name('getdatafiles');
     Route::post('descargasporpais/getdatacsv2', 'MainController@getdatacsv2')->name('getdatacsv2');
-    Route::post('archivo/createchartimage','MainController@createchartimage')->name('createchartimage');
+    //Route::post('archivo/createchartimage','MainController@createchartimage')->name('createchartimage');
     Route::get('descargasporpais/{filename?}', 'MainController@downstatscountry');
     /*Route::get('descargasporpais/{filename?}', function($filename = "noData") {
       return view('downstatscountry', array('filename' => $filename));
@@ -52,7 +52,7 @@ Route::group(['middleware' => 'journal'], function() {
   Route::post('readxml', 'MainController@readxml');
   Route::post('lastcsv', 'MainController@lastcsv')->name('lastcsv');
   Route::post('listcsvfiles','MainController@listcsvfiles');
-
+  Route::post('createchartimage','MainController@createchartimage')->name('createchartimage');
   /********************* [JOURNAL ADMIN PANEL] ++++++++++++++++++++++++++++*/
   Route::group(['middleware' => 'jadmin'], function () {
     Route::match(['get', 'post'], 'users', 'JadminController@users');

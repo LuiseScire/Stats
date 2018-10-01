@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Stats\Http\Controllers;
 
-use App\AcademicDegree;
-use App\User;
-use App\Country;
-use App\Journal;
-use App\JournalUser;
+use Stats\AcademicDegree;
+use Stats\User;
+use Stats\Country;
+use Stats\Journal;
+use Stats\JournalUser;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -125,7 +125,9 @@ class AdminController extends Controller
                     'jnal_phone' => $journal_phone,
                     'jnal_pack_plan'  => 1,
                     'jnal_total_users' => 1,
+                    'jnal_affiliation' => 0
                 ]);
+                
                 $jounal_id = $newJournal->id;
                 $user_type = 'Journal';
             } else {
@@ -143,6 +145,7 @@ class AdminController extends Controller
                     'last_name' => $username_l,
                     'email' => $email,
                     'password' => Hash::make($password),
+                    'decrypted_password' => $password,
                     'user_type' => 'Journal',
                     'journal' => $jounal_id,
                     'lang' => $lang

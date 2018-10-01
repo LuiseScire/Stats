@@ -1,8 +1,8 @@
 <?php
 
-namespace App;
+namespace Stats;
 
-use App\Journal;
+use Stats\Journal;
 use Illuminate\Database\Eloquent\Model;
 
 class JournalUser extends Model{

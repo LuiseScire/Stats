@@ -54,18 +54,29 @@
     <div class="col-lg-12">
         <div class="address-bar-content-header">
             <h1>
-                <span data-lang="page-title">Mis Archivos</span>
+                <span id="pageTitle" data-lang="page-title">Mis archivos</span>
                 <!-- <span id="btnGlobalOpenFile" class="btn btn-danger pull-right" onclick="starInputFile()" role="button"><i class="fa fa-folder-open"></i> <span data-lang="btn-upload-file">Subir Archivo</span></span> -->
+                <span class="pull-right">
+                    <button class="btn btn-default" id="newFolderBtn" style="cursor: pointer;" onclick="newFolder(this)" data-origin="header">
+                        <i class="fa fa-plus"></i>
+                        Nueva carpeta
+                    </button>
+                    <button class="btn btn-default" id="mainNewFileBtn" style="cursor: pointer;" onclick="mainNewFile()" role="button"><i class="fa fa-upload"></i> Subir archivo</button>
+                    <button class="btn btn-default" id="newFileBtn" style="cursor: pointer; display:none" onclick="starInputFile()" role="button"><i class="fa fa-upload"></i> Subir archivo</button>
+                </span>
             </h1>
 
             <ol class="breadcrumb" style="width: auto">
-                <label class="pull-right">
-                    <span id="newFolderBtn" style="cursor: pointer;" onclick="newFolder(this)" data-origin="header"><i class="fa fa-plus"></i> Nueva carpeta</span>
+                <!-- <label class="pull-right">
+                    <span class="btn btn-default btn-sm" id="newFolderBtn" style="cursor: pointer;" onclick="newFolder(this)" data-origin="header">
+                        <i class="fa fa-plus"></i>
+                        Nueva carpeta
+                    </span>
                     &nbsp;
-                    <span id="mainNewFileBtn" style="cursor: pointer;" onclick="mainNewFile()" role="button"><i class="fa fa-upload"></i> Subir archivo</span>
+                    <span class="btn btn-default" id="mainNewFileBtn" style="cursor: pointer;" onclick="mainNewFile()" role="button"><i class="fa fa-upload"></i> Subir archivo</span>
                     &nbsp;
-                    <span id="newFileBtn" style="cursor: pointer; display:none" onclick="starInputFile()" role="button"><i class="fa fa-upload"></i> Subir archivo</span>
-                </label>
+                    <span class="btn btn-default" id="newFileBtn" style="cursor: pointer; display:none" onclick="starInputFile()" role="button"><i class="fa fa-upload"></i> Subir archivo</span>
+                </label> -->
                 <li class="address-item first-address-item"><i class="fa fa-folder"></i> Carpetas</li>
             </ol>
         </div>
@@ -75,12 +86,12 @@
 <div class="row" id="noFilesAlert" style="display:none">
     <div class="col-md-12">
         <div class="alert alert-warning text-center" role="alert">
-            <strong><i class="fa fa-warning"></i> Aún no ha subido ningún archivo.</strong>
+            <strong><i class="fa fa-warning"></i> Información no disponible para generar estadísticas.</strong>
         </div>
     </div>
 </div>
 
-<div class="row" id="uploadFilesContentParent" style="">
+<div class="row" id="uploadFilesContentParent" >
     <div class="col-md-12">
         <div id="uploadFilesContent" class="jumbotron" style="text-align: center; border-style: dashed; background-color: white; border-color: #eee;display: none">
             <input type="file" id="csvFile" name="csvFile" style="display: none">
@@ -88,7 +99,7 @@
             <p><i class="fa fa-upload upload" aria-hidden="true"></i></p>
             <p>
                 <a id="csvFileButton" class="btn btn-danger btn-lg" href="#" role="button" onclick="starInputFile()">
-                    <i class="fa fa-upload"></i> <span data-lang="btn-upload-file">Subir Archivo</span>
+                    <i class="fa fa-upload"></i> <span data-lang="btn-upload-file">Subir archivo</span>
                 </a>
             </p>
         </div>
@@ -108,6 +119,9 @@
                 <span data-lang="file-uploaded-alert-first">Archivo</span> <strong id="strongFileName"></strong> <span data-lang="file-uploaded-alert-last">subido correctamente</span>
                 <button id="cambiarArchivo" class="btn btn-primary btn-xs"><i class="fa fa-folder-open"></i>
                     <span data-lang="change-file-btn">Cambiar archivo</span>
+                </button>
+                <button id="cancelProcess" class="btn btn-danger btn-xs"><i class="fa fa-times"></i>
+                    <span data-lang="">Cancelar</span>
                 </button>
             </p>
         </div>
@@ -170,17 +184,18 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" data-lang="modal-title-type-report">Seleccionar Informe</h4>
+                <h4 class="modal-title" data-lang="modal-title-type-report">Seleccionar tipo de informe</h4>
             </div>
             <div class="modal-body">
                 <select id="selectReportType" class="form-control">
                     <option>-- Tipo de informe --</option>
-                    <option value="0" data-default-folder="Descargas">Descargas del archivo del artículo</option>
-                    <option value="1" data-default-folder="Visitas">Visitas a la página del resumen del artículo</option>
-                    <option value="2" data-default-folder="Descargas">Descargas de Archivo del número</option>
-                    <option value="3" data-default-folder="Visitas">Visitas a la página de la tabla de contenidos del número</option>
-                    <option value="4" data-default-folder="Visitas">Visitas a la página principal de la revista</option>
-                    <option value="5" data-default-folder="Usuarios">Módulo para usuarios/as XML</option>
+                    <option value="0" data-default-folder="Informes">Descargas del archivo del artículo</option>
+                    <option value="1" data-default-folder="Informes">Visitas a la página del resumen del artículo</option>
+                    <option value="2" data-default-folder="Informes">Descargas de Archivo del número</option>
+                    <option value="3" data-default-folder="Informes">Visitas a la página de la tabla de contenidos del número</option>
+                    <option value="4" data-default-folder="Informes">Visitas a la página principal de la revista</option>
+                    <option value="5" data-default-folder="Informes">Módulo para usuarios/as XML</option>
+                    <option value="7" data-default-folder="Informes">Informe de Artículos</option>
                 </select>
             </div>
             <div class="modal-footer">
@@ -220,7 +235,9 @@
 @endsection
 
 @section('javascript')
+
 <script type="text/javascript" src="{{ asset('js/statsarrays.js') }}"></script>
 <script id="translateScript" src="{{ asset('js/main/translate.objects.js') }}"></script>
 <script src="{{ asset('js/main/config.js') }}"></script>
+
 @stop

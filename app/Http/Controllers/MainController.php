@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Stats\Http\Controllers;
 
-use App\Authenticatable;
-//use App\Csvfile;
-use App\File;
-use App\Folder;
-use App\LastFileUploaded;
-use App\User;
-//use App\Xmlfile;
+use Stats\Authenticatable;
+//use Stats\Csvfile;
+use Stats\File;
+use Stats\Folder;
+use Stats\LastFileUploaded;
+use Stats\User;
+//use Stats\Xmlfile;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-//use App\Http\Controllers\Controller;
+//use Stats\Http\Controllers\Controller;
 
 class MainController extends Controller
 {
@@ -158,8 +158,18 @@ class MainController extends Controller
 
                 break;
             case 'seeFileAgain':
+                //$file_back_name = $request->fileName;
+                //$file = $files_db->where('file_back_name', $file_back_name)->first();
                 $file_back_name = $request->fileName;
-                $file = $files_db->where('file_back_name', $file_back_name)->first();
+                //$file = $files_db->select()->where([['file_back_name', $file_back_name], ['file_journal_id', $journal_id]])->first();
+
+                $file = $files_db
+                ->join('users as u', 'files.file_user_id', '=', 'u.id')
+                ->where([
+                    ['u.journal', $journal_id],
+                    ['file_status', 'Active'],
+                    ['file_back_name', $file_back_name]
+                ])->orderBy('file_timestamp', 'desc')->first();
 
                 $response = array($file);
                 // $response = array(
@@ -309,14 +319,11 @@ class MainController extends Controller
                 if (rename($origin_path, $destination_path)) {
 
                     if($folderId == 0){
-
                         $folder = $folder_model->where([
                             ['folder_name', $folder_default],
                             ['folder_journal_id', $journal_id],
                             ['folder_status', 'Active']
                         ])->first();
-
-
 
                         if(is_null($folder)){
                             $newFolder = $folder_model->create([
@@ -326,14 +333,14 @@ class MainController extends Controller
                                 'folder_journal_id' => $journal_id,
                                 'folder_status' => 'Active'
                             ]);
-
                             $folderId = $newFolder->id;
-
                         } else {
                             $folderId = $folder->folder_id;
                         }
-
                     }
+
+                    $folderFiles = $folder_model->where('folder_id', $folderId)->first();
+                    $filesInFolder = $folderFiles->folder_total_files;
 
                     $newFile = $files_db->create([
                         'file_front_name' => $file_name,
@@ -350,43 +357,6 @@ class MainController extends Controller
                         'file_folder_id' => $folderId,
                     ]);
 
-
-                    // switch ($file_type) {
-                    //     case 'csv':
-                    //         $newRow = $csv_file_db->create([
-                    //             'csv_front_name' => $file_name,
-                    //             'csv_back_name' => $storage_file_name,
-                    //             'csv_path' => $targetDir,
-                    //             'csv_user_id' => $auth_id,
-                    //             'csv_version' => $version,
-                    //             'csv_indices' => json_encode($index_array),
-                    //             'csv_type_report' => $type_report,
-                    //             'csv_type_report_index' => $type_report_index,
-                    //         ]);
-                    //         break;
-                    //     default:
-                    //         $newRow = $xml_file_db->create([
-                    //             'xml_front_name' => $file_name,
-                    //             'xml_back_name' => $storage_file_name,
-                    //             'xml_path' => $targetDir,
-                    //             'xml_user_id' => $auth_id,
-                    //             'xml_version' => $version,
-                    //             'xml_indices' => json_encode($index_array),
-                    //             'xml_type_report' => $type_report,
-                    //             'xml_type_report_index' => $type_report_index,
-                    //         ]);
-                    //         break;
-                    // }
-                    // $csv_file_db->csv_front_name = $file_name;
-                    // $csv_file_db->csv_back_name = $storage_file_name;
-                    // $csv_file_db->csv_path = $csv_final_p;
-                    // $csv_file_db->csv_user_id = $auth_id;
-                    // $csv_file_db->csv_version = $version;
-                    // $csv_file_db->csv_indices = json_encode($index_array);
-                    // $csv_file_db->csv_type_report = $type_report;
-                    // $csv_file_db->csv_type_report_index = $type_report_index;
-
-
                     //$csv_file_db->save()
                     if ($newFile) {
                         $data_set = [
@@ -396,6 +366,9 @@ class MainController extends Controller
                             'last_block_two'    =>  $request->block_two,
                             'last_block_three'  =>  $request->block_three,
                         ];
+
+                        $fileAdd = $filesInFolder + 1;
+                        $folder_model->where('folder_id', $folderId)->update(['folder_total_files' => $fileAdd]);
 
                         $updateLast = $lastcsv_db->where('last_user_id', $auth_id)->update($data_set);
 
@@ -427,9 +400,17 @@ class MainController extends Controller
             case 'delete':
                 //$delete = $csv_file_db->where('csv_id', $request->csv_id)->update(['csv_status', 'deleted']);
                 $file_id = $request->fileId;
+                $folder_id = $request->folderId;
+
                 $delete = $files_db->where('file_id', $file_id)->update(['file_status' => 'deleted']);
                 if ($delete) {
-                    $response = array('status' => 'success', 'message' => 'Archivo eliminado satisfactóriamete');
+                    $folderFiles = $folder_model->where('folder_id', $folder_id)->first();
+                    $filesInFolder = (int)$folderFiles->folder_total_files;
+
+                    $file_subtract = $filesInFolder - 1;
+                    $folder_model->where('folder_id', $folder_id)->update(['folder_total_files' => $file_subtract]);
+
+                    $response = array('status' => 'success', 'message' => 'Archivo eliminado satisfactóriamete', 'totalFiles' => $file_subtract);
                 } else {
                     $response = array('status' => 'error', 'message' => 'Error al eliminar archivo');
                 }

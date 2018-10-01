@@ -28,11 +28,12 @@ var imageChartType,
     imageChartCity,
     imageChartCountry,
     imageChartMonth,
-    imageChartTotal;
-
-var imageChartRoles,
+    imageChartTotal,
+    imageChartRoles,
     imageChartGenders,
-    imageChartAffiliation;
+    imageChartAffiliation,
+    imageChartAcceptedRefused;
+
 
 
 /*Deprecated*/
@@ -77,14 +78,27 @@ $(document).ready(function(){
     start(data);
 });
 
+function dateFormat(date, lang, fileUserName){
+	var months, dateFormat, date = new Date(date);
+	switch (lang) {
+		case 'es':
+			months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septimbre", "Octube", "Nomviembre", "Diciembre"];
+			dateFormat = 'Subido por ' + fileUserName + ' el ' + date.getDate() + ' de ' + months[date.getMonth()] + ' de ' + date.getFullYear();
+		    dateFormat += ' ' + date.toLocaleString("en-EU", { hour: "numeric", minute: "numeric", hour12: true });
+			return dateFormat;
+			break;
+		case 'en':
+			months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+			dateFormat = 'Uploaded by ' + fileUserName + ' on ' + months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+			dateFormat += ' ' + date.toLocaleString("en-EU", { hour: "numeric", minute: "numeric", hour12: true });
+			return dateFormat;
+			break;
+	}
+}
+
 function start(data){
     $('#chartsModuleContent').show();
-    var url;
-    if(!fileNameParam){
-        url = 'files';
-    } else {
-        url = '../files';
-    }
+    var url = (!fileNameParam) ? 'files' : '../files';
 
     var counter = 0;
     $.post(url, data, function(response){
@@ -93,11 +107,13 @@ function start(data){
             file_front_name,
             fileIndices,
             fileIndicesRoles,
+            fileTimestamp,
+            fileUserName,
             type_report,
             typeReportIndex;
 
         if(response[0] == null){
-            location.href = 'config';
+            location.href = configLocation;
         } else {
             $.each(response, function(index, v){
                 file_folder_id = v.file_folder_id;
@@ -108,16 +124,21 @@ function start(data){
                 globalFileId = v.file_id;
                 fileIndices = v.file_indices;
                 fileIndicesRoles = v.file_role_indices;
+
+                fileTimestamp = v.file_timestamp;
+                fileUserName = v.name + ' ' + v.last_name;
                 indexArray = JSON.parse("[" + fileIndices + "]");
                 indexArrayRoles = JSON.parse("[" + fileIndicesRoles + "]");
                 globalFileType = v.file_type;
                 typeReportIndex = v.file_report_index;
                 type_report = v.file_report_name;
-
             });
 
-            var text = 'Información obtenida del reporte <strong style="color: #ad0004;"><i>'+type_report+'</i></strong>.<br> <small>Archivo: ' + file_front_name + '</small>';
-            $('#topTitle').html(text);
+            lang = 'es';
+            var uploadDate = dateFormat(fileTimestamp, lang, fileUserName);
+            var titleHeader = 'Informe: <strong style="color: #ad0004;"><i>'+type_report+'.</i></strong>'+
+            '<br> <small><strong>Archivo:</strong> ' + file_front_name + '</small> <small>'+uploadDate+'</small>';
+            $('#topTitle').html(titleHeader);
             filePath = public_path + 'files/'+file_back_name
 
             switch (typeReportIndex){
@@ -133,6 +154,9 @@ function start(data){
                 case 5:
                     globalTypeReport = 'Usuarios';
                     break;
+                case 7:
+                    globalTypeReport = 'Artículos';
+                    break;
             }
 
             folderIdActive = liFolderId;
@@ -144,14 +168,19 @@ function start(data){
                     $.each(v, function(ind, val){
                         var folder_name = val.folder_name;
                         var folder_id = val.folder_id;
+                        var folder_total_files = val.folder_total_files;
+
                         var sortOrder = countFolders;
                         //console.log(file_folder_id);
                         if(file_folder_id == folder_id){
                             sortOrder = 1;
                         }
 
-                        var li = '<li class="folder-list" id="liFolder'+folder_id+'" data-folderid="'+folder_id+'" data-folderorder="'+sortOrder+'">'+
-                                    '<a href="#"><i class="fa fa-bar-chart fa-fw" style="color: darkred"></i> Gráficas de '+folder_name+'<span class="fa arrow"></span></a>'+
+                        var li = '<li class="folder-list"  id="liFolder'+folder_id+'" title="Gráficas de '+folder_name+'" data-folderid="'+folder_id+'" data-folderorder="'+sortOrder+'" data-totalfiles="'+folder_total_files+'" data-filebackname="">'+
+                                    '<a href="#">'+
+                                        '<span class="folder-title"> Gráficas de '+folder_name+'</span>'+
+                                        '<span class="fa arrow"></span>'+
+                                    '</a>'+
                                     '<ul class="nav nav-second-level" id="folder'+folder_id+'" data-folderid="'+folder_id+'">'+
 
                                     '</ul>'+
@@ -222,25 +251,76 @@ function start(data){
                 }
             });
         }
-
-
     });
 }
 
-
-$(document).on('click', 'li.folder-list', function(){
+$(document).on('click', 'li.folder-list', function(event){
     var thisFolderId = $(this).data('folderid');
+    var totalFiles = parseInt($(this).data('totalfiles'));
 
     if(thisFolderId != folderIdActive) {
-        folderIdActive = thisFolderId;
-        $('#side-menu').find('li.folder-list').remove();
-        fadeInLoader();
+        //folderIdActive = thisFolderId;
+        //$('#side-menu').find('li.folder-list').remove();
+        //fadeInLoader();
         // headers = [];
         // indexArray = [];
+        if(totalFiles == 0){
+            swal({
+                title: 'Aún no ha subido ningun archivo',
+                text: '¿Desea subir un archivo a esta carpeta?',
+                type: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, subir archivo'
+            }).then((result) => {
+                if(result.value){
+                    location.href = configLocation;
+                    // var data = {'_token': CSRF_TOKEN, 'swi tchCase': 'getLastFileRequest', 'folderId': thisFolderId};
+                    // start(data);
+                }else if (result.dismiss === swal.DismissReason.cancel) {
+                    //$('li.folder-list:first').click();
 
-        var data = {'_token': CSRF_TOKEN, 'switchCase': 'getLastFileRequest', 'folderId': thisFolderId};
-        start(data);
+                    // $('.folder-list').each(function(index, v) {
+                    //     var liId = $(v).attr('id');
+                    //     if(liId == 'liFolder'+folderIdActive){
+                    //         console.log(v);
+                    //         $(v).click();
+                    //     }
+                    // });
 
+                    $('#liFolder'+folderIdActive+'>a').click();
+
+                    // $('.folder-list').find('ul#folder'+thisFolderId).removeClass('in');
+                    //
+                    // $('.folder-list').removeClass('active');
+                    // $('.folder-list').find('ul#folder'+folderIdActive).addClass('in').parent('.folder-list').addClass('active');
+                    //
+                    //$('.folder-list#liFolder'+folderIdActive).click();
+
+                    //$('#folder'+folderIdActive).find('.chartOption:first').click();
+                }
+            });
+        } else {
+            // folderIdActive = thisFolderId;
+            // $('#side-menu').find('li.folder-list').remove();
+            // fadeInLoader();
+            var data = {'_token': CSRF_TOKEN, 'switchCase': 'getLastFileRequest', 'folderId': thisFolderId};
+            var url = (!fileNameParam) ? 'files' : '../files';
+            $.post(url, data, function(response){
+                var file_back_name;
+                $.each(response, function(index, v){
+                    file_back_name = v.file_back_name;
+                });
+
+                var location_ = (!fileNameParam) ? 'stats/'+file_back_name : file_back_name;
+                location.href = location_;
+
+            });
+
+
+            // start(data);
+        }
 
         // $.post('files', data, function(response){
         //
@@ -256,12 +336,11 @@ function generateArraysXML(fileName){
     //var usersDataSet = {'userType': '', 'totals': 0, 'national': 0, 'international': 0};
     //var usersDataSet = {};
     //var usersDataSet = [];
+    globalTotals = 0;
     var showOnlyGraph = [];
 
     //cabeceras del documento
     headers = ['Roles', 'Géneros', 'País', 'Afiliación'];
-
-
 
     var chartCountry = 0,
         chartGenders = 0,
@@ -298,10 +377,11 @@ function generateArraysXML(fileName){
     }
 
     $.post('../../readxml', data, function(response) {
+        contador = 0;
         $.each(response, function(index, v){
             var country = v.country;
             var gender = v.gender;
-            var affiliation = v.affiliation;
+            var affiliation = String(v.affiliation);
 
             var counterRoles = 0;
             $.each(v.roles, function(index, v){
@@ -403,7 +483,6 @@ function generateArraysXML(fileName){
                     for(var i = 0; i < counterRoles; i++){
                         gendersObj[0].countries.push(country);
                     }
-
                 } else {
                     $.each(gendersObj, function(index, v) {
                         if(gender == v.shortname) {
@@ -435,17 +514,38 @@ function generateArraysXML(fileName){
                     'Colegio de México',
                     'COLEGIO DE MÉXICO',
                     'Colegio de M[exico',
+                    'Seminario sobre Violencia y Paz de El Colegio de México'
                  ];
 
+                 jnalAffiliation = 'Guadalajara';
+                 //var strToSearch = jnalAffiliation.replace(/\s/g, '+');
+                 var strToSearch = jnalAffiliation;
+                 //console.log('strToSearch: ' + strToSearch);
+                 //omitir artículos
+                 var regexp = new RegExp(strToSearch, 'i');
+                 //console.log(regexp);
+                 //var n = affiliation.search(/colegio de méxico/i);
+                 var n = affiliation.search(regexp);
+
+                 if(n > 0){
+                    // console.log('< N\''+n);
+                     contador++;
+                     //console.log('Afiliciación: '+affiliation);
+                     //console.log('Contador: '+contador);
+                 }
+                 //console.log('Affiliation in xml: ' + affiliation);
+                 //console.log('----------');
                  //83
                 var foundValue = 0;
                 for(var i = 0; i < match.length; i++){
-                     if(match[i] == affiliation){
-                         foundValue = 1;
-                     }
-                 }
+                    if(match[i] == affiliation){
+                        foundValue = 1;
+                        // console.log('Afiliciación Array: '+affiliation);
+                        //console.log('----------');
+                    }
+                }
 
-                 if(foundValue == 1){
+                if(foundValue == 1){
                      // if(affiliationArrg.length < 1){
                      //     var data = {'affiliation': 'El Colegio de México', 'totals': 1};
                      //     affiliationArrg[0] = data
@@ -508,25 +608,30 @@ function generateArraysXML(fileName){
     });
 }
 
-
 function generateArraysCSV() {
     dataSet = [];
     d3.text(filePath, function(data) {
         var parsedCSV = d3.csv.parseRows(data);
 
+        globalTotals = 0;
+
         var indexNumber = 0;
         var indexCity = 0;
         var indexMonth = 0;
         var indexCountry = 0;
+        var indexacceptedRefused = 0
 
         var chartNumber = 0;
         var chartCity = 0;
         var chartMonth = 0;
         var chartCountry = 0;
+        var chartacceptedRefused = 0;
 
         indexArray.forEach(function (values) {
             values.forEach(function (value) {
                 var index = value.i;
+                var acceptedRefused = 'Decisión del director(Estatus Aceptado/Rechazado)';
+
                 switch(value.v){
                     case 'Texto':
                         indexText = index;
@@ -548,6 +653,10 @@ function generateArraysCSV() {
                         indexMonth = index;
                         chartMonth = 1;
                         break;
+                    case acceptedRefused:
+                        indexacceptedRefused = index;
+                        chartacceptedRefused = 1;
+                        break;
                 }
             });
         });
@@ -559,7 +668,6 @@ function generateArraysCSV() {
 
         var contador = 0;
         $.each(parsedCSV, function(index, v){
-
             var temp = v;
             if(temp.length > 1) {
                 if (unusableData) {
@@ -567,129 +675,124 @@ function generateArraysCSV() {
                 }
 
                 if(contador > 0){
-
-                    var last = temp[temp.length -1];
-                    var months = temp[temp.length -2];
-                    var country = temp[temp.length -3];
-
-                    //TOTALES
-                    var totals = parseInt(last);
-                    globalTotals = globalTotals + totals;
-
-                    //MESES
-                    var month = parseInt(months.substr(5));
-                    if(month == 1){
-                        month = month - 1;
+                    if(chartacceptedRefused == 1){
+                        //console.log(indexacceptedRefused);
                     } else {
-                        month = month - 1;
-                    }
-                    monthsObj[month].downloads = monthsObj[month].downloads + totals;
+                        var last = temp[temp.length -1];
+                        var months = temp[temp.length -2];
+                        var country = temp[temp.length -3];
 
+                        //TOTALES
+                        var totals = parseInt(last);
+                        globalTotals = globalTotals + totals;
 
-                    //globales
-                    $.each(countriesObj, function(index, v) {
-                        if(country == ''){
-                            if(v.code == 'UNK'){
-                                v.downloads = v.downloads + totals;
-                            }
+                        //MESES
+                        var month = parseInt(months.substr(5));
+
+                        if(month == 1){
+                            month = month - 1;
                         } else {
-                            if(country == v.code) {
-                                v.downloads = v.downloads + totals;
-
-                            }
+                            month = month - 1;
                         }
-                    });
 
+                        monthsObj[month].downloads = monthsObj[month].downloads + totals;
 
-                    //number
-                    if(chartNumber == 1) {
-                        var number = temp[indexNumber];
-
-                        if(numberArrg.length == 0) {
-                            var a = {'number': number, totals: totals, 'loops': 1};
-                            numberArrg.push(a);
-
-                        } else {
-                            var match = false;
-                            var loops = 0;
-
-                            for(i in numberArrg) {
-                                var _number = numberArrg[i].number;
-
-                                if(number == _number){
-                                    match = true;
-                                    loops++;
-                                    numberArrg[i].loops = numberArrg[i].loops + loops;
-                                    numberArrg[i].totals = numberArrg[i].totals + totals;
-                                }
-                            }
-
-                            if(!match){
-                                //console.log(!!match);
-                                var a = {'number': number, totals: totals, 'loops': 1};
-                                numberArrg.push(a);
-                            }
-
-                        }
-                    }// end if chartNumber
-
-                    /*Chart City*/
-                    if(chartCity == 1) {
-                        var city = temp[indexCity];
-                        var _country = country;
-                        var countryCode;
-                        var continent;
-
+                        //globales
                         $.each(countriesObj, function(index, v) {
                             if(country == ''){
-                                _country = 'UNK';
-                                continent = 'UNK';
-                                countryCode = 'UNK'
+                                if(v.code == 'UNK'){
+                                    v.downloads = v.downloads + totals;
+                                }
                             } else {
-                                if(_country == v.code) {
-                                    continent = v.continent;
-                                    _country = v.name;
-                                    countryCode = v.code;
+                                if(country == v.code) {
+                                    v.downloads = v.downloads + totals;
                                 }
                             }
-
                         });
 
-                        //if(count < 10){
-                        if(city.trim().length > 0) {
-                            if(citiesArrg.length == 0) {
-                                var o = {'city': city, 'totals': totals,  'loops': 1, 'countryCode': countryCode, 'country': _country, 'continent': continent};
-                                citiesArrg.push(o);
-
+                        //number
+                        if(chartNumber == 1) {
+                            var number = temp[indexNumber];
+                            if(numberArrg.length == 0) {
+                                var a = {'number': number, totals: totals, 'loops': 1};
+                                numberArrg.push(a);
                             } else {
                                 var match = false;
                                 var loops = 0;
-                                for(i in citiesArrg){
-                                    var _city = citiesArrg[i].city;
-                                    if(_city == city) {
+
+                                for(i in numberArrg) {
+                                    var _number = numberArrg[i].number;
+                                    if(number == _number){
                                         match = true;
                                         loops++;
-                                        citiesArrg[i].loops = citiesArrg[i].loops + loops;
-                                        citiesArrg[i].totals = citiesArrg[i].totals + totals;
+                                        numberArrg[i].loops = numberArrg[i].loops + loops;
+                                        numberArrg[i].totals = numberArrg[i].totals + totals;
                                     }
                                 }
 
-                                if(!match) {
-                                    var o = {'city': city, 'totals': totals, 'loops': 1, 'countryCode': countryCode, 'country': _country, 'continent': continent};
+                                if(!match){
+                                    var a = {'number': number, totals: totals, 'loops': 1};
+                                    numberArrg.push(a);
+                                }
+                            }
+                        }// end if chartNumber
+
+                        /*Chart City*/
+                        if(chartCity == 1) {
+                            var city = temp[indexCity];
+                            var _country = country;
+                            var countryCode;
+                            var continent;
+
+                            $.each(countriesObj, function(index, v) {
+                                if(country == ''){
+                                    _country = 'UNK';
+                                    continent = 'UNK';
+                                    countryCode = 'UNK';
+                                } else {
+                                    if(_country == v.code) {
+                                        continent = v.continent;
+                                        _country = v.name;
+                                        countryCode = v.code;
+                                    }
+                                }
+                            });
+
+                            //if(count < 10){
+                            if(city.trim().length > 0) {
+                                if(citiesArrg.length == 0) {
+                                    var o = {'city': city, 'totals': totals,  'loops': 1, 'countryCode': countryCode, 'country': _country, 'continent': continent};
                                     citiesArrg.push(o);
+                                } else {
+                                    var match = false;
+                                    var loops = 0;
+                                    for(i in citiesArrg){
+                                        var _city = citiesArrg[i].city;
+                                        if(_city == city) {
+                                            match = true;
+                                            loops++;
+                                            citiesArrg[i].loops = citiesArrg[i].loops + loops;
+                                            citiesArrg[i].totals = citiesArrg[i].totals + totals;
+                                        }
+                                    }
+
+                                    if(!match) {
+                                        var o = {'city': city, 'totals': totals, 'loops': 1, 'countryCode': countryCode, 'country': _country, 'continent': continent};
+                                        citiesArrg.push(o);
+                                    }
+
                                 }
 
                             }
-
-                        }
-                        //}
-                    }// end if chartCity
+                            //}
+                        }// end if chartCity
+                    }
                 }
                 contador++;
                 dataSet.push(temp);
             }
-
         });//end each(parsedCSV)
+
         $.each(countriesObj, function(index, v) {
             var totals = parseInt(v.downloads);
             var code = v.code;
@@ -705,8 +808,6 @@ function generateArraysCSV() {
                 }
             }
         });
-
-        //console.log(dataSet[0]);
 
         headers = dataSet[0];
         dataSet.shift();
@@ -743,15 +844,16 @@ function switchData() {
         objects.forEach(function(v) {
             showCharts.push(v.v);
 
+            var acceptedRefused = 'Decisión del director(Estatus Aceptado/Rechazado)';
             switch(v.v){
                 case 'Texto':
                     //$("#chartPanelText").show();
                     switch (globalTypeReport) {
                         case 'Descargas':
-                            panelTitle = 'Gráfica comparativa de los principales artículos más descargados';
+                            panelTitle = 'Principales artículos más descargados';
                             break;
                         case 'Visitas':
-                            panelTitle = 'Gráfica comparativa de los principales artículos más visitados';
+                            panelTitle = 'Principales artículos más visitados';
                             break;
                     }
                     $("#panelTitleText").text(panelTitle);
@@ -795,11 +897,11 @@ function switchData() {
                     //$("#chartPanelNumber").show();
                     switch (globalTypeReport) {
                         case 'Descargas':
-                            panelTitle = 'Gráfica descriptiva de los principales números más descargados';
+                            panelTitle = 'Principales números más descargados';
                             panelTitleCloudWords = 'Nube de palabras de todos los números descargados';
                             break;
                         case 'Visitas':
-                            panelTitle = 'Gráfica descriptiva de los principales números más visitados';
+                            panelTitle = 'Principales números más visitados';
                             panelTitleCloudWords = 'Nube de palabras de todos los números visitados';
                             break;
                     }
@@ -849,15 +951,15 @@ function switchData() {
                     //$("#chartPanelCity").show();
                     switch (globalTypeReport) {
                         case 'Descargas':
-                            panelTitle = 'Las principales ciudades donde realizan descargas';
+                            panelTitle = 'Principales ciudades donde realizan descargas';
                             panelTitleCloudWords = 'Nube de palabras de todas las ciudades que realizan descargas';
                             break;
                         case 'Visitas':
-                            panelTitle = 'Las principales ciudades desde donde realizan visitas';
+                            panelTitle = 'Principales ciudades desde donde realizan visitas';
                             panelTitleCloudWords = 'Nube de palabras de todas las ciudades que realizan visitas';
                             break;
                         case 'Usuarios':
-                            panelTitle = 'Las principales ciudades con usuarios registrados';
+                            panelTitle = 'Principales ciudades con usuarios registrados';
                             panelTitleCloudWords = 'Nube de palabras de todas las ciudades con usuarios registrados';
                             break;
                         default:
@@ -891,7 +993,7 @@ function switchData() {
                     }
 
                     //si se cambia el título, cambiarlo también en la función processDataCountries()
-                    $("#panelTitleCountries").text(panelTitle);
+                    //$("#panelTitleCountries").text(panelTitle);
                     $('#panelTitleCloudWordsCountry').text(panelTitleCloudWords);
                     $("#chartPanelCountries").show();
                     //$('#liMenuChartCountry').show();
@@ -937,7 +1039,7 @@ function switchData() {
                     //processDataTotal(v.i);
                     break;
                 case 'Roles':
-                    panelTitle = 'Gráfica comparativa por tipo de usuario';
+                    panelTitle = 'Tipos de usuario registrados';
                     panelTitleCloudWords = 'Nube de palabras por tipo de usuario';
                     $('#panelTitleRoles').text(panelTitle);
                     $('#panelTitleCloudWordsRoles').text(panelTitleCloudWords);
@@ -952,7 +1054,7 @@ function switchData() {
                     //processDataRoles();
                     break;
                 case 'Géneros':
-                    panelTitle = 'Gráfica comparativa de usuarios por Géneros';
+                    panelTitle = 'Usuarios registrados por géneros';
                     $('#panelTitleGenders').text(panelTitle);
                     $('#chartPanelGenders').show();
                     //$('#liMenuChartGender').show();
@@ -965,12 +1067,26 @@ function switchData() {
                     //processDataGenders();
                     break;
                 case 'Afiliación':
-                    panelTitle = 'Gráfica comparativa por afiliación';
+                    panelTitle = 'Usuarios registrdos por afiliación';
                     $('#panelTitleAffiliation').text(panelTitle);
+                    $('#chartPanelAffiliation').show();
+
                     li = '<li id="liMenuChartAffiliation" data-orderid="4" class="chartOption" data-paneltarget="chartPanelAffiliation" data-position="'+v.i+'">'+
                         '<a class="link-menu">'+
                             '<i class="fa fa-handshake-o" style="color: purple"></i> '+
                             'Por Afiliación'+
+                        '</a>'+
+                    '</li>';
+                    break;
+                case acceptedRefused:
+                    penelTitle = 'Estado ';
+                    $('#panelTitleAcceptedRefused').text(penelTitle);
+                    $('#chartPanelAcceptedRefused').show();
+
+                    li = '<li id="liMenuChartAcceptedRefused" data-orderid="8" class="chartOption" data-paneltarget="chartPanelAcceptedRefused" data-position="'+v.i+'">'+
+                        '<a class="link-menu">'+
+                            '<i class="fa fa-check-square-o" style="color: #CBC717"></i> '+
+                            'Por Aceptado/Rechazado'+
                         '</a>'+
                     '</li>';
                     break;
@@ -1001,45 +1117,58 @@ function switchData() {
     //     //$('.folder-list').find('ul#folder'+liFolderId).addClass('in').parent('.folder-list').addClass('Active');
     // }
     $('.chartOption:first').click();
-    fadeOutLoader();
+    //fadeOutLoader();
 }
 
+var clickCounter = 0;
 $(document).on('click', '.chartOption', function() {
     var element = $(this).data('paneltarget');
     var position = $(this).data('position');
 
-    $('.chartContent').hide();
-    $('.chartOption').find('a').removeClass('active');
-    $(this).find('a').addClass('active');
-    $('#'+element).slideDown('slow');
-
-    switch (element) {
-        case 'chartPanelText':
-            processDataText(position);
-            break;
-        case 'chartPanelNumber':
-            processDataNumber(position);
-            break;
-        case 'chartPanelCity':
-            processDataCities(position);
-            break;
-        case 'chartPanelCountries':
-            processDataCountries();
-            break;
-        case 'chartPanelMonths':
-            processDataMonths(position);
-            break;
-        case 'chartPanelRoles':
-            processDataRoles();
-            break;
-        case 'chartPanelGenders':
-            processDataGenders();
-            break;
-        case 'chartPanelAffiliation':
-            processDataAffiliation();
-            break;
-        default:
+    if(clickCounter > 0){
+        showPreloader('Cargando Gráfica, espere un momento por favor');
     }
+
+    setTimeout(function(){
+        $('.chartContent').hide();
+        $('.chartOption').find('a').removeClass('active');
+        $(this).find('a').addClass('active');
+        $('#'+element).slideDown('slow');
+
+        switch (element) {
+            case 'chartPanelText':
+                processDataText(position);
+                break;
+            case 'chartPanelNumber':
+                processDataNumber(position);
+                break;
+            case 'chartPanelCity':
+                processDataCities(position);
+                break;
+            case 'chartPanelCountries':
+                processDataCountries();
+                break;
+            case 'chartPanelMonths':
+                processDataMonths(position);
+                break;
+            case 'chartPanelRoles':
+                processDataRoles();
+                break;
+            case 'chartPanelGenders':
+                processDataGenders();
+                break;
+            case 'chartPanelAffiliation':
+                processDataAffiliation();
+                break;
+            case 'chartPanelAcceptedRefused':
+                processDataAcceptedRefused(position);
+                break
+            default:
+        }
+
+        clickCounter++;
+        fadeOutLoader();
+    }, 1000);
 
 
 });
@@ -1241,15 +1370,15 @@ function drawChartCountries() {
             switch (globalTypeReport) {
                 case 'Descargas':
                     //panelTitle = 'Gráfica de Países desde donde realizan descargas en el mundo';
-                    panelTitle = 'Gráfica de Países donde realizan descargas';
+                    panelTitle = 'Países con descargas';
                     //panelTitleCloudWords += ' los países que realizan descargas';
                     break;
                 case 'Visitas':
-                    panelTitle = 'Gráfica de Países desde donde realizan visitas en el mundo';
+                    panelTitle = 'Países con visitas';
                     //panelTitleCloudWords += ' los países que realizan visitas';
                     break;
                 case 'Usuarios':
-                    panelTitle = 'Gráfica de usuarios regitrados por País';
+                    panelTitle = 'Países con usuarios';
                     //panelTitleCloudWords += ' los países con usuarios registrados';
                     break;
             }
@@ -1264,17 +1393,17 @@ function drawChartCountries() {
             switch (globalTypeReport) {
 
                 case 'Descargas':
-                    panelTitle = 'Principales Países con mayores descargas en el mundo';
+                    panelTitle = '10 Países con mayor número de descargas';
                     title = panelTitle;
                     //panelTitleCloudWords += ' los países que realizan descargas';
                     break;
                 case 'Visitas':
-                    panelTitle = 'Principales Países con mayores visitas en el mundo';
+                    panelTitle = '10 Países con mayor número de visitas';
                     title = panelTitle;
                     //panelTitleCloudWords += ' los países que realizan visitas';
                     break;
                 case 'Usuarios':
-                    panelTitle = 'Principales Países con mayores usuarios registrados en el mundo';
+                    panelTitle = '10 Países con mayor número de usuarios registrados';
                     title = panelTitle;
                     //panelTitleCloudWords += ' los países con usuarios registrados';
                     break;
@@ -1292,15 +1421,15 @@ function drawChartCountries() {
         case 'line':
             switch (globalTypeReport) {
                 case 'Descargas':
-                    panelTitle = 'Principales Países con mayores descargas en el mundo';
+                    panelTitle = '10 Países con mayor número de descargas';
                     title = panelTitle;
                     break;
                 case 'Visitas':
-                    panelTitle = 'Principales Países con mayores visitas en el mundo';
+                    panelTitle = '10 Países con mayor número de visitas';
                     title = panelTitle;
                     break;
                 case 'Usuarios':
-                    panelTitle = 'Principales Países con mayores usuarios registrados en el mundo';
+                    panelTitle = '10 Países con mayor número de usuarios registrados';
                     title = panelTitle;
                     break;
             }
@@ -1354,6 +1483,8 @@ function drawChartCountries() {
     //chart.draw(data, options);
     chart.draw(view, options);
     $('#cloudWordsCountry').jQCloud(wordsCountry);
+
+    hidePreloader();
 }
 
 $("#searchCountry").keyup(function() {
@@ -1370,7 +1501,8 @@ $("#searchCountry").keyup(function() {
 ===============CITIES CHART===============
 ========================================*/
 var cityChartDraw = 'column';
-$('.switchCityChart').click(function () {
+$('.switchCityChart').click(function (event) {
+    showPreloader();
     cityChartDraw = $(this).data('chart');
     if(!$(this).hasClass('btn-primary')) {
         $('.switchCityChart').removeClass('btn-primary').addClass('btn-default');
@@ -1477,13 +1609,13 @@ function drawChartCities() {
 
     switch (globalTypeReport) {
         case 'Descargas':
-            title = 'Las principales ciudades donde realizan descargas';
+            title = 'Principales ciudades donde realizan descargas';
             break;
         case 'Visitas':
-            title = 'Las principales ciudades desde donde realizan visitas';
+            title = 'Principales ciudades desde donde realizan visitas';
             break;
         case 'Usuarios':
-            title = 'Las principales ciudades con usuarios registrados';
+            title = 'Principales ciudades con usuarios registrados';
             break;
     }
 
@@ -1557,6 +1689,8 @@ function drawChartCities() {
 
     chart.draw(view, options);
     $('#cloudWordsCity').jQCloud(wordsCity);
+
+    hidePreloader();
 }
 
 $("#searchCity").keyup(function() {
@@ -1770,6 +1904,8 @@ function drawChartMonths(){
 
     chart.draw(view, options);
     $('#cloudWordsMonth').jQCloud(wordsMonth);
+
+    hidePreloader();
 }
 
 /*========================================
@@ -1865,8 +2001,6 @@ function drawChartNumber() {
     var previewLimit = 10;
     var countPreview = 0;
 
-
-
     $('.md-chips, #numbersList').empty();
     $.each(_numberArrg, function(index, v) {
         var colorhexa = colorHexa();
@@ -1942,10 +2076,10 @@ function drawChartNumber() {
     var title = '';
     switch (globalTypeReport) {
         case 'Descargas':
-            title = 'Gráfica descriptiva de los principales números más descargados';
+            title = 'Principales números más descargados';
             break;
         case 'Visitas':
-            title = 'Gráfica descriptiva de los principales números más visitados';
+            title = 'Principales números más visitados';
             break;
     }
 
@@ -2014,8 +2148,11 @@ function drawChartNumber() {
     google.visualization.events.addListener(chart, 'ready', function () {
         imageChartNumber = chart.getImageURI();
     });
+
     chart.draw(view, options);
     $('#cloudWordsNumber').jQCloud(wordsNumber);
+
+    hidePreloader();
 }
 
 
@@ -2088,7 +2225,6 @@ function processDataText(position) {
                 textArrg.push(x);
             }
         }// end if textArrg.length
-
         //}//end if test
         count++;
     });
@@ -2221,10 +2357,10 @@ function drawChartText() {
     var title = '';
     switch (globalTypeReport) {
         case 'Descargas':
-            title = 'Gráfica comparativa de los principales artículos más descargados';
+            title = 'Principales artículos más descargados';
             break;
         case 'Visitas':
-            title = 'Gráfica comparativa de los principales artículos más visitados';
+            title = 'Principales artículos más visitados';
             break;
     }
     // var title = 'Rating ' + previewLimit + ' de principales ' + globalTypeReport;
@@ -2284,6 +2420,7 @@ function drawChartText() {
     });
 
     chart.draw(view, options);
+    hidePreloader();
 
     $('#tableContentTextLabel').html('<i class="fa fa-newspaper-o"></i> Lista de todos los artículos ordenados por el total de '+ globalTypeReport +' de mayor a menor<small class="pull-right">Artículos totales: ' + $.number(countPreview) + '</small>');
 
@@ -2557,7 +2694,7 @@ function drawChartRoles() {
 
     var data = google.visualization.arrayToDataTable(d);
     var view = new google.visualization.DataView(data);
-    var title = 'Gráfica comparativa por tipo de usuario';
+    var title = 'Tipos de usuario registrados';
 
     switch (rolesChartDraw){
         case 'pie':
@@ -2732,6 +2869,7 @@ function drawChartRoles() {
         $('#cloudWordsRoles').jQCloud(wordsRoles);
     }
 
+    hidePreloader();
 }
 
 function drawRolesMap(countries, gtotals, role, national) {
@@ -2919,12 +3057,13 @@ function drawChartGenders(){
         //     }
         // }
 
-        var per = (totals / globalTotals) * 100;
-        if(per < parseFloat(1.0)) {
-            per = 1;
-        } else {
-            per = Math.round(per);
-        }
+        // var per = (totals / globalTotals) * 100;
+        // if(per < parseFloat(1.0)) {
+        //     per = 1;
+        // } else {
+        //     per = Math.round(per);
+        // }
+        var per = Math.round((totals / globalTotals) * 100);
 
         switch (gendersChartDraw){
             case 'pie':
@@ -2935,15 +3074,15 @@ function drawChartGenders(){
                 var color = {color: colorHex};
                 colors.push(color);
 
-                var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
-                    '              <small style="color: #72777a">'+ globalTypeReport+' de género <span style="font-weight: bold; color: #000">'+gender+'</span></small>\n' +
-                    '              <span class="pull-right">'+per+'%</span>\n' +
-                    '              <div class="c-progress">\n' +
-                    '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;">\n' +
-                    '                </div>\n' +
-                    '              </div></div>';
-
-                $("#gendersList").append(layer);
+                // var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
+                //     '              <small style="color: #72777a">'+ globalTypeReport+' de género <span style="font-weight: bold; color: #000">'+gender+'</span></small>\n' +
+                //     '              <span class="pull-right">'+per+'%</span>\n' +
+                //     '              <div class="c-progress">\n' +
+                //     '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;">\n' +
+                //     '                </div>\n' +
+                //     '              </div></div>';
+                //
+                // $("#gendersList").append(layer);
                 break;
             case 'column':
                 var bar = [gender+'('+totals+')', totals, 'color: '+colorHex];
@@ -2958,23 +3097,25 @@ function drawChartGenders(){
                 // ];
                 // d.push(bar);
 
-                var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
-                    '              <small style="color: #72777a">'+ globalTypeReport+' de género <span style="font-weight: bold; color: #000">'+gender+'</span></small>\n' +
-                    '              <span class="pull-right">'+per+'%</span>\n' +
-                    '              <div class="c-progress">\n' +
-                    '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;">\n' +
-                    '                </div>\n' +
-                    '              </div></div>';
 
-                $("#gendersList").append(layer);
                 break;
         }
+
+        var layer = '<div><h5 style="color: #72777a; font-weight: bold">'+abbreviateNumber(totals)+'</h5>\n' +
+            '              <small style="color: #72777a">'+ globalTypeReport+' de género <span style="font-weight: bold; color: #000">'+gender+'</span></small>\n' +
+            '              <span class="pull-right">'+per+'%</span>\n' +
+            '              <div class="c-progress">\n' +
+            '                <div class="c-progress-bar" style="width: '+per+'%; background: '+colorHex+' !important;">\n' +
+            '                </div>\n' +
+            '              </div></div>';
+
+        $("#gendersList").append(layer);
 
     });
 
     var data = google.visualization.arrayToDataTable(d);
     var view = new google.visualization.DataView(data);
-    var title = 'Gráfica comparativa de usuarios por Géneros';
+    var title = 'Usuarios registrados por géneros';
 
     switch (gendersChartDraw){
         case 'pie':
@@ -3012,6 +3153,10 @@ function drawChartGenders(){
                 hAxis: {
                     title: 'Géneros',
                 },
+                animation: {
+                    duration: 1500,
+                    startup: true
+                },
                 chartArea:{left:50, top:20, width:"100%", height:"80%"},
             };
             if(rolesChartDraw == 'column'){
@@ -3026,6 +3171,8 @@ function drawChartGenders(){
         imageChartGenders = chart.getImageURI();
     });
     chart.draw(view, options);
+
+    hidePreloader();
 }
 
 
@@ -3106,7 +3253,7 @@ function drawChartAffiliation(){
 
     var data = google.visualization.arrayToDataTable(d);
     var view = new google.visualization.DataView(data);
-    var title = 'Gráfica comparativa por Afilicación';
+    var title = 'Usuarios registrdos por afiliación';
 
     switch (affiliationChartDraw){
         case 'pie':
@@ -3119,7 +3266,6 @@ function drawChartAffiliation(){
             var chart = new google.visualization.PieChart(document.getElementById("chartContentAffiliation"));
             break;
         case 'column':
-
             var options = {
                 title: title,
                 bar: {groupWidth: "70%"},
@@ -3148,9 +3294,157 @@ function drawChartAffiliation(){
         imageChartAffiliation = chart.getImageURI();
     });
     chart.draw(view, options);
+
+    hidePreloader();
 }
 
+/*=====================================================================================================================
+============================================== ACCEPTED/REFUSED CHART =================================================
+=====================================================================================================================*/
 
+var acceptedRefusedChartDraw = 'column';
+$('.switchAcceptedRefusedChart').click(function () {
+    acceptedRefusedChartDraw = $(this).data('chart');
+    if(!$(this).hasClass('btn-primary')) {
+        $('.switchAcceptedRefusedChart').removeClass('btn-primary').addClass('btn-default');
+        $(this).addClass('btn-primary');
+    }
+    google.charts.setOnLoadCallback(drawChartAcceptedRefused);
+});
+
+var acceptedRefusedArrg = [];
+function processDataAcceptedRefused(position){
+    $.each(dataSet, function(index, v) {
+        if(v[position]){
+            var match = 0;
+            if(acceptedRefusedArrg.length > 0){
+                // passes match = 0;
+                for(var i in acceptedRefusedArrg) {
+                    if(acceptedRefusedArrg[i].statusArt == v[position]){
+                        acceptedRefusedArrg[i].totals = acceptedRefusedArrg[i].totals + 1;
+                        match = 1;
+                    }
+                }
+            }
+
+            if(!Boolean(match)){
+                let data = {'statusArt': v[position], 'totals': 1};
+                acceptedRefusedArrg.push(data);
+            }
+        }
+    });
+
+    //console.log(acceptedRefusedArrg);
+    // var chart = function() { drawChartAcceptedRefused(position) };
+    // google.charts.setOnLoadCallback(chart);
+    google.charts.setOnLoadCallback(drawChartAcceptedRefused);
+}
+
+function drawChartAcceptedRefused(){
+    var _acceptedRefusedArrg = acceptedRefusedArrg.sort(dynamicSort("totals"));
+
+    var colors = [],
+        d;
+
+    switch (acceptedRefusedChartDraw) {
+        case 'pie':
+            d = [
+                ['Estado', 'Total'],
+            ];
+            break;
+        case 'column':
+            d = [
+                ['Estado', 'Total', { role: 'style' }],
+            ];
+            break;
+    }
+
+    $.each(_acceptedRefusedArrg, function(index, v) {
+        //show all typeData
+        var statusArt = v.statusArt;
+        var totals = v.totals;
+        var colorHex = ['#CBC717', '#cb171b', '#FDF720', '#ea4548'];
+        //['Sin decidir', 'Aceptar el texto', 'Rechazado', 'Aceptar con modificaciones']
+        //if(statusArt == 'Aceptar el texto' || statusArt == 'Rechazado'){
+            let data;
+            switch (statusArt) {
+                case 'Aceptar el texto':
+                    defindColor = colorHex[0];
+                    break;
+                case 'Rechazado':
+                    defindColor = colorHex[1];
+                    break;
+                case 'Sin decidir':
+                    defindColor = colorHex[2];
+                    break;
+                case 'Aceptar con modificaciones':
+                    defindColor = colorHex[3];
+                    break;
+            }
+
+            switch (acceptedRefusedChartDraw) {
+                case 'pie':
+                    data = [statusArt + ' (' + totals + ')', totals];
+                    d.push(data);
+
+                    let color = {color: defindColor};
+                    colors.push(color);
+                    break;
+                case 'column':
+                    data = [statusArt, totals, 'color:' + defindColor];
+                    d.push(data);
+                    break;
+            }
+        //}//end if
+    });
+
+    var data = google.visualization.arrayToDataTable(d);
+    var view = new google.visualization.DataView(data);
+    var title = 'Gráfica comparativa por estatus de solicitud de los Artículos';
+    var options,
+        chart;
+
+    switch (acceptedRefusedChartDraw){
+        case 'pie':
+            options = {
+                title: title,
+                is3D: true,
+                chartArea:{left:10, top:20, width:"100%", height:"90%"},
+                slices: colors
+            };
+            chart = new google.visualization.PieChart(document.getElementById('chartContentAcceptedRefused'));
+            break;
+        case 'column':
+            options = {
+                title: title,
+                bar: {groupWidth: '70%'},
+                legend: { position: 'none' },
+                height: '500',
+                vAxis: {
+                    title: globalTypeReport,
+                    gridlines: {count: gridlinesCount},
+                    format: 'short',
+                },
+                hAxis: {
+                    title: 'Estatus',
+                },
+                chartArea:{left:50, top:50, width: '100%', height: '80%'},
+                animation: {
+                    duration: 1500,
+                    startup: true
+                },
+            };
+
+            chart = new google.visualization.ColumnChart(document.getElementById('chartContentAcceptedRefused'));
+            break;
+    };
+
+    google.visualization.events.addListener(chart, 'ready', function () {
+        imageChartAcceptedRefused = chart.getImageURI();
+    });
+    chart.draw(view, options);
+    hidePreloader();
+}
 
 // extra functions
 
@@ -3222,6 +3516,13 @@ $(".export-action").click(function() {
             name =  globalTypeReport+'-por-afiliación';
             typeReport = 'Afiliación';
             icon = '<i class="fa fa-handshake-o"></i>';
+            pass = true;
+            break;
+        case 'acceptedRefused':
+            image = imageChartAcceptedRefused;
+            name = globalTypeReport + '-por-aceptado-rechazado';
+            typeReport = 'Aceptado/Rechazado';
+            icon = '<i class="fa fa-check-square-o"></i>';
             pass = true;
             break;
         default:
@@ -3320,60 +3621,83 @@ $('#chartOptions').click(function () {
     var theresRoles = 0;
 
     headers.forEach(function (value, index) {
-
-        if(value != 'Tipo' && value != 'Revista') {
+        //console.log(value);
+        if(value != 'Tipo' && value != 'Revista' && value != 'Total') {
             var orderId = 0,
+                passes = 0,
                 icon;
+
             switch (value) {
               case 'Total':
                 orderId = 1;
                 icon = '<i class="fa fa-trophy" style="color: gold;"></i>';
+                passes = 1;
                 break;
               case 'País':
                 orderId = 2;
                 icon = '<i class="fa fa-globe" style="color: dodgerblue;"></i>';
+                passes = 1;
                 break;
               case 'Ciudad':
                 orderId = 3;
                 icon = '<i class="fa fa-building" style="color: cadetblue;"></i>';
+                passes = 1;
                 break
               case 'Mes':
                 orderId = 4;
                 icon = '<i class="fa fa-calendar" style="color: darkred"></i>';
+                passes = 1;
                 break;
               case 'Número':
                 orderId = 5;
                 icon = '<i class="fa fa-hashtag" style="color: darkgreen"></i>';
+                passes = 1;
                 break;
               case 'Texto':
                 orderId = 6;
-                icon = '<i class="fa fa-font"></i>';
+                icon = '<i class="fa fa-newspaper-o"></i>';
+                passes = 1;
+                value = 'Artículos';
                 break;
               case 'Roles':
                 orderId = 3;//3
                 icon = '<i class="fa fa-users" style="color: #555e81;"></i>';
+                passes = 1;
                 break;
               case 'Géneros':
                 orderId = 5;//5
                 icon = '<i class="fa fa-transgender" style="color: #00adc1;"></i>';
+                passes = 1;
                 break;
              case 'Afiliación':
                 orderId = 6;//6
                 icon = '<i class="fa fa-handshake-o" style="color: purple;"></i>';
+                passes = 1;
+                break;
+            case 'Decisión del director':
+                orderId = 7;
+                icon = '<i class="fa fa-check-square-o" style="color: #CBC717"></i>';
+                value = 'Aceptado/Rechazado';
+                passes = 1;
                 break;
             }
 
+            if(Boolean(passes)) {
+                // if(globalTypeReport == 'Artículos') {
+                //         input ='<li class="list-group-item" id="orderId'+orderId+'"><label style="width: 100%;">'+icon+' '+_value+' <input type="checkbox" name="checkChart" data-index="'+index+'"  data-typechart="'+value+'" value="'+value+'" class="pull-right"></label></li>';
+                // }
+                input ='<li class="list-group-item" id="orderId'+orderId+'"><label style="width: 100%;">'+icon+' '+value+' <input type="checkbox" name="checkChart" data-index="'+index+'"  data-typechart="'+value+'" value="'+value+'" class="pull-right"></label></li>';
 
-            input ='<li class="list-group-item" id="orderId'+orderId+'"><label style="width: 100%;">'+icon+' '+value+' <input type="checkbox" name="checkChart" data-index="'+index+'"  data-typechart="'+value+'" value="'+value+'" class="pull-right"></label></li>';
-
-            if(value == 'Roles') {
-                input+= '<li class="list-group-item" id="orderId4" style="display:none"><label>Lista de Roles</label><ul class="list-group">';
-                headersRolesArray.forEach(function(value, index){
-                    input+= '<li class="list-group-item"><label style="width: 100%;"><i class="fa fa-user" style="color: #555e81;"></i> '+value+' <input type="checkbox" name="checkChartRole" data-index="'+index+'"  data-typerole="'+value+'" value="'+value+'" class="pull-right"></label></li>';
-                });
-                input+= '</ul></li>';
+                if(value == 'Roles') {
+                    input+= '<li class="list-group-item" id="orderId4" style="display:none"><label>Lista de Roles</label><ul class="list-group">';
+                    headersRolesArray.forEach(function(value, index){
+                        input+= '<li class="list-group-item"><label style="width: 100%;"><i class="fa fa-user" style="color: #555e81;"></i> '+value+' <input type="checkbox" name="checkChartRole" data-index="'+index+'"  data-typerole="'+value+'" value="'+value+'" class="pull-right"></label></li>';
+                    });
+                    input+= '</ul></li>';
+                }
+                chartList.append(input);
             }
-            chartList.append(input);
+
         }
     });
 
@@ -3388,6 +3712,7 @@ $('#chartOptions').click(function () {
       chartList.append(element);
     });
 
+    //console.log(globalTypeReport);
     indexArray.forEach(function (values) {
         values.forEach(function (value) {
             var indexBD = value.i;
@@ -3410,6 +3735,7 @@ $('#chartOptions').click(function () {
         });
     });
 
+    //Decisión del director
 
     if(globalTypeReport == 'Usuarios'){
         if(theresRoles == 1){
@@ -3432,7 +3758,6 @@ $('#chartOptions').click(function () {
         }
     }
 
-
     $('#configCharts').modal({
         backdrop: 'static',
         keyboard: true,
@@ -3440,6 +3765,11 @@ $('#chartOptions').click(function () {
     });
 
 });
+
+
+
+
+
 
 
 $(document).on("click", "input[name='checkChart']", function() {
@@ -3585,18 +3915,18 @@ function dynamicSortMenor(property) {
 }
 
 function abbreviateNumber(value) {
-  let newValue = value;
-  const suffixes = ["", "K", "M", "B","T"];
-  let suffixNum = 0;
-  while (newValue >= 1000) {
-    newValue /= 1000;
-    suffixNum++;
-  }
+    let newValue = value;
+    const suffixes = ["", "K", "M", "B","T"];
+    let suffixNum = 0;
+    while (newValue >= 1000) {
+        newValue /= 1000;
+        suffixNum++;
+    }
 
-  newValue = newValue.toPrecision(3);
+    newValue = newValue.toPrecision(3);
 
-  newValue += suffixes[suffixNum];
-  return newValue;
+    newValue += suffixes[suffixNum];
+    return newValue;
 }
 
 // function abbreviateNumber(value) {

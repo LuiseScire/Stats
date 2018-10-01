@@ -107,27 +107,30 @@ function getJournalUsers(){
                 //'journalAdscripcion': v.journals_adscripcion
             };
 
-            var data = [];
-            data[0] = v.jnal_name;
-            data[1] = v.jnal_pack_plan;
-            data[2] = v.jnal_total_users;
-            data[3] = v.jnal_status;
-            data[4] =
-            '<div class="dropdown pull-right">'+
-            '   <button class="btn btn-danger btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
-            '       <i class="fa fa-gears"></i>'+
-            '       Opciones '+
-            '       <span class="caret"></span>'+
-            '   </button>'+
-            '    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">'+
-            '       <li><a href="javascript:void(0)" onclick="showModalJournalRegister('+id+')"><i class="fa fa-user-plus"></i> Registrar Usuario</li>'+
-            '       <li><a href="javascript:void(0)" onclick="showUsers('+id+', event)" data-journalname="'+data[0]+'"><i class="fa fa-users"></i> Ver Usuarios</a></li>'+
-            '       <li role="separator" class="divider"></li>'+
-            '       <li><a href="javascript:void(0)" onclick="deleteUserJournal('+id+', event)" data-userjournal="journal"><i class="fa fa-trash"></i> Eliminar Revista</a></li>'+
-            '    </ul>'+
-            '</div>';
+            if(v.jnal_status == 'Activo'){
+                var data = [];
+                data[0] = v.jnal_name;
+                data[1] = v.jnal_pack_plan;
+                data[2] = v.jnal_total_users;
+                data[3] = v.jnal_status;
+                data[4] =
+                '<div class="dropdown pull-right">'+
+                '   <button class="btn btn-danger btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+                '       <i class="fa fa-gears"></i>'+
+                '       Opciones '+
+                '       <span class="caret"></span>'+
+                '   </button>'+
+                '    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">'+
+                '       <li><a href="javascript:void(0)" onclick="showModalJournalRegister('+id+')"><i class="fa fa-user-plus"></i> Registrar Usuario</li>'+
+                '       <li><a href="javascript:void(0)" onclick="showUsers('+id+', event)" data-journalname="'+data[0]+'"><i class="fa fa-users"></i> Ver Usuarios</a></li>'+
+                '       <li role="separator" class="divider"></li>'+
+                '       <li><a href="javascript:void(0)" onclick="deleteUserJournal('+id+', event)" data-userjournal="journal" data-fullname="'+data[0]+'"><i class="fa fa-trash"></i> Eliminar Revista</a></li>'+
+                '    </ul>'+
+                '</div>';
 
-            dataSet.push(data);
+                dataSet.push(data);
+            }
+
         });
 
         loadDataforJournals();
@@ -187,27 +190,30 @@ function showUsers(journalId, event){
                 email = v.email;
                 userType = v.jnals_user_type;
                 status = v.status;
-                options = '<div class="dropdown pull-right">'+
-                '   <button class="btn btn-danger btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
-                '       <i class="fa fa-gears"></i>'+
-                '       Opciones '+
-                '       <span class="caret"></span>'+
-                '   </button>'+
-                '    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">'+
-                '       <li><a href="javascript:void(0)"><i class="fa fa-edit"></i> Editar Usuario</a></li>'+
-                '       <li role="separator" class="divider"></li>'+
-                '       <li><a href="javascript:void(0)" onclick="deleteUserJournal('+userId+', event)" data-userjournal="user"><i class="fa fa-trash"></i> Eliminar Usuario</a></li>'+
-                '    </ul>'+
-                '</div>';
 
-            $('#usersList').find('tbody')
-              .append($('<tr></tr>').attr("id", "user" + userId)
-                .append($('<td>' + fullname + '</td>'))
-                .append($('<td>' + email + '</td>'))
-                .append($('<td>' + userType + '</td>'))
-                .append($('<td>' + status + '</td>'))
-                .append($('<td>' + options + '</td>'))
-              );
+                if(status == 'Active'){
+                    options = '<div class="dropdown pull-right">'+
+                    '   <button class="btn btn-danger btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'+
+                    '       <i class="fa fa-gears"></i>'+
+                    '       Opciones '+
+                    '       <span class="caret"></span>'+
+                    '   </button>'+
+                    '    <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">'+
+                    '       <li><a href="javascript:void(0)"><i class="fa fa-edit"></i> Editar Usuario</a></li>'+
+                    '       <li role="separator" class="divider"></li>'+
+                    '       <li><a href="javascript:void(0)" onclick="deleteUserJournal('+userId+', event)" data-userjournal="user" data-fullname="'+fullname+'"><i class="fa fa-trash"></i> Eliminar Usuario</a></li>'+
+                    '    </ul>'+
+                    '</div>';
+
+                    $('#usersList').find('tbody')
+                      .append($('<tr></tr>').attr("id", "user" + userId)
+                        .append($('<td>' + fullname + '</td>'))
+                        .append($('<td>' + email + '</td>'))
+                        .append($('<td>' + userType + '</td>'))
+                        .append($('<td>' + status + '</td>'))
+                        .append($('<td>' + options + '</td>'))
+                      );
+                }
         });
     });
 }
@@ -235,27 +241,42 @@ function showModalJournalRegister(journalId){
 function deleteUserJournal(id, event){
     var eSelector = event.target;
     var userJournal = $(eSelector).data('userjournal');
+    var fooName = $(eSelector).data('fullname');
 
     var data = {'_token': CSRF_TOKEN, 'userJournal': userJournal, 'id': id, 'switchCase': 'delete'};
 
-    $.post('users', data, function(response){
+    var text = (userJournal == 'journal')
+            ? 'Al eliminar la revista todos los usuarios asociados serán eliminados también'
+            : 'El usuario ' + fooName + ' será eliminado';
 
-        if(response.status == 'success') {
-            swal(
-                '¡Genial!',
-                'Eliminado correctamente',
-                'success'
-            );
+    swal({
+        title   : '¿Está seguro de eliminar?',
+        text    : text,
+        type    : 'question',
+        confirmButtonText: 'Sí, eliminar',
+        showCancelButton: true,
+    }).then((result) => {
+        if(result.value){
+            $.post('users', data, function(response){
+                if(response.status == 'success') {
+                    $(eSelector).parents('tr').slideUp('slow', function() {
+                        swal(
+                            '¡Genial!',
+                            'Eliminado correctamente',
+                            'success'
+                        );
+                    });
+                }
+
+                if(response.status == 'error') {
+                    swal(
+                        'Error!',
+                        'Error al eliminar, inténtelo más tarde por favor.',
+                        'error'
+                    );
+                }
+            });
         }
-
-        if(response.status == 'error') {
-            swal(
-                'Error!',
-                'Error al eliminar, inténtelo más tarde por favor.',
-                'error'
-            );
-        }
-
     });
 }
 

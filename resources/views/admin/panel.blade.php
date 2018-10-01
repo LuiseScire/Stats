@@ -9,6 +9,9 @@
         background-color: #A41C1E !important;
         color: #ffffff;
     }
+    p.header{
+        color: #999;
+    }
 </style>
 @stop
 
@@ -49,7 +52,7 @@
                         <strong>!Error¡ </strong><span id="registerFormAlertMessage"></span>
                     </div>
                     <form id="userRegisterForm">
-                        <p style="color: #999;"><span>Datos de la revista</span></p>
+                        <p class="header"><span>Datos de la revista</span></p>
                         <div class="form-group">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-book"></i> *</span>
@@ -62,8 +65,19 @@
                                 <input type="text" class="form-control" name="userJournalPhone" placeholder="Teléfono">
                             </div>
                         </div>
+                        <p class="header">
+                            <span>Palabras clave del <em>nombre de la revista</em> para una búsqueda de datos más precisa.</span>
+                            <br>
+                            <small>Evite escribir artículos por ejemplo: <strong>el o la</strong>, al inicio.</small>
+                        </p>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                                <input type="text" class="form-control" name="userJournalAffiliation" placeholder="">
+                            </div>
+                        </div>
                         <br>
-                        <p style="color: #999;"><span>Datos del usuario administrador</span></p>
+                        <p class="header"><span>Datos del usuario administrador</span></p>
                         <div class="form-group">
                 			<div class="row">
                 				<div class="col-xs-6">
