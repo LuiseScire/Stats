@@ -196,6 +196,7 @@
                     <option value="4" data-default-folder="Informes">Visitas a la página principal de la revista</option>
                     <option value="5" data-default-folder="Informes">Módulo para usuarios/as XML</option>
                     <option value="7" data-default-folder="Informes">Informe de Artículos</option>
+                    <option value="8" data-default-folder="Informes">Respositorio DSpace</option>
                 </select>
             </div>
             <div class="modal-footer">

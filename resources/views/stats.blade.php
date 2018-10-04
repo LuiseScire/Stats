@@ -1065,7 +1065,7 @@
             <div class="panel"  style="border-top: 3px solid #555e81;">
                 <div class="panel-heading">
                     <h4 style="color: #555e81">
-                        <div class="pull-right">
+                        <div class="pull-right" id="rolesOptionMain">
                             <span class="dropdown" style="margin-left: 5px;">
                                 <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                     <span class="fa fa-download"></span>
@@ -1091,6 +1091,32 @@
                                 </ul>
                             </span>
                         </div>
+                        <div class="pull-right" id="rolesOptionSecond" style="display: none">
+                            <span class="dropdown" style="margin-left: 5px;">
+                                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span class="fa fa-download"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <li>
+                                        <a href="javascript:void(0)" class="export-action" data-charttype="roleDesglose" data-typeexport="png">
+                                            <i class="fa fa-image"></i> Descargar imagen PNG
+                                        </a>
+                                    </li>
+                                </ul>
+                            </span>
+                            <span class="dropdown" style="margin-left: 5px;">
+                                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span class="fa fa-share-alt"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <li>
+                                        <a href="javascript:void(0)" class="export-action" data-charttype="roleDesglose" data-typeexport="embed">
+                                            <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                        </a>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
                         <i class="fa fa-users"></i>
                         <span id="panelTitleRoles"></span>
                     </h4>
@@ -1098,7 +1124,7 @@
                 <div class="panel-body">
                     <div class="col-md-12 text-center" style="z-index: 2;">
                         <div class="btn-group" role="group">
-                            <div class="btn-group" role="group" style="display:none">
+                            <!-- <div class="btn-group" role="group" style="display:none">
                                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <i class="fa fa-pie-chart"></i>
                                     Pastel
@@ -1107,7 +1133,7 @@
                                 <ul class="dropdown-menu" id="rolesPieChartList">
 
                                 </ul>
-                            </div>
+                            </div> -->
                             <!-- <button class="switchUserChart btn btn-default" data-chart="pie">
                                 <i class="fa fa-pie-chart"></i>
                                 Pastel
@@ -1347,6 +1373,62 @@
         </div>
     </div>
 
+    <!--  ######################## [CHART TIPO ITEMS] ######################## -->
+    <div class="row chartContent" id="chartPanelTypeItems" style="display: none">
+        <div class="col-md-12">
+            <div class="panel" style="border-top: 3px solid #5B78D8;">
+                <div class="panel-heading">
+                    <h4 style="color: #5B78D8">
+                        <div class="pull-right">
+                            <span class="dropdown" style="margin-left: 5px;">
+                                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span class="fa fa-download"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <li>
+                                        <a href="javascript:void(0)" class="export-action" data-charttype="typeItems" data-typeexport="png">
+                                            <i class="fa fa-image"></i> Descargar imagen PNG
+                                        </a>
+                                    </li>
+                                </ul>
+                            </span>
+                            <span class="dropdown" style="margin-left: 5px;">
+                                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    <span class="fa fa-share-alt"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                                    <li>
+                                        <a href="javascript:void(0)" class="export-action" data-charttype="typeItems" data-typeexport="embed">
+                                            <i class="fa fa-image"></i> Compartir imagen PNG en mi página web
+                                        </a>
+                                    </li>
+                                </ul>
+                            </span>
+                        </div>
+                        <i class="fa fa-check-square-o"></i>
+                        <span id="panelTitleTypeItems"></span>
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-12 text-center">
+                        <div class="btn-group" role="group" aria-label="...">
+                            <button class="switchTypeItemChart btn btn-default" data-chart="pie">
+                                <i class="fa fa-pie-chart"></i>
+                                Pastel
+                            </button>
+                            <button class="switchTypeItemChart btn btn-primary" data-chart="column">
+                                <i class="fa fa-bar-chart"></i>
+                                Columnas
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-xs-12">
+                        <div id="chartContentTypeItems"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 <!-- END chartsModuleContent -->
@@ -1406,14 +1488,15 @@
 @endsection
 
 @section('javascript')
-    <script src="{{ asset('js/pluggins/download.js') }}"></script>
-    <script src="{{ asset('js/statsarrays.js') }}"></script>
-    <script src="{{ asset('js/stats/translate.objects.js') }}" charset="utf-8"></script>
-    <script src="{{ asset('js/stats/stats.js') }}"></script>
+<script src="{{ asset('js/pluggins/download.js') }}"></script>
+<script src="{{ asset('js/statsarrays.js') }}"></script>
+<script src="{{ asset('js/stats/translate.objects.js') }}" charset="utf-8"></script>
 
-    <script type="text/javascript">
-        var fileNameParam = '{{ $filename }}';
-        var configLocation = '{{ url("config") }}';
-        var jnalAffiliation = $('#jnal_affiliation').val(); //this element is in div#wrapper in master view
-    </script>
+
+<script type="text/javascript">
+    var fileNameParam = '{{ $filename }}';
+    var configLocation = '{{ url("config") }}';
+    var jnalAffiliation = $('#jnal_affiliation').val(); //this element is in div#wrapper in master view
+</script>
+<script src="{{ asset('js/stats/stats.js') }}"></script>
 @stop

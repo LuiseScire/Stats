@@ -1,18 +1,18 @@
 <?php
 
-namespace Stats\Http\Controllers;
+namespace App\Http\Controllers;
 
-use Stats\Authenticatable;
-//use Stats\Csvfile;
-use Stats\File;
-use Stats\Folder;
-use Stats\LastFileUploaded;
-use Stats\User;
-//use Stats\Xmlfile;
+use App\Authenticatable;
+//use App\Csvfile;
+use App\File;
+use App\Folder;
+use App\LastFileUploaded;
+use App\User;
+//use App\Xmlfile;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-//use Stats\Http\Controllers\Controller;
+//use App\Http\Controllers\Controller;
 
 class MainController extends Controller
 {

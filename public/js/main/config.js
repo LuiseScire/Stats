@@ -19,8 +19,6 @@ switch (currentLang) {
 }
 // end config required for each views
 
-
-
 /*uploadcsv*/
 var fileNameConfirmed;
 var changeFile = 0;
@@ -975,251 +973,594 @@ function processPreview(){
 	var dataSet = [];
 	var indices = 0;
 
-    if (globalTypeReportAllowed == 7){//7 = articles
-        d3.text(url, function (error, data) {
-            if (error) throw error;
-            var parsedCSV = d3.csv.parseRows(data);
+    switch (globalTypeReportAllowed) {
+        case 7:
+        // Artículos
+            d3.text(url, function (error, data) {
+                if (error) throw error;
+                var parsedCSV = d3.csv.parseRows(data);
 
-            var maxPreviewItems = 100;
-            var countItems = 0;
-            var unusableData = 1;
+                var maxPreviewItems = 100;
+                var countItems = 0;
+                var unusableData = 1;
 
-            if (parsedCSV[0].length > 1) {
-                unusableData = 0;
-    		}
-    		//datos para BD
-            $.each(parsedCSV, function(index, v){
-                //if(countItems < maxPreviewItems) {
-            		if(v.length > 1) {
-                        if(unusableData){
-                            v.shift();
-                        }
-
-    					if(countItems < maxPreviewItems) {
-                        	dataSet.push(v);
-    					}
-
-    					var last = v[v.length -1];
-    					var totals = 0;
-
-    					if(!isNaN(last)){
-    						totals = parseInt(last);
-    					}
-
-    					var country = v[v.length -3];
-
-                        globalTotals = globalTotals + totals;
-
-    					$.each(countriesObj, function(index, v) {
-                            if(country == ''){
-                                if(v.code == 'UNK'){
-                                    v.downloads = v.downloads + totals;
-                                }
-                            } else {
-                                if(country == v.code) {
-                                    v.downloads = v.downloads + totals;
-                                }
+                if (parsedCSV[0].length > 1) {
+                    unusableData = 0;
+                }
+                //datos para BD
+                $.each(parsedCSV, function(index, v){
+                    //if(countItems < maxPreviewItems) {
+                        if(v.length > 1) {
+                            if(unusableData){
+                                v.shift();
                             }
-                        });
-                    }
-                    countItems++;
-    			//}
 
-            });
-
-    		//datos para BD
-
-    		var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
-    		$.each(_countriesObj, function(index, v) {
-    			var downloads = v.downloads;
-    			if(downloads > 0){
-    				globalCountCountries++;
-    			}
-    		});
-
-    		//datos para BD
-    		var mainCountry = _countriesObj[0];
-            globalNameCountry = mainCountry.name;
-            globalTotalsMainCountry = mainCountry.downloads;
-    		//end for bd
-
-            //dataSet[0] => array
-            //console.log(dataSet[0]);
-            // var headers = [];
-            // $.each(dataSet[0], function(index, v){
-            //     if(v == 'Decisión del director'){
-            //         headers.push(v);
-            //     }
-            // });
-            var headers = dataSet[0];
-
-            var columns = [];
-            var checkboxTitles = "";
-            for(var i in headers){
-                var title = headers[i];
-                if(title == 'Decisión del director') {
-                    title = title + '(Estatus Aceptado/Rechazado)';
-                    checkboxTitles += '<label class="checkbox-inline"><input type="checkbox" name="indices[]" data-index="'+indices+'"  data-typegraph="'+title+'" value="'+title+'">'+title+'</label>';
-    			}
-                indices++;
-                var column = {"title": title};
-                columns.push(column);
-    		}
-
-            var alertContent = '<p><strong data-lang="show-graph-legend">'+translate.showGraphLegend+'</strong></p>';
-            alertContent += checkboxTitles;
-
-            if(fileSizeExceeded){
-                alertContent += '<p style="color: darkred" data-lang="file-exceeds-legend">'+translate.fileExceedsLegend+'</p>';
-    		}
-
-            alertContent += '<p><button id="uploadFileConfirmed" class="btn btn-primary btn-xs" data-lang="modal-continue-btn" data-filetype="csv">Continuar <i class="fa fa-arrow-right"></i> </button></p>';
-            $("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html(alertContent);
-
-            dataSet.shift();
-    		dataTableLangeURL = (currentLang == 'es')
-    		? "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
-    		: '//cdn.datatables.net/plug-ins/1.10.19/i18n/English.json';
-            preViewTable = $('#preViewTable').DataTable({
-                columns: columns,
-                data : dataSet,
-                responsive: true,
-                "ordering": false,
-                "language": {
-                    "url": dataTableLangeURL
-                },
-                "lengthMenu": [[50, 25], [50, 25]],
-                "scrollX": true
-            });
-
-            $("#confirmFileContent").show();
-            $("#strongFileName").text(fileNameConfirmed);
-
-            if(changeFile == 1) {
-                $("#cambiarArchivo").removeAttr('disabled');
-                $("#uploadFileConfirmed").removeAttr('disabled');
-            }
-
-            $("#preView").show();
-            fadeOutLoader();
-
-        });
-    } else {
-        d3.text(url, function (error, data) {
-            if (error) throw error;
-            var parsedCSV = d3.csv.parseRows(data);
-
-            var maxPreviewItems = 100;
-            var countItems = 0;
-            var unusableData = 1;
-
-            if (parsedCSV[0].length > 1) {
-                unusableData = 0;
-    		}
-    		//datos para BD
-            $.each(parsedCSV, function(index, v){
-                //if(countItems < maxPreviewItems) {
-            		if(v.length > 1) {
-                        if(unusableData){
-                            v.shift();
-                        }
-    					if(countItems < maxPreviewItems) {
-                        	dataSet.push(v);
-    					}
-    					var last = v[v.length -1];
-    					var totals = 0;
-    					if(!isNaN(last)){
-    						totals = parseInt(last);
-    					}
-    					var country = v[v.length -3];
-
-                        globalTotals = globalTotals + totals;
-
-
-    					$.each(countriesObj, function(index, v) {
-                            if(country == ''){
-                                if(v.code == 'UNK'){
-                                    v.downloads = v.downloads + totals;
-                                }
-                            } else {
-                                if(country == v.code) {
-                                    v.downloads = v.downloads + totals;
-                                }
+                            if(countItems < maxPreviewItems) {
+                                dataSet.push(v);
                             }
-                        });
+
+                            var last = v[v.length -1];
+                            var totals = 0;
+
+                            if(!isNaN(last)){
+                                totals = parseInt(last);
+                            }
+
+                            var country = v[v.length -3];
+
+                            globalTotals = globalTotals + totals;
+
+                            $.each(countriesObj, function(index, v) {
+                                if(country == ''){
+                                    if(v.code == 'UNK'){
+                                        v.downloads = v.downloads + totals;
+                                    }
+                                } else {
+                                    if(country == v.code) {
+                                        v.downloads = v.downloads + totals;
+                                    }
+                                }
+                            });
+                        }
+                        countItems++;
+                    //}
+
+                });
+
+                //datos para BD
+
+                var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
+                $.each(_countriesObj, function(index, v) {
+                    var downloads = v.downloads;
+                    if(downloads > 0){
+                        globalCountCountries++;
                     }
-                    countItems++;
-    			//}
+                });
+
+                //datos para BD
+                var mainCountry = _countriesObj[0];
+                globalNameCountry = mainCountry.name;
+                globalTotalsMainCountry = mainCountry.downloads;
+                //end for bd
+
+                //dataSet[0] => array
+                //console.log(dataSet[0]);
+                // var headers = [];
+                // $.each(dataSet[0], function(index, v){
+                //     if(v == 'Decisión del director'){
+                //         headers.push(v);
+                //     }
+                // });
+                var headers = dataSet[0];
+
+                var columns = [];
+                var checkboxTitles = "";
+                for(var i in headers){
+                    var title = headers[i];
+                    if(title == 'Decisión del director') {
+                        title = title + '(Estatus Aceptado/Rechazado)';
+                        checkboxTitles += '<label class="checkbox-inline"><input type="checkbox" name="indices[]" data-index="'+indices+'"  data-typegraph="'+title+'" value="'+title+'">'+title+'</label>';
+                    }
+                    indices++;
+                    var column = {"title": title};
+                    columns.push(column);
+                }
+
+                var alertContent = '<p><strong data-lang="show-graph-legend">'+translate.showGraphLegend+'</strong></p>';
+                alertContent += checkboxTitles;
+
+                if(fileSizeExceeded){
+                    alertContent += '<p style="color: darkred" data-lang="file-exceeds-legend">'+translate.fileExceedsLegend+'</p>';
+                }
+
+                alertContent += '<p><button id="uploadFileConfirmed" class="btn btn-primary btn-xs" data-lang="modal-continue-btn" data-filetype="csv">Continuar <i class="fa fa-arrow-right"></i> </button></p>';
+                $("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html(alertContent);
+
+                dataSet.shift();
+                dataTableLangeURL = (currentLang == 'es')
+                ? "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+                : '//cdn.datatables.net/plug-ins/1.10.19/i18n/English.json';
+                preViewTable = $('#preViewTable').DataTable({
+                    columns: columns,
+                    data : dataSet,
+                    responsive: true,
+                    "ordering": false,
+                    "language": {
+                        "url": dataTableLangeURL
+                    },
+                    "lengthMenu": [[50, 25], [50, 25]],
+                    "scrollX": true
+                });
+
+                $("#confirmFileContent").show();
+                $("#strongFileName").text(fileNameConfirmed);
+
+                if(changeFile == 1) {
+                    $("#cambiarArchivo").removeAttr('disabled');
+                    $("#uploadFileConfirmed").removeAttr('disabled');
+                }
+
+                $("#preView").show();
+                fadeOutLoader();
+
+            });
+            break;
+        case 8:
+            // DSpace
+            d3.text(url, function (error, data) {
+                if (error) throw error;
+                var parsedCSV = d3.csv.parseRows(data);
+
+                var maxPreviewItems = 100;
+                var countItems = 0;
+                var unusableData = 1;
+
+                if (parsedCSV[0].length > 1) unusableData = 0;
+
+                $.each(parsedCSV, function(index, v) {
+                    if(countItems < maxPreviewItems) {
+                        if(v.length > 1) {
+                            if(unusableData) v.shift();
+
+                            if(countItems < maxPreviewItems) {
+                                dataSet.push(v);
+                            }
+
+                            var last = v[v.length -1];
+                            var totals = 0;
+
+                            if(!isNaN(last)){
+                                totals = parseInt(last);
+                            }
+
+                            var country = v[v.length -3];
+
+                            globalTotals = globalTotals + totals;
+                        }
+                        countItems++;
+                    }
+                });
+
+                var headers = dataSet[0];
+
+                var columns = [];
+                var checkboxTitles = "";
+                for(var i in headers){
+                    var title = headers[i];
+                    if(title != 'Fecha_log' && title != 'Identificador' && title != 'Usuario') {
+                        var userTitle = (title == 'Direccion') ? 'País basado en dirección IP' : title;
+                        checkboxTitles += '<label class="checkbox-inline"><input type="checkbox" name="indices[]" data-index="'+indices+'"  data-typegraph="'+title+'" value="'+title+'">'+userTitle+'</label>';
+                    }
+                    indices++;
+                    var column = {"title": title};
+                    columns.push(column);
+                }
+
+                var alertContent = '<p><strong data-lang="show-graph-legend">'+translate.showGraphLegend+'</strong></p>';
+                alertContent += checkboxTitles;
+
+                if(fileSizeExceeded){
+                    alertContent += '<p style="color: darkred" data-lang="file-exceeds-legend">'+translate.fileExceedsLegend+'</p>';
+                }
+
+                alertContent += '<p><button id="uploadFileConfirmed" class="btn btn-primary btn-xs" data-lang="modal-continue-btn" data-filetype="csv">Continuar <i class="fa fa-arrow-right"></i> </button></p>';
+                $("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html(alertContent);
+
+                dataSet.shift();
+                dataTableLangeURL = (currentLang == 'es')
+                ? "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+                : '//cdn.datatables.net/plug-ins/1.10.19/i18n/English.json';
+                preViewTable = $('#preViewTable').DataTable({
+                    columns: columns,
+                    data : dataSet,
+                    responsive: true,
+                    "ordering": false,
+                    "language": {
+                        "url": dataTableLangeURL
+                    },
+                    "lengthMenu": [[50, 25], [50, 25]],
+                    "scrollX": true
+                });
+
+                $("#confirmFileContent").show();
+                $("#strongFileName").text(fileNameConfirmed);
+
+                if(changeFile == 1) {
+                    $("#cambiarArchivo").removeAttr('disabled');
+                    $("#uploadFileConfirmed").removeAttr('disabled');
+                }
+
+                $("#preView").show();
+                fadeOutLoader();
+
+
+            });
+            break;
+        default:
+            d3.text(url, function (error, data) {
+                if (error) throw error;
+                var parsedCSV = d3.csv.parseRows(data);
+
+                var maxPreviewItems = 100;
+                var countItems = 0;
+                var unusableData = 1;
+
+                if (parsedCSV[0].length > 1) {
+                    unusableData = 0;
+                }
+                //datos para BD
+                $.each(parsedCSV, function(index, v){
+                    //if(countItems < maxPreviewItems) {
+                        if(v.length > 1) {
+                            if(unusableData){
+                                v.shift();
+                            }
+                            if(countItems < maxPreviewItems) {
+                                dataSet.push(v);
+                            }
+                            var last = v[v.length -1];
+                            var totals = 0;
+                            if(!isNaN(last)){
+                                totals = parseInt(last);
+                            }
+                            var country = v[v.length -3];
+
+                            globalTotals = globalTotals + totals;
+
+
+                            $.each(countriesObj, function(index, v) {
+                                if(country == ''){
+                                    if(v.code == 'UNK'){
+                                        v.downloads = v.downloads + totals;
+                                    }
+                                } else {
+                                    if(country == v.code) {
+                                        v.downloads = v.downloads + totals;
+                                    }
+                                }
+                            });
+                        }
+                        countItems++;
+                    //}
+
+                });
+
+                //datos para BD
+
+                var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
+                $.each(_countriesObj, function(index, v) {
+                    var downloads = v.downloads;
+                    if(downloads > 0){
+                        globalCountCountries++;
+                    }
+                });
+
+                //datos para BD
+                var mainCountry = _countriesObj[0];
+                globalNameCountry = mainCountry.name;
+                globalTotalsMainCountry = mainCountry.downloads;
+                //end for bd
+
+                var headers = dataSet[0];
+                var columns = [];
+                var checkboxTitles = "";
+                for(var i in headers){
+                    var title = headers[i];
+                    if(title != 'Tipo' && title != 'Revista' && title != 'Total') {
+                        checkboxTitles += '<label class="checkbox-inline"><input type="checkbox" name="indices[]" data-index="'+indices+'"  data-typegraph="'+title+'" value="'+title+'">'+title+'</label>';
+                    }
+                    indices++;
+                    var column = {"title": title};
+                    columns.push(column);
+                }
+
+                var alertContent = '<p><strong data-lang="show-graph-legend">'+translate.showGraphLegend+'</strong></p>';
+                alertContent += checkboxTitles;
+
+                if(fileSizeExceeded){
+                    alertContent += '<p style="color: darkred" data-lang="file-exceeds-legend">'+translate.fileExceedsLegend+'</p>';
+                }
+
+                alertContent += '<p><button id="uploadFileConfirmed" class="btn btn-primary btn-xs" data-lang="modal-continue-btn" data-filetype="csv">Continuar <i class="fa fa-arrow-right"></i> </button></p>';
+                $("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html(alertContent);
+
+                dataSet.shift();
+                dataTableLangeURL = (currentLang == 'es')
+                ? "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+                : '//cdn.datatables.net/plug-ins/1.10.19/i18n/English.json';
+                preViewTable = $('#preViewTable').DataTable({
+                    columns: columns,
+                    data : dataSet,
+                    responsive: true,
+                    "ordering": false,
+                    "language": {
+                        "url": dataTableLangeURL
+                    },
+                    "lengthMenu": [[50, 25], [50, 25]]
+                });
+
+                $("#confirmFileContent").show();
+                $("#strongFileName").text(fileNameConfirmed);
+
+                if(changeFile == 1) {
+                    $("#cambiarArchivo").removeAttr('disabled');
+                    $("#uploadFileConfirmed").removeAttr('disabled');
+                }
+
+                $("#preView").show();
+                fadeOutLoader();
 
             });
 
-    		//datos para BD
 
-    		var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
-    		$.each(_countriesObj, function(index, v) {
-    			var downloads = v.downloads;
-    			if(downloads > 0){
-    				globalCountCountries++;
-    			}
-    		});
-
-    		//datos para BD
-    		var mainCountry = _countriesObj[0];
-            globalNameCountry = mainCountry.name;
-            globalTotalsMainCountry = mainCountry.downloads;
-    		//end for bd
-
-            var headers = dataSet[0];
-            var columns = [];
-            var checkboxTitles = "";
-            for(var i in headers){
-                var title = headers[i];
-                if(title != 'Tipo' && title != 'Revista' && title != 'Total') {
-                    checkboxTitles += '<label class="checkbox-inline"><input type="checkbox" name="indices[]" data-index="'+indices+'"  data-typegraph="'+title+'" value="'+title+'">'+title+'</label>';
-    			}
-                indices++;
-                var column = {"title": title};
-                columns.push(column);
-    		}
-
-            var alertContent = '<p><strong data-lang="show-graph-legend">'+translate.showGraphLegend+'</strong></p>';
-            alertContent += checkboxTitles;
-
-            if(fileSizeExceeded){
-                alertContent += '<p style="color: darkred" data-lang="file-exceeds-legend">'+translate.fileExceedsLegend+'</p>';
-    		}
-
-            alertContent += '<p><button id="uploadFileConfirmed" class="btn btn-primary btn-xs" data-lang="modal-continue-btn" data-filetype="csv">Continuar <i class="fa fa-arrow-right"></i> </button></p>';
-            $("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html(alertContent);
-
-            dataSet.shift();
-    		dataTableLangeURL = (currentLang == 'es')
-    		? "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
-    		: '//cdn.datatables.net/plug-ins/1.10.19/i18n/English.json';
-            preViewTable = $('#preViewTable').DataTable({
-                columns: columns,
-                data : dataSet,
-                responsive: true,
-                "ordering": false,
-                "language": {
-                    "url": dataTableLangeURL
-                },
-                "lengthMenu": [[50, 25], [50, 25]]
-            });
-
-            $("#confirmFileContent").show();
-            $("#strongFileName").text(fileNameConfirmed);
-
-            if(changeFile == 1) {
-                $("#cambiarArchivo").removeAttr('disabled');
-                $("#uploadFileConfirmed").removeAttr('disabled');
-            }
-
-            $("#preView").show();
-            fadeOutLoader();
-
-        });
     }
+    // end swith
+
+    // if (globalTypeReportAllowed == 7){
+    //     d3.text(url, function (error, data) {
+    //         if (error) throw error;
+    //         var parsedCSV = d3.csv.parseRows(data);
+    //
+    //         var maxPreviewItems = 100;
+    //         var countItems = 0;
+    //         var unusableData = 1;
+    //
+    //         if (parsedCSV[0].length > 1) {
+    //             unusableData = 0;
+    // 		}
+    // 		//datos para BD
+    //         $.each(parsedCSV, function(index, v){
+    //             //if(countItems < maxPreviewItems) {
+    //         		if(v.length > 1) {
+    //                     if(unusableData){
+    //                         v.shift();
+    //                     }
+    //
+    // 					if(countItems < maxPreviewItems) {
+    //                     	dataSet.push(v);
+    // 					}
+    //
+    // 					var last = v[v.length -1];
+    // 					var totals = 0;
+    //
+    // 					if(!isNaN(last)){
+    // 						totals = parseInt(last);
+    // 					}
+    //
+    // 					var country = v[v.length -3];
+    //
+    //                     globalTotals = globalTotals + totals;
+    //
+    // 					$.each(countriesObj, function(index, v) {
+    //                         if(country == ''){
+    //                             if(v.code == 'UNK'){
+    //                                 v.downloads = v.downloads + totals;
+    //                             }
+    //                         } else {
+    //                             if(country == v.code) {
+    //                                 v.downloads = v.downloads + totals;
+    //                             }
+    //                         }
+    //                     });
+    //                 }
+    //                 countItems++;
+    // 			//}
+    //
+    //         });
+    //
+    // 		//datos para BD
+    //
+    // 		var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
+    // 		$.each(_countriesObj, function(index, v) {
+    // 			var downloads = v.downloads;
+    // 			if(downloads > 0){
+    // 				globalCountCountries++;
+    // 			}
+    // 		});
+    //
+    // 		//datos para BD
+    // 		var mainCountry = _countriesObj[0];
+    //         globalNameCountry = mainCountry.name;
+    //         globalTotalsMainCountry = mainCountry.downloads;
+    // 		//end for bd
+    //
+    //         //dataSet[0] => array
+    //         //console.log(dataSet[0]);
+    //         // var headers = [];
+    //         // $.each(dataSet[0], function(index, v){
+    //         //     if(v == 'Decisión del director'){
+    //         //         headers.push(v);
+    //         //     }
+    //         // });
+    //         var headers = dataSet[0];
+    //
+    //         var columns = [];
+    //         var checkboxTitles = "";
+    //         for(var i in headers){
+    //             var title = headers[i];
+    //             if(title == 'Decisión del director') {
+    //                 title = title + '(Estatus Aceptado/Rechazado)';
+    //                 checkboxTitles += '<label class="checkbox-inline"><input type="checkbox" name="indices[]" data-index="'+indices+'"  data-typegraph="'+title+'" value="'+title+'">'+title+'</label>';
+    // 			}
+    //             indices++;
+    //             var column = {"title": title};
+    //             columns.push(column);
+    // 		}
+    //
+    //         var alertContent = '<p><strong data-lang="show-graph-legend">'+translate.showGraphLegend+'</strong></p>';
+    //         alertContent += checkboxTitles;
+    //
+    //         if(fileSizeExceeded){
+    //             alertContent += '<p style="color: darkred" data-lang="file-exceeds-legend">'+translate.fileExceedsLegend+'</p>';
+    // 		}
+    //
+    //         alertContent += '<p><button id="uploadFileConfirmed" class="btn btn-primary btn-xs" data-lang="modal-continue-btn" data-filetype="csv">Continuar <i class="fa fa-arrow-right"></i> </button></p>';
+    //         $("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html(alertContent);
+    //
+    //         dataSet.shift();
+    // 		dataTableLangeURL = (currentLang == 'es')
+    // 		? "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+    // 		: '//cdn.datatables.net/plug-ins/1.10.19/i18n/English.json';
+    //         preViewTable = $('#preViewTable').DataTable({
+    //             columns: columns,
+    //             data : dataSet,
+    //             responsive: true,
+    //             "ordering": false,
+    //             "language": {
+    //                 "url": dataTableLangeURL
+    //             },
+    //             "lengthMenu": [[50, 25], [50, 25]],
+    //             "scrollX": true
+    //         });
+    //
+    //         $("#confirmFileContent").show();
+    //         $("#strongFileName").text(fileNameConfirmed);
+    //
+    //         if(changeFile == 1) {
+    //             $("#cambiarArchivo").removeAttr('disabled');
+    //             $("#uploadFileConfirmed").removeAttr('disabled');
+    //         }
+    //
+    //         $("#preView").show();
+    //         fadeOutLoader();
+    //
+    //     });
+    // } else {
+    //     d3.text(url, function (error, data) {
+    //         if (error) throw error;
+    //         var parsedCSV = d3.csv.parseRows(data);
+    //
+    //         var maxPreviewItems = 100;
+    //         var countItems = 0;
+    //         var unusableData = 1;
+    //
+    //         if (parsedCSV[0].length > 1) {
+    //             unusableData = 0;
+    // 		}
+    // 		//datos para BD
+    //         $.each(parsedCSV, function(index, v){
+    //             //if(countItems < maxPreviewItems) {
+    //         		if(v.length > 1) {
+    //                     if(unusableData){
+    //                         v.shift();
+    //                     }
+    // 					if(countItems < maxPreviewItems) {
+    //                     	dataSet.push(v);
+    // 					}
+    // 					var last = v[v.length -1];
+    // 					var totals = 0;
+    // 					if(!isNaN(last)){
+    // 						totals = parseInt(last);
+    // 					}
+    // 					var country = v[v.length -3];
+    //
+    //                     globalTotals = globalTotals + totals;
+    //
+    //
+    // 					$.each(countriesObj, function(index, v) {
+    //                         if(country == ''){
+    //                             if(v.code == 'UNK'){
+    //                                 v.downloads = v.downloads + totals;
+    //                             }
+    //                         } else {
+    //                             if(country == v.code) {
+    //                                 v.downloads = v.downloads + totals;
+    //                             }
+    //                         }
+    //                     });
+    //                 }
+    //                 countItems++;
+    // 			//}
+    //
+    //         });
+    //
+    // 		//datos para BD
+    //
+    // 		var _countriesObj = countriesObj.sort(dynamicSort("downloads"));
+    // 		$.each(_countriesObj, function(index, v) {
+    // 			var downloads = v.downloads;
+    // 			if(downloads > 0){
+    // 				globalCountCountries++;
+    // 			}
+    // 		});
+    //
+    // 		//datos para BD
+    // 		var mainCountry = _countriesObj[0];
+    //         globalNameCountry = mainCountry.name;
+    //         globalTotalsMainCountry = mainCountry.downloads;
+    // 		//end for bd
+    //
+    //         var headers = dataSet[0];
+    //         var columns = [];
+    //         var checkboxTitles = "";
+    //         for(var i in headers){
+    //             var title = headers[i];
+    //             if(title != 'Tipo' && title != 'Revista' && title != 'Total') {
+    //                 checkboxTitles += '<label class="checkbox-inline"><input type="checkbox" name="indices[]" data-index="'+indices+'"  data-typegraph="'+title+'" value="'+title+'">'+title+'</label>';
+    // 			}
+    //             indices++;
+    //             var column = {"title": title};
+    //             columns.push(column);
+    // 		}
+    //
+    //         var alertContent = '<p><strong data-lang="show-graph-legend">'+translate.showGraphLegend+'</strong></p>';
+    //         alertContent += checkboxTitles;
+    //
+    //         if(fileSizeExceeded){
+    //             alertContent += '<p style="color: darkred" data-lang="file-exceeds-legend">'+translate.fileExceedsLegend+'</p>';
+    // 		}
+    //
+    //         alertContent += '<p><button id="uploadFileConfirmed" class="btn btn-primary btn-xs" data-lang="modal-continue-btn" data-filetype="csv">Continuar <i class="fa fa-arrow-right"></i> </button></p>';
+    //         $("#loadPreviewText").removeClass('alert-warning').addClass('alert-info').html(alertContent);
+    //
+    //         dataSet.shift();
+    // 		dataTableLangeURL = (currentLang == 'es')
+    // 		? "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+    // 		: '//cdn.datatables.net/plug-ins/1.10.19/i18n/English.json';
+    //         preViewTable = $('#preViewTable').DataTable({
+    //             columns: columns,
+    //             data : dataSet,
+    //             responsive: true,
+    //             "ordering": false,
+    //             "language": {
+    //                 "url": dataTableLangeURL
+    //             },
+    //             "lengthMenu": [[50, 25], [50, 25]]
+    //         });
+    //
+    //         $("#confirmFileContent").show();
+    //         $("#strongFileName").text(fileNameConfirmed);
+    //
+    //         if(changeFile == 1) {
+    //             $("#cambiarArchivo").removeAttr('disabled');
+    //             $("#uploadFileConfirmed").removeAttr('disabled');
+    //         }
+    //
+    //         $("#preView").show();
+    //         fadeOutLoader();
+    //
+    //     });
+    // }
 }
 
 

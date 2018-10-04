@@ -23,9 +23,9 @@
 
     <style>
         /* @import url(https://fonts.googleapis.com/css?family=Seaweed+Script); */
-
+        @import url('https://fonts.googleapis.com/css?family=Roboto:100i');
         .navbar-brand{
-            font-style: italic;
+            font-family: 'Roboto', sans-serif;
             font-size: 40px;
         }
 
@@ -49,49 +49,6 @@
             background: #FFFFFF;
             z-index: 3;
         }
-
-        /*
-          ##Device = Tablets, Ipads (portrait)
-          ##Screen = B/w 768px to 1024px
-        */
-
-        /* @media (min-width: 768px) and (max-width: 1024px) {
-            .navbar-brand{
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                width: 55%;
-            }
-        } */
-
-        /*
-          ##Device = Tablets, Ipads (landscape)
-          ##Screen = B/w 768px to 1024px
-        */
-
-        /* @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-
-        } */
-
-        /* @media (max-width: 768px) {
-
-            footer{
-                margin: 0 !important;
-                width: 100% !important;
-            }
-
-              .navbar-brand{
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                width: 85%;
-            }
-        } */
-
-        /*
-          ##Device = Most of the Smartphones Mobiles (Portrait)
-          ##Screen = B/w 320px to 479px
-        */
 
         @media (min-width: 320px) and (max-width: 480px) {
             .navbar-brand{
@@ -562,12 +519,11 @@
     var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
     $(document).ready(function () {
 
-        // if(isMobile.any()) {
-        //     $('#navBar').removeClass('navbar-fixed-top');
-        //     $('#page-wrapper').css('margin-top', '0 !important');
-        // } else {
-        //
-        // }
+        if(isMobile.any()) {
+            console.log('hello world');
+            $('#navBar').removeClass('navbar-fixed-top');
+            $('#page-wrapper').css('margin', '0');
+        }
 
         $('.ir-arriba').click(function () {
             $('body, html').animate({
